@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 namespace DanmakuEngine.Tests;
 
-public class ArgumentParserTests
+public class TestArguments
 {
     [SetUp]
     public void Setup()
@@ -31,7 +31,7 @@ public class ArgumentParserTests
         using (var argParser = new ArgumentParser(Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
-            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(60));
+            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(ArgumentTemplate.RefreshRate.GetValue<int>()));
 
             try
             {
@@ -125,7 +125,7 @@ public class ArgumentParserTests
         using (var argParser = new ArgumentParser(Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
-            Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(60));
+            Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(ArgumentTemplate.RefreshRate.GetValue<int>()));
         }
 
         Assert.Pass();
