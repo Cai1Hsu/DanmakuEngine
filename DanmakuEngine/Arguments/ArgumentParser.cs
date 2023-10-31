@@ -1,0 +1,231 @@
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Reflection;
+
+namespace DanmakuEngine.Arguments;
+
+public class ArgumentParser : IDisposable
+{
+    private readonly string[] args;
+
+    private Dictionary<string, Argument> avaliableArguments = new();
+
+    private readonly List<Argument> arguments = new();
+
+    private readonly bool executionAction;
+
+    public ArgumentParser(string[] args = null!, bool executeAction = true)
+    {
+        this.args = args ?? Environment.GetCommandLineArgs();
+
+        this.executionAction = executeAction;
+
+        LoadTemplateArguments();
+
+        Parse();
+    }
+
+    private void LoadTemplateArguments()
+    {
+        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        {
+            var arg = argInfo.GetValue(null);
+
+            if (arg is not Argument)
+                continue;
+
+            avaliableArguments.Add(((Argument)arg).Key, (Argument)arg);
+        }
+    }
+
+    private void Parse()
+    {
+        for (int i = 0; i < args.Length; i++)
+        {
+            var arg = args[i];
+
+            if (!IsSupport(arg))
+            {
+                // TODO: We should let the user know that they passed an unknown argument.
+                // However, it's difficult to handle the first argument, since it's usually the executable file
+                if (i == 0 && File.Exists(arg))
+                    continue;
+
+                ArgumentTemplate.PrintHelp();
+
+                Environment.Exit(1);
+            }
+
+            if (!avaliableArguments[arg].HasValue)
+            {
+                StoreArgument(new Argument(arg));
+                continue;
+            }
+
+            // The user passed the key, but didn't provide the value
+            if (i == args.Length - 1 || args[i + 1].StartsWith('-'))
+            {
+                var missingValueException = new Exception($"Missing value for argument: {arg}");
+                if (!executionAction)
+                    throw missingValueException;
+
+                var usages = GetUsage(arg);
+                usages.ForEach(s => Console.WriteLine(s));
+
+                throw missingValueException;
+            }
+
+            Type valueType = avaliableArguments[arg].TValue;
+
+            object value = args[++i];
+
+            var argument = new Argument(arg, valueType, value);
+            StoreArgument(argument);
+        }
+    }
+
+    private void StoreArgument(Argument arg)
+    {
+        arguments.Add(arg);
+        
+        var template = avaliableArguments[arg.Key];
+
+        if (template.Action != null && executionAction)
+            template.Action(arg);
+    }
+
+    public TValue GetDefault<TValue>(string key)
+    {
+        if (!IsSupport(key))
+            throw new Exception($"Target argument is not supported: {key}");
+
+        var arg = avaliableArguments[key];
+
+        if (!arg.HasValue)
+            throw new Exception($"Target argument doesn't contain a value.");
+
+        return arg.GetValue<TValue>();
+    }
+
+    private const string indent = "    ";
+
+    private static readonly List<string> help_template = new(new[] { "A STG game with magnificent *Danmaku* built with .NET",
+                                           "",
+                                           "Usage: ./<game> [arguments]",
+                                           "", 
+                                           "To get help, type: ./<game> -help or ./<game> -h",
+                                           ""});
+
+    public static List<string> GenerateHelp()
+    {
+        var helps = new List<string>(help_template);
+
+        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        {
+            var arg = (Argument)argInfo.GetValue(null)!;
+
+            string keyInfo = arg.Key;
+
+            if (arg.HasValue)
+                keyInfo += $" <value:{arg.TValue}>";
+
+            keyInfo += ":";
+
+            helps.Add(keyInfo);
+
+            string description = indent + argInfo
+                                            .GetCustomAttribute<DescriptionAttribute>()!
+                                            .Description;
+
+            helps.Add(description);
+
+            string example = indent + "example: ./<game> " + arg.Key;
+
+            if (arg.HasValue)
+                example += $" {arg.ToString()}";
+
+            helps.Add(example);
+
+            helps.Add("");
+        }
+
+        return helps;
+    }
+
+    public List<string> GetUsage(string flag)
+    {
+        var usages = new List<string>(help_template);
+        
+        if (!IsSupport(flag))
+        {
+            usages.Add($"Target flag is NOT supported: {flag}");
+
+            return usages;
+        }
+
+        bool found = false;
+
+        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        {
+            var arg = (Argument)argInfo.GetValue(null)!;
+            
+            if (arg.Key != flag)
+                continue;
+
+            string keyInfo = arg.Key;
+
+            if (arg.HasValue)
+                keyInfo += $" <value:{arg.TValue}>";
+
+            keyInfo += ":";
+
+            usages.Add(keyInfo);
+
+            string description = indent + argInfo
+                                            .GetCustomAttribute<DescriptionAttribute>()!
+                                            .Description;
+
+            usages.Add(description);
+
+            usages.AddRange(new[] { "", "Example:" });
+
+            string example = indent + "./<game> " + arg.Key;
+
+            if (arg.HasValue)
+                example += $" {arg.ToString()}";
+
+            usages.Add(example);
+
+            usages.Add("");
+
+            found = true;
+        }
+
+        Debug.Assert(found);
+
+        return usages;
+    }
+    
+    public ArgumentProvider CreateArgumentProvider()
+    {
+        Debug.Assert(this != null);
+
+        return new ArgumentProvider(this, arguments.ToDictionary(arg => arg.Key, arg => arg));
+    }
+
+    public bool IsSupport(string key) => avaliableArguments.ContainsKey(key);
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing)
+            return;
+
+        avaliableArguments = null!;
+    }
+}
