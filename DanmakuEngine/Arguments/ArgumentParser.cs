@@ -48,6 +48,8 @@ public class ArgumentParser : IDisposable
             {
                 // TODO: We should let the user know that they passed an unknown argument.
                 // However, it's difficult to handle the first argument, since it's usually the executable file
+                // And it's difficult to check wheter the file is the program(or assembly) itself or a valid file passed to the program
+                // since a simple string comparison is not always reliable.
                 if (i == 0 && File.Exists(arg))
                     continue;
 
@@ -87,7 +89,7 @@ public class ArgumentParser : IDisposable
     private void StoreArgument(Argument arg)
     {
         arguments.Add(arg);
-        
+
         var template = avaliableArguments[arg.Key];
 
         if (template.Action != null && executionAction)
@@ -112,7 +114,7 @@ public class ArgumentParser : IDisposable
     private static readonly List<string> help_template = new(new[] { "A STG game with magnificent *Danmaku* built with .NET",
                                            "",
                                            "Usage: ./<game> [arguments]",
-                                           "", 
+                                           "",
                                            "To get help, type: ./<game> -help or ./<game> -h",
                                            ""});
 
@@ -155,7 +157,7 @@ public class ArgumentParser : IDisposable
     public List<string> GetUsage(string flag)
     {
         var usages = new List<string>(help_template);
-        
+
         if (!IsSupport(flag))
         {
             usages.Add($"Target flag is NOT supported: {flag}");
@@ -168,7 +170,7 @@ public class ArgumentParser : IDisposable
         foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
         {
             var arg = (Argument)argInfo.GetValue(null)!;
-            
+
             if (arg.Key != flag)
                 continue;
 
@@ -205,7 +207,7 @@ public class ArgumentParser : IDisposable
 
         return usages;
     }
-    
+
     public ArgumentProvider CreateArgumentProvider()
     {
         Debug.Assert(this != null);

@@ -28,10 +28,10 @@ public class Argument
     public Argument(string key, Type valueType, object value, Action<Argument> action)
     {
         this.Key = key.ToLower();
-        
+
         this.TValue = valueType;
         this.Value = Convert(value);
-        
+
         this.Action = action;
 
         this.HasValue = true;

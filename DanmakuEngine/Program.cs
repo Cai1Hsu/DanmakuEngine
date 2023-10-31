@@ -2,7 +2,6 @@
 // and magnificent *Danmaku*
 using DanmakuEngine.Arguments;
 
-
 using (var argParser = new ArgumentParser(/*new[] {"-refresh", "120"}*/))
 using (var argProvider = argParser.CreateArgumentProvider())
 {
