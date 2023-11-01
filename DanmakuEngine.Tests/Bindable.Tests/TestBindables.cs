@@ -170,7 +170,7 @@ public class TestBindables
     {
         bool flag = false;
         Bindable<int> b = new(1);
-        
+
         Action<bool> action = _ =>
         {
             flag = true;
@@ -211,8 +211,10 @@ public class TestBindables
     }
 
     [Test]
-    public void TestFailOnMultipleBinds()
+    public void TestMultipleBinds()
     {
+        Assert.Fail("Not Implemented");
+
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(2);
 
@@ -309,7 +311,7 @@ public class TestBindables
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.UnBind(b2);
+        b1.Unbind(b2);
 
         Assert.That(b1.IsBound(), Is.False);
         Assert.That(b2.IsBound(), Is.False);
@@ -319,13 +321,68 @@ public class TestBindables
     }
 
     [Test]
+    public void TestUnbindDifferent()
+    {
+        Bindable<int> b1 = new(1);
+        Bindable<int> b2 = new(1);
+
+        b1.BindTo(b2);
+
+        try
+        {
+            b1.Unbind(new Bindable<int>(3));
+
+            Assert.Fail();
+        }
+        catch (InvalidOperationException)
+        {
+            Assert.Pass();
+        }
+
+        Assert.Pass();
+    }
+
+    [Test]
+    public void TestUnbindBeforeBind()
+    {
+        Bindable<int> b1 = new(1);
+        Bindable<int> b2 = new(1);
+
+        b1.BindTo(b2);
+
+        try
+        {
+            b1.Unbind(new Bindable<int>(3));
+
+            Assert.Fail();
+        }
+        catch (InvalidOperationException)
+        {
+            Assert.Pass();
+        }
+
+        try
+        {
+            b1.Unbind();
+
+            Assert.Fail();
+        }
+        catch (InvalidOperationException)
+        {
+            Assert.Pass();
+        }
+
+        Assert.Pass();
+    }
+
+    [Test]
     public void TestUnbindValueSync()
     {
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.UnBind(b2);
+        b1.Unbind(b2);
 
         b1.Value = 2;
 
@@ -339,10 +396,26 @@ public class TestBindables
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.UnBind(b2);
+        b1.Unbind(b2);
 
         b1.Enabled = false;
 
         Assert.That(b2.Enabled, Is.True);
+    }
+
+    [Test]
+    public void TestUnbindUnspecified()
+    {
+        Bindable<int> b1 = new(1);
+        Bindable<int> b2 = new(1);
+
+        b1.BindTo(b2);
+        b1.Unbind();
+
+        Assert.That(b1.IsBound(), Is.False);
+        Assert.That(b2.IsBound(), Is.False);
+
+        Assert.That(b1.IsBoundWith(b2), Is.False);
+        Assert.That(b2.IsBoundWith(b1), Is.False);
     }
 }

@@ -3,7 +3,7 @@ namespace DanmakuEngine.Bindables;
 public class Bindable<T>
 {
     protected event Action<bool> EnabledChanged = null!;
-    
+
     private bool _enabled;
     public bool Enabled
     {
@@ -14,11 +14,11 @@ public class Bindable<T>
                 return;
 
             _enabled = value;
-            
+
             OnEnabledChanged(value);
         }
     }
-    
+
     protected event Action<BindValueChangedEvent<T>> ValueChanged = null!;
 
     private T _value;
@@ -40,11 +40,11 @@ public class Bindable<T>
         }
     }
 
-    private Bindable<T> _weakReference = null!;
+    private Bindable<T>? _weakReference = null;
 
     public bool IsBound() => _weakReference != null;
 
-    public bool IsBoundWith(Bindable<T> them) => IsBound() && this._weakReference.Equals(them);
+    public bool IsBoundWith(Bindable<T> them) => IsBound() && this._weakReference!.Equals(them);
 
     public void AddEnabledChangedEvent(Action<bool> enabledChanged, bool executeImmediately = false)
     {
@@ -68,7 +68,7 @@ public class Bindable<T>
     {
         ValueChanged?.Invoke(e);
     }
-    
+
     public void RemoveBindValueChangedEvent(Action<BindValueChangedEvent<T>> eventHandler)
     {
         if (!Enabled)
@@ -92,7 +92,7 @@ public class Bindable<T>
     {
         if (them is not Bindable<T> tBindable)
             throw new InvalidOperationException($"Can NOT bind to a bindable with different type, this: {this.GetType()}, them: {them.GetType()}");
-        
+
         if (!Enabled || !them.Enabled)
             throw new InvalidOperationException("Can NOT change a disabled Bindable.");
 
@@ -115,30 +115,43 @@ public class Bindable<T>
 
     protected virtual void syncOnValueChanged(BindValueChangedEvent<T> e)
     {
-        _weakReference.Value = this._value;
+        _weakReference!.Value = this._value;
     }
 
     protected virtual void syncOnEnabledChanged(bool enabled)
     {
-        _weakReference.Enabled = this._enabled;
+        _weakReference!.Enabled = this._enabled;
     }
 
-    public void UnBind(Bindable<T> them)
+    public void Unbind(Bindable<T> them)
     {
-        if (!this._weakReference.Equals(them) ||
-            !them._weakReference.Equals(this))
+        if (!IsBound() || !them.IsBound())
+            throw new InvalidOperationException("Can NOT unbind before bind");
+
+        if (!this._weakReference!.Equals(them) ||
+            !them._weakReference!.Equals(this))
             throw new InvalidOperationException("Can NOT unbind from a bindable that has not bound to this.");
 
         this.removeWeakReference();
         them.removeWeakReference();
     }
 
+    /// <summary>
+    /// I want to unbind it no matter what it is!!!
+    /// </summary>
+    public void Unbind()
+    {
+        this.removeWeakReference();
+
+        this._weakReference?.removeWeakReference();
+    }
+
     protected void removeWeakReference()
     {
         this.ValueChanged -= syncOnValueChanged;
         this.EnabledChanged -= syncOnEnabledChanged;
-        
-        this._weakReference = null!;
+
+        this._weakReference = null;
     }
 
     public void CopyTo(Bindable<T> them)
@@ -158,6 +171,6 @@ public class Bindable<T>
     }
 
     public override string ToString() => $"Bindable<{typeof(T)}>({Value})";
-    
+
     public string ToString(string formatter) => string.Format("Bindable<{0}>({{1}:{2}})", typeof(T), Value, formatter);
 }
