@@ -14,9 +14,13 @@ public class ArgumentParser : IDisposable
 
     private readonly bool executionAction;
 
-    public ArgumentParser(string[] args = null!, bool executeAction = true)
+    private readonly IArgumentTemplate argumentTemplate;
+
+    public ArgumentParser(IArgumentTemplate template, string[] args = null!, bool executeAction = true)
     {
         this.args = args ?? Environment.GetCommandLineArgs();
+
+        this.argumentTemplate = template;
 
         this.executionAction = executeAction;
 
@@ -27,9 +31,9 @@ public class ArgumentParser : IDisposable
 
     private void LoadTemplateArguments()
     {
-        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        foreach (var argInfo in argumentTemplate.GetType().GetFields())
         {
-            var arg = argInfo.GetValue(null);
+            var arg = argInfo.GetValue(argumentTemplate);
 
             if (arg is not Argument)
                 continue;
@@ -53,9 +57,9 @@ public class ArgumentParser : IDisposable
                 if (i == 0 && File.Exists(arg))
                     continue;
 
-                ArgumentTemplate.PrintHelp();
+                PrintHelp();
 
-                Environment.Exit(1);
+                throw new NotSupportedException($"Unrecognized argument: {arg}");
             }
 
             if (!avaliableArguments[arg].HasValue)
@@ -68,6 +72,7 @@ public class ArgumentParser : IDisposable
             if (i == args.Length - 1 || args[i + 1].StartsWith('-'))
             {
                 var missingValueException = new Exception($"Missing value for argument: {arg}");
+                
                 if (!executionAction)
                     throw missingValueException;
 
@@ -118,13 +123,13 @@ public class ArgumentParser : IDisposable
                                            "To get help, type: ./<game> -help or ./<game> -h",
                                            ""});
 
-    public static List<string> GenerateHelp()
+    public List<string> GenerateHelp()
     {
         var helps = new List<string>(help_template);
 
-        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        foreach (var argInfo in argumentTemplate.GetType().GetFields())
         {
-            var arg = (Argument)argInfo.GetValue(null)!;
+            var arg = (Argument)argInfo.GetValue(argumentTemplate)!;
 
             string keyInfo = arg.Key;
 
@@ -167,9 +172,9 @@ public class ArgumentParser : IDisposable
 
         bool found = false;
 
-        foreach (var argInfo in typeof(ArgumentTemplate).GetFields(BindingFlags.Static | BindingFlags.Public))
+        foreach (var argInfo in argumentTemplate.GetType().GetFields())
         {
-            var arg = (Argument)argInfo.GetValue(null)!;
+            var arg = (Argument)argInfo.GetValue(argumentTemplate)!;
 
             if (arg.Key != flag)
                 continue;
@@ -208,12 +213,15 @@ public class ArgumentParser : IDisposable
         return usages;
     }
 
-    public ArgumentProvider CreateArgumentProvider()
+    public void PrintHelp()
     {
-        Debug.Assert(this != null);
+        var helps = GenerateHelp();
 
-        return new ArgumentProvider(this, arguments.ToDictionary(arg => arg.Key, arg => arg));
+        helps.ForEach(s => Console.WriteLine(s));
     }
+
+    public ArgumentProvider CreateArgumentProvider()
+        => new(this, arguments.ToDictionary(arg => arg.Key, arg => arg));
 
     public bool IsSupport(string key) => avaliableArguments.ContainsKey(key);
 

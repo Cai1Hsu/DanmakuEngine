@@ -29,7 +29,7 @@ public class ArgumentProvider : IDisposable
         if (_argParser.IsSupport(key))
             return _argParser.GetDefault<TResult>(key);
 
-        throw new InvalidOperationException("Target argument does not exist.");
+        throw new InvalidOperationException($"Target argument does not exist: {key}");
     }
 
     public void Dispose()

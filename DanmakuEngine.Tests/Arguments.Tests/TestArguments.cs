@@ -5,16 +5,18 @@ namespace DanmakuEngine.Tests;
 
 public class TestArguments
 {
+    private ArgumentTemplate argTemplate;
+
     [SetUp]
     public void Setup()
     {
-
+        argTemplate = new();
     }
 
     [Test]
     public void TestArgumentsSupport()
     {
-        using (var argParser = new ArgumentParser(Array.Empty<string>()))
+        using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
             Assert.That(argParser.IsSupport("-help"), Is.True);
@@ -28,10 +30,10 @@ public class TestArguments
     [Test]
     public void TestGetDefault()
     {
-        using (var argParser = new ArgumentParser(Array.Empty<string>()))
+        using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
-            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(ArgumentTemplate.RefreshRate.GetValue<int>()));
+            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(argTemplate.RefreshRate.GetValue<int>()));
 
             try
             {
@@ -73,7 +75,7 @@ public class TestArguments
     [Test]
     public void TestArgumentParse()
     {
-        using (var argParser = new ArgumentParser(new string[] { "-refresh", "120" }))
+        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh", "120" }))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
             Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(120));
@@ -81,7 +83,7 @@ public class TestArguments
 
         try
         {
-            using (var argParser = new ArgumentParser(new string[] { "-refresh" }, false)) // We dont want to print the usage on the screen as it may cause crashes
+            using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh" }, false)) // We dont want to print the usage on the screen as it may cause crashes
             using (var argProvider = argParser.CreateArgumentProvider())
             {
                 Assert.Fail();
@@ -92,6 +94,21 @@ public class TestArguments
             Assert.Pass();
         }
 
+        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh" }, false)) // We dont want to print the usage on the screen as it may cause crashes
+        {
+            var fieldsInfo = argTemplate.GetType().GetFields();
+
+            Assert.That(fieldsInfo.All(f =>
+            {
+                var field = f.GetValue(argTemplate);
+
+                if (field is not Argument arg)
+                    return true;
+
+                return argParser.GenerateHelp()
+                                .Any(s => s.Contains(arg.Key));
+            }), Is.True);
+        }
 
         Assert.Pass();
     }
@@ -103,7 +120,7 @@ public class TestArguments
         // FIXME
         // pass "-help" crashed host process??????
         // Seems caused by the operation of "-help"
-        using (var argParser = new ArgumentParser(new string[] { "-help" }, false/*remove this will lead to hotst crash*/))
+        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-help" }, false/*remove this will lead to hotst crash*/))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
             Assert.That(argProvider.Find("-help"), Is.True);
@@ -117,16 +134,16 @@ public class TestArguments
     [Test]
     public void TestArgumentGetValue()
     {
-        using (var argParser = new ArgumentParser(new string[] { "-refresh", "120" }))
+        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh", "120" }))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
             Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(120));
         }
 
-        using (var argParser = new ArgumentParser(Array.Empty<string>()))
+        using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
-            Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(ArgumentTemplate.RefreshRate.GetValue<int>()));
+            Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(argTemplate.RefreshRate.GetValue<int>()));
         }
 
         Assert.Pass();

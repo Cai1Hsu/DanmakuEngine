@@ -1,16 +1,13 @@
 ﻿// A library to create STG game
 // and magnificent *Danmaku*
 using DanmakuEngine.Arguments;
+using DanmakuEngine.Logging;
 
-using (var argParser = new ArgumentParser(/*new[] {"-refresh", "120"}*/))
+using (var argParser = new ArgumentParser(new ArgumentTemplate()/*, new[] {"-refresh", "120"}*/))
 using (var argProvider = argParser.CreateArgumentProvider())
 {
     var refreshRate = argProvider.GetValue<int>("-refresh");
 
     // Load everything into ConfigManager or something like that.
-
-    Console.WriteLine($"Refresh rate: {refreshRate}");
+    Logger.Debug($"Refresh rate: {refreshRate}");
 }
-
-Console.Write("Press any key to continue.");
-Console.ReadKey(true);
