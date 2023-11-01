@@ -337,5 +337,7 @@ inspectcode
 
 *.GeneratedMSBuildEditorConfig.editorconfig
 
+.vscode
+
 */.vscode
 */.idea
