@@ -222,6 +222,7 @@ public class TestBindables
         {
             b1.BindTo(new Bindable<int>(3));
 
+            // Multiple binds is not allowed
             Assert.Fail();
         }
         catch (InvalidOperationException)
@@ -278,7 +279,6 @@ public class TestBindables
     [Test]
     public void TestBindEnabledSync()
     {
-        // FIXME: Dead loop
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(1);
 
@@ -292,7 +292,6 @@ public class TestBindables
     [Test]
     public void TestBindValueSync()
     {
-        // FIXME: Dead loop
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(1);
 
@@ -336,18 +335,14 @@ public class TestBindables
     [Test]
     public void TestUnbindEnabledSync()
     {
-        // FIXME: Dead loop
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
+        b1.UnBind(b2);
 
         b1.Enabled = false;
 
-        b1.UnBind(b2);
-
-        b1.Enabled = true;
-
-        Assert.That(b2.Enabled, Is.False);
+        Assert.That(b2.Enabled, Is.True);
     }
 }
