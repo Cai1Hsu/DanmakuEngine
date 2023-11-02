@@ -72,7 +72,7 @@ public class ArgumentParser : IDisposable
             if (i == args.Length - 1 || args[i + 1].StartsWith('-'))
             {
                 var missingValueException = new Exception($"Missing value for argument: {arg}");
-                
+
                 if (!executionAction)
                     throw missingValueException;
 

@@ -19,7 +19,7 @@ public class TestArgumentParse
         {
             using var argParser = new ArgumentParser(argTemplate, new string[] { "-int" }, false); // We dont want to print the usage on the screen as it may cause crashes
             using var argProvider = argParser.CreateArgumentProvider();
-            
+
             Assert.Fail();
         }
         catch (Exception)
@@ -31,7 +31,7 @@ public class TestArgumentParse
         {
             using var argParser = new ArgumentParser(argTemplate, new string[] { "-unknown" }, false); // We dont want to print the usage on the screen as it may cause crashes
             using var argProvider = argParser.CreateArgumentProvider();
-            
+
             Assert.Fail();
         }
         catch (Exception)
@@ -45,7 +45,7 @@ public class TestArgumentParse
     {
         using var argParser = new ArgumentParser(argTemplate, new string[] { "-int", "2" });
         using var argProvider = argParser.CreateArgumentProvider();
-        
+
         Assert.That(argProvider.GetValue<int>("-int"), Is.EqualTo(2));
     }
 
@@ -70,7 +70,7 @@ public class TestArgumentParse
     {
         using var argParser = new ArgumentParser(argTemplate, new string[] { "-double", "2.0" });
         using var argProvider = argParser.CreateArgumentProvider();
-        
+
         Assert.That(argProvider.GetValue<double>("-double"), Is.EqualTo(2.0d));
     }
 
@@ -79,7 +79,7 @@ public class TestArgumentParse
     {
         using var argParser = new ArgumentParser(argTemplate, new string[] { "-float", "2.0" });
         using var argProvider = argParser.CreateArgumentProvider();
-        
+
         Assert.That(argProvider.GetValue<float>("-float"), Is.EqualTo(2.0f));
     }
 
@@ -109,7 +109,7 @@ public class TestArgumentParse
         try
         {
             using var argParser = new ArgumentParser(argTemplate, new string[] { "-unsupported", "wtf" });
-            
+
             Assert.Fail();
         }
         catch (NotSupportedException)
