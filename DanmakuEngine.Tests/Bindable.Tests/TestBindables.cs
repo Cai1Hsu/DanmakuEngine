@@ -2,7 +2,7 @@ using DanmakuEngine.Bindables;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace DanmakuEngine.Tests;
+namespace DanmakuEngine.Tests.Bindables;
 
 public class TestBindables
 {
@@ -210,11 +210,12 @@ public class TestBindables
         Assert.That(b1.IsBoundWith(new Bindable<int>(3)), Is.False);
     }
 
+    /// <summary>
+    /// Currently we do not support multiple bindings
+    /// </summary>
     [Test]
     public void TestMultipleBinds()
     {
-        Assert.Fail("Not Implemented");
-
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(2);
 

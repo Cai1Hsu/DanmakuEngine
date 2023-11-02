@@ -141,9 +141,10 @@ public class Bindable<T>
     /// </summary>
     public void Unbind()
     {
-        this.removeWeakReference();
-
+        // We should remove their's weak reference first    
         this._weakReference?.removeWeakReference();
+
+        this.removeWeakReference();
     }
 
     protected void removeWeakReference()
