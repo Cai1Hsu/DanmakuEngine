@@ -1,52 +1,54 @@
 // All keys must be lower-cased
+using System.ComponentModel.DataAnnotations;
+using System.Reflection;
+
 namespace DanmakuEngine.Arguments;
 
 public class Argument
 {
-    public bool HasValue = false;
+    public bool HasValue => this.TValue != null && this.Value != null;
 
     public readonly string Key;
     public readonly Type TValue = null!;
     private readonly object Value = null!;
 
-    public Action<Argument> Action = null!;
+    public Action<Argument> Operation = null!;
 
-    public Argument(string key, Type TValue, object value)
-    {
-        this.Key = key.ToLower();
-        this.TValue = TValue;
-        this.Value = Convert(value);
-
-        this.HasValue = true;
-    }
+    // public Func<string, object> CustomConvertor = null!;
 
     public Argument(string key)
     {
         this.Key = key.ToLower();
     }
+    public Argument(string key, Type TValue, object value)
+    {
+        this.Key = key.ToLower();
+        this.TValue = TValue;
+        this.Value = Convert(value);
+    }
 
-    public Argument(string key, Type valueType, object value, Action<Argument> action)
+    public Argument(string key, Type valueType, object value, Action<Argument> operation = null!/*, Func<string, object> convertor = null!*/)
     {
         this.Key = key.ToLower();
 
         this.TValue = valueType;
         this.Value = Convert(value);
 
-        this.Action = action;
-
-        this.HasValue = true;
+        this.Operation = operation;
+        // this.CustomConvertor = convertor;
     }
 
     private object Convert(object value)
     {
+        if (this.TValue == typeof(string)
+            && value.GetType() == typeof(string))
+            return ((string)value).Trim('\"');
+
         if (value.GetType() == TValue)
             return value;
 
-        if (this.TValue == typeof(string))
-            return value;
-
         if (value is not string v)
-            throw new NotSupportedException($"Unsupported argument type: {this.TValue}");
+            throw new NotSupportedException($"Unsupported value type: {this.TValue}");
 
         if (this.TValue == typeof(int))
             return int.Parse(v);
@@ -57,13 +59,27 @@ public class Argument
         if (this.TValue == typeof(float))
             return float.Parse(v);
 
-        throw new NotSupportedException($"Unsupported argument type: {this.TValue}");
+        if (this.TValue == typeof(bool))
+            return bool.Parse(v.ToLower());
+
+        // To support custom convertor is not worthwhile.
+        // users can parse arguments later.
+
+        // if (this.CustomConvertor == null)
+        throw new NotSupportedException($"Unsupported value type for flag \"{this.Key}\": {this.TValue}");
+
+        // var converted = CustomConvertor.Invoke(v);
+
+        // if (converted.GetType() != TValue)
+        //     throw new ValidationException($"Return type does NOT match the give TValue, expect: {TValue}, but was: {converted.GetType()}");
+
+        // return converted;
     }
 
     public Argument(string key, Action<Argument> action)
     {
         this.Key = key.ToLower();
-        this.Action = action;
+        this.Operation = action;
     }
 
     public TValue GetValue<TValue>()

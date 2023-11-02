@@ -39,7 +39,6 @@ public class ArgumentTemplate : IArgumentTemplate
 
         argParser.PrintHelp();
 
-
         Environment.Exit(0);
     }
 }

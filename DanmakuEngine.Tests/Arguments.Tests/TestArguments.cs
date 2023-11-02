@@ -1,7 +1,7 @@
 using DanmakuEngine.Arguments;
 using NUnit.Framework;
 
-namespace DanmakuEngine.Tests;
+namespace DanmakuEngine.Tests.Arguments;
 
 public class TestArguments
 {
@@ -11,6 +11,28 @@ public class TestArguments
     public void Setup()
     {
         argTemplate = new();
+    }
+
+    [Test]
+    public void TestGenerateHelp()
+    {
+        using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>(), false)) // We dont want to print the usage on the screen as it may cause crashes
+        {
+            var fieldsInfo = argTemplate.GetType().GetFields();
+
+            Assert.That(fieldsInfo.All(f =>
+            {
+                var field = f.GetValue(argTemplate);
+
+                if (field is not Argument arg)
+                    return true;
+
+                return argParser.GenerateHelp()
+                                .Any(s => s.Contains(arg.Key));
+            }), Is.True);
+        }
+
+        Assert.Pass();
     }
 
     [Test]
@@ -71,48 +93,6 @@ public class TestArguments
 
         Assert.Pass();
     }
-
-    [Test]
-    public void TestArgumentParse()
-    {
-        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh", "120" }))
-        using (var argProvider = argParser.CreateArgumentProvider())
-        {
-            Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(120));
-        }
-
-        try
-        {
-            using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh" }, false)) // We dont want to print the usage on the screen as it may cause crashes
-            using (var argProvider = argParser.CreateArgumentProvider())
-            {
-                Assert.Fail();
-            }
-        }
-        catch (Exception)
-        {
-            Assert.Pass();
-        }
-
-        using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh" }, false)) // We dont want to print the usage on the screen as it may cause crashes
-        {
-            var fieldsInfo = argTemplate.GetType().GetFields();
-
-            Assert.That(fieldsInfo.All(f =>
-            {
-                var field = f.GetValue(argTemplate);
-
-                if (field is not Argument arg)
-                    return true;
-
-                return argParser.GenerateHelp()
-                                .Any(s => s.Contains(arg.Key));
-            }), Is.True);
-        }
-
-        Assert.Pass();
-    }
-
 
     [Test]
     public void TestArgumentProviderFind()

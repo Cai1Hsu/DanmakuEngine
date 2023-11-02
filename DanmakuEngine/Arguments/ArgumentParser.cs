@@ -97,8 +97,8 @@ public class ArgumentParser : IDisposable
 
         var template = avaliableArguments[arg.Key];
 
-        if (template.Action != null && executionAction)
-            template.Action(arg);
+        if (template.Operation != null && executionAction)
+            template.Operation(arg);
     }
 
     public TValue GetDefault<TValue>(string key)
