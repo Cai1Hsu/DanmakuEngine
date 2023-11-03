@@ -13,7 +13,7 @@ namespace DanmakuEngine.Games;
 
 public class GameHost : IDisposable, IInjectable
 {
-    private static GameHost _instence = null!;
+    private static GameHost _instance = null!;
 
     public IWindow window { get; private set; } = null!;
 
@@ -81,7 +81,7 @@ public class GameHost : IDisposable, IInjectable
 
         window.Load += OnLoad;
         window.Update += OnUpdate;
-        window.Update += (_) => Logger.Write($"FPS: {window.FramesPerSecond}\r", true);
+        window.Update += delta => Logger.Write($"FPS: {1 / delta:F2}\r", true);
 
         window.Render += OnRender;
 
@@ -95,13 +95,14 @@ public class GameHost : IDisposable, IInjectable
         PerformExit();
     }
 
-    private void PerformExit()
+    public void PerformExit()
     {
-        window.Close();
-
-        Console.CursorVisible = true;
+        if (!window.IsClosing)
+            window.Close();
 
         window.Dispose();
+
+        Console.CursorVisible = true;
     }
 
     private void OnLoad()
@@ -123,7 +124,7 @@ public class GameHost : IDisposable, IInjectable
     {
         //Here all updates to the program should be done.
 
-        // Call Game.Update...
+        // Call Game.Update... 
     }
 
     private string GetWindowName()
@@ -139,8 +140,8 @@ public class GameHost : IDisposable, IInjectable
 
     public GameHost()
     {
-        if (_instence != null)
-            throw new InvalidOperationException("Can NOT create multiple GameHost instence");
+        if (_instance != null)
+            throw new InvalidOperationException("Can NOT create multiple GameHost instance");
     }
 
     public void Dispose()
