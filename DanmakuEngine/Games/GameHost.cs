@@ -1,26 +1,43 @@
+using System.Runtime;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
+using DanmakuEngine.Dependency;
+using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;
 using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
 namespace DanmakuEngine.Games;
 
-public class GameHost : IDisposable
+public class GameHost : IDisposable, IInjectable
 {
-    private static GameHost Instence = null!;
+    private static GameHost _instence = null!;
 
-    private IWindow window = null!;
+    public IWindow window { get; private set; } = null!;
 
-    private Game game = null!;
+    private GL _gl = null!;
+
+    public Game Game { get; private set; } = null!;
+
+    public ConfigManager ConfigManager { get; private set; } = null!;
+
+    public InputManager InputManager { get; private set; } = null!;
+
+    public DependencyContainer Dependencies { get; private set; } = null!;
 
     public void Run(Game game)
     {
+        SetUpDependency();
+        
+        this.Game = game;
+        Dependencies.CacheAndInject(Game);
+
         LoadConfig();
-
-        this.game = game;
-
+        
+        GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
+        
         CreateWindow();
 
         RegisterEvents();
@@ -28,14 +45,15 @@ public class GameHost : IDisposable
         RunUntilExit();
     }
 
+    private void SetUpDependency() => Dependencies = new DependencyContainer(this);
+
     private void LoadConfig()
     {
+        ConfigManager = new ConfigManager();
+        Dependencies.CacheAndInject(ConfigManager);
+
         using var argParser = new ArgumentParser(new ParamTemplate());
         using var argProvider = argParser.CreateArgumentProvider();
-
-        var directory = argProvider.GetValue<string>("-log");
-
-        Logger.SetLogDirectory(directory);
 
         ConfigManager.LoadFromArguments(argProvider);
     }
@@ -43,6 +61,8 @@ public class GameHost : IDisposable
     private void CreateWindow()
     {
         var options = WindowOptions.Default;
+
+        // TODO
         options.Size = new Vector2D<int>(640, 480);
 
         options.WindowBorder = WindowBorder.Fixed;
@@ -86,21 +106,12 @@ public class GameHost : IDisposable
 
     private void OnLoad()
     {
+        _gl = window.CreateOpenGL();
+        
         //Set-up input context.
-        IInputContext input = window.CreateInput();
-        for (int i = 0; i < input.Keyboards.Count; i++)
-        {
-            input.Keyboards[i].KeyDown += KeyDown;
-        }
-
-        void KeyDown(IKeyboard arg1, Key arg2, int arg3)
-        {
-            //Check to close the window on escape.
-            if (arg2 == Key.Escape)
-            {
-                window.Close();
-            }
-        }
+        InputManager = new InputManager(window.CreateInput());
+        
+        Dependencies.CacheAndInject(InputManager);
     }
 
     private void OnRender(double time)
@@ -118,7 +129,7 @@ public class GameHost : IDisposable
     private string GetWindowName()
     {
         var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-        var name = game.Name;
+        var name = Game.Name;
 
         if (ConfigManager.DebugBuild)
             return name + $" - Debug {ver!.Build}";
@@ -128,7 +139,7 @@ public class GameHost : IDisposable
 
     public GameHost()
     {
-        if (Instence != null)
+        if (_instence != null)
             throw new InvalidOperationException("Can NOT create multiple GameHost instence");
     }
 
@@ -144,5 +155,11 @@ public class GameHost : IDisposable
             return;
 
         window?.Dispose();
+    }
+
+    public void Inject(DependencyContainer container)
+    {
+        // Don't need
+        // this.Dependencies = container;
     }
 }

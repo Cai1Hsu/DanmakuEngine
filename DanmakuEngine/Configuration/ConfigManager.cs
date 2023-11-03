@@ -1,30 +1,31 @@
 using System.ComponentModel.DataAnnotations;
 using DanmakuEngine.Arguments;
+using DanmakuEngine.Dependency;
 
 namespace DanmakuEngine.Configuration;
 
-public static class ConfigManager
+public class ConfigManager : IInjectable
 {
     [LoadFromArgument("-refresh")]
-    public static int RefreshRate { get; private set; }
+    public int RefreshRate { get; private set; }
 
     [LoadFromArgument("-debug")]
-    public static bool DebugMode { get; private set; }
+    public bool DebugMode { get; private set; }
 
     [LoadFromArgument("-fullscreen")]
-    public static bool FullScreen { get; private set; }
+    public bool FullScreen { get; private set; }
 
     [LoadFromArgument("-vsync")]
-    public static bool Vsync { get; private set; }
+    public bool Vsync { get; private set; }
 
-    public static void LoadFromArguments(ArgumentProvider argProvider)
+    public void LoadFromArguments(ArgumentProvider argProvider)
     {
         foreach (var propInfo in typeof(ConfigManager).GetProperties())
         {
             var attribute = propInfo.GetCustomAttributes(typeof(LoadFromArgumentAttribute), false);
 
-            if (attribute == null || attribute.Length == 0 
-                || !attribute.Any(a => a is LoadFromArgumentAttribute))
+            if (attribute.Length == 0 
+                      || !attribute.Any(a => a is LoadFromArgumentAttribute))
                 continue;
 
             var flag = ((LoadFromArgumentAttribute)attribute.Where(a => a is LoadFromArgumentAttribute).First()).Flag;
@@ -34,11 +35,11 @@ public static class ConfigManager
 
             var value = argProvider.GetValue(flag);
 
-            propInfo.SetValue(value, null);
+            propInfo.SetValue(_configManager, value);
         }
     }
 
-    public static bool DebugBuild
+    public bool DebugBuild
     {
         get
         {
@@ -60,4 +61,11 @@ public static class ConfigManager
             this.Flag = flag;
         }
     }
+
+    public void Inject(DependencyContainer container)
+    {
+        _configManager = container.Get<ConfigManager>();
+    }
+    
+    private ConfigManager _configManager = null!;
 }
