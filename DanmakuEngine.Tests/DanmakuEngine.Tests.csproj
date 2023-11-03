@@ -6,7 +6,7 @@
     <Nullable>enable</Nullable>
 
     <!-- We want the whole project is AOT friendly, so we have to consider them into test coverage.-->
-    <PublishAot>true</PublishAot>
+    <PublishAot>false</PublishAot>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
