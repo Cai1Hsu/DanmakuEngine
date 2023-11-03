@@ -23,10 +23,11 @@ public static class ConfigManager
         {
             var attribute = propInfo.GetCustomAttributes(typeof(LoadFromArgumentAttribute), false);
 
-            if (attribute == null || attribute.Length == 0)
+            if (attribute == null || attribute.Length == 0 
+                || !attribute.Any(a => a is LoadFromArgumentAttribute))
                 continue;
 
-            var flag = ((LoadFromArgumentAttribute)attribute.First()).Flag;
+            var flag = ((LoadFromArgumentAttribute)attribute.Where(a => a is LoadFromArgumentAttribute).First()).Flag;
 
             if (!argProvider.IsSupport(flag))
                 throw new NotSupportedException($"Unrecognized flag {flag} for property {propInfo.Name}");
