@@ -112,23 +112,20 @@ public class Logger
         // TODO: Whether we should reset the color
         // Only needed when we develop the TUI debugging
         // However this causes performance issue.
-        // Maybe we should do it asyncly
+        // Maybe we should do it async
     }
 
     public static void Write(string str, bool resetColor = false, bool writeLine = false)
     {
         lock (_syncconsole)
         {
-            if (resetColor)
+            if (resetColor && !defaultcolor)
             {
                 lock (_synccolor)
                 {
-                    if (!defaultcolor)
-                    {
-                        Console.ResetColor();
+                    Console.ResetColor();
 
-                        defaultcolor = true;
-                    }
+                    defaultcolor = true;
                 }
             }
 
