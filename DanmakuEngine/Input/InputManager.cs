@@ -1,4 +1,5 @@
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Games;
 using Silk.NET.Input;
 using Silk.NET.Windowing;
 
@@ -7,8 +8,9 @@ namespace DanmakuEngine.Input;
 public class InputManager : IInjectable, ICacheHookable
 {
     private IInputContext Input { get; }
+
     [Inject]
-    private IWindow _window = null!;
+    private GameHost _host = null!;
 
     public InputManager(IInputContext input)
     {
@@ -23,15 +25,13 @@ public class InputManager : IInjectable, ICacheHookable
         {
             //Check to close the window on escape.
             if (arg2 == Key.Escape)
-            {
-                _window.Close();
-            }
+                _host.PerformExit();
         }
     }
 
     public void Inject(DependencyContainer container)
     {
-        this._window = container.Get<IWindow>();
+        _host = container.Get<GameHost>();
     }
 
     public void OnCache(DependencyContainer container)
