@@ -1,5 +1,5 @@
-﻿using DanmakuEngine.Games;
-using Silk.NET.Core.Attributes;
+﻿using System.Reflection;
+using DanmakuEngine.Games;
 
 namespace DanmakuEngine.Dependency;
 
@@ -24,6 +24,9 @@ public class DependencyContainer
             
             if (!added)
                 throw new Exception($"Unable to cache {T}");
+
+            if (obj is ICacheHookable hookable)
+                hookable.OnCache(this);
         }
     }
     
@@ -31,6 +34,7 @@ public class DependencyContainer
         where T : IInjectable
     {
         Cache(obj);
+
         obj.Inject(this);
     }
     
@@ -55,6 +59,9 @@ public class DependencyContainer
             return value!;
         }
     }
+
+    public void AutoInject(IInjectable obj)
+        => obj.AutoInject();
     
     public void Inject(IInjectable obj)
         => obj.Inject(this);

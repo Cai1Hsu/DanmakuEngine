@@ -4,9 +4,10 @@ using Silk.NET.Windowing;
 
 namespace DanmakuEngine.Input;
 
-public class InputManager : IInjectable
+public class InputManager : IInjectable, ICacheHookable
 {
     private IInputContext Input { get; }
+    [Inject]
     private IWindow _window = null!;
 
     public InputManager(IInputContext input)
@@ -30,7 +31,11 @@ public class InputManager : IInjectable
 
     public void Inject(DependencyContainer container)
     {
-        container.Cache(Input);
         this._window = container.Get<IWindow>();
+    }
+
+    public void OnCache(DependencyContainer container)
+    {
+        container.Cache(Input);
     }
 }

@@ -67,5 +67,6 @@ public class ConfigManager : IInjectable
         _configManager = container.Get<ConfigManager>();
     }
     
+    [Inject]
     private ConfigManager _configManager = null!;
 }
