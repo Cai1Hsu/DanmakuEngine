@@ -14,7 +14,7 @@ public abstract class Paramaters
             if (arg.Key != key)
                 continue;
 
-            
+            throw new NotImplementedException();
         }
 
         throw new NotSupportedException("");
