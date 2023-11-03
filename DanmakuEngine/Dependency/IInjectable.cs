@@ -4,6 +4,11 @@ public interface IInjectable
 {
     public void Inject(DependencyContainer container);
     
+    /// <summary>
+    /// Auto inject dependency with <see cref="InjectAttribute"/>
+    /// </summary>
+    /// <exception cref="InvalidOperationException"></exception>
+    /// <exception cref="Exception">Raises when unable to inject a dependency</exception>
     public void AutoInject()
     {
         foreach (var fieldInfo in this.GetType().GetFields())
@@ -25,7 +30,7 @@ public interface IInjectable
             var value = DependencyContainer.Instance.Get(type);
             
             if (value == null)
-                throw new InvalidOperationException($"Unable to inject {type}");
+                throw new Exception($"Unable to inject {type}");
             
             fieldInfo.SetValue(this, value);
         }
@@ -49,7 +54,7 @@ public interface IInjectable
             var value = DependencyContainer.Instance.Get(type);
             
             if (value == null)
-                throw new InvalidOperationException($"Unable to inject {type}");
+                throw new Exception($"Unable to inject {type}");
             
             propInfo.SetValue(this, value);
         }
