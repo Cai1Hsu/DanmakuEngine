@@ -6,12 +6,25 @@ public class Logger
 
     private static readonly object _synclog = new();
     private static readonly object _syncqueue = new();
+    private static readonly object _syncconsole = new();
+
+    private static string log_directory;
 
     private static readonly string log_file;
+
+    private static string FullLogFile => Path.Combine(log_directory, log_file);
 
     private const string game = @"DanmakuEngine";
 
     public static Logger GetLogger() => _instence;
+
+    public static void SetLogDirectory(string directory)
+    {
+        if (!Directory.Exists(directory))
+            throw new DirectoryNotFoundException($"{directory}");
+
+        log_directory = directory;
+    }
 
     public static void Info(string message) => Log(message, LogLevel.Info);
 
@@ -82,11 +95,19 @@ public class Logger
         {LogLevel.Info, () => Console.ForegroundColor = ConsoleColor.DarkGray}
     };
 
+    private static bool defaultcolor = true;
+    private static object _synccolor = new();
+
     private static void PrintLog(Log log)
     {
-        colorMap[log.level].Invoke();
+        lock (_synccolor)
+        {
+            colorMap[log.level].Invoke();
 
-        Console.WriteLine(log.ToString());
+            defaultcolor = false;
+        }
+
+        Write(log.ToString(), false, true);
 
         // TODO: Whether we should reset the color
         // Only needed when we develop the TUI debugging
@@ -94,13 +115,42 @@ public class Logger
         // Maybe we should do it asyncly
     }
 
+    public static void Write(string str, bool resetColor = false, bool writeLine = false)
+    {
+        lock (_syncconsole)
+        {
+            if (resetColor)
+            {
+                lock (_synccolor)
+                {
+                    if (!defaultcolor)
+                    {
+                        Console.ResetColor();
+
+                        defaultcolor = true;
+                    }
+                }
+            }
+
+            if (writeLine)
+                WriteLine(str);
+            else
+                Write(str);
+
+        }
+    }
+
+    private static void Write(string str) => Console.Write(str);
+
+    private static void WriteLine(string str) => Console.WriteLine(str);
+
     private static void PeriodSave()
     {
         lock (_syncqueue)
         {
             var pendings = _instence.pendingWrite;
 
-            using var fs = new StreamWriter(log_file, true);
+            using var fs = new StreamWriter(FullLogFile, true);
             while (pendings.TryDequeue(out Log log))
             {
                 fs.WriteLine(log);
@@ -117,7 +167,12 @@ public class Logger
     private static int getTimeStamp()
         => (int)((DateTime.UtcNow - begin).TotalSeconds * 10);
 
-    public static void SetLogLevel(LogLevel logLevel) => _instence.logLevel = logLevel;
+    public static void SetLogLevel(LogLevel logLevel)
+    {
+        _instence.logLevel = logLevel;
+
+        Logger.Log($"Log level updated, current: {_instence.logLevel}");
+    }
 
     /// <summary>
     /// Default log level if not specified.
@@ -132,6 +187,7 @@ public class Logger
     {
         _instence = new Logger();
 
+        log_directory = Environment.CurrentDirectory;
         log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH:mm}.log";
     }
 }

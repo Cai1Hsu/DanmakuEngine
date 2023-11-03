@@ -14,9 +14,9 @@ public class ArgumentParser : IDisposable
 
     private readonly bool executionAction;
 
-    private readonly IArgumentTemplate argumentTemplate;
+    private readonly Paramaters argumentTemplate;
 
-    public ArgumentParser(IArgumentTemplate template, string[] args = null!, bool executeAction = true)
+    public ArgumentParser(Paramaters template, string[] args = null!, bool executeAction = true)
     {
         this.args = args ?? Environment.GetCommandLineArgs();
 
@@ -101,7 +101,9 @@ public class ArgumentParser : IDisposable
             template.Operation(arg);
     }
 
-    public TValue GetDefault<TValue>(string key)
+    public TValue GetDefault<TValue>(string key) => (TValue)GetDefault(key);
+
+    public object GetDefault(string key)
     {
         if (!IsSupport(key))
             throw new Exception($"Target argument is not supported: {key}");
@@ -109,9 +111,9 @@ public class ArgumentParser : IDisposable
         var arg = avaliableArguments[key];
 
         if (!arg.HasValue)
-            throw new Exception($"Target argument doesn't contain a value.");
+            throw new Exception($"Target argument doesn't contain a value: {key}");
 
-        return arg.GetValue<TValue>();
+        return arg.GetValue();
     }
 
     private const string indent = "    ";

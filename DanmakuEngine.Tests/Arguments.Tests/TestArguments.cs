@@ -5,7 +5,7 @@ namespace DanmakuEngine.Tests.Arguments;
 
 public class TestArguments
 {
-    private ArgumentTemplate argTemplate;
+    private ParamTemplate argTemplate;
 
     [SetUp]
     public void Setup()
@@ -55,15 +55,16 @@ public class TestArguments
         using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
         using (var argProvider = argParser.CreateArgumentProvider())
         {
-            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(argTemplate.RefreshRate.GetValue<int>()));
+            var default_value = argTemplate.RefreshRate.GetValue<int>();
+            Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(default_value));
 
             try
             {
-                argParser.GetDefault<double>("-refresh");
+                var value = argParser.GetDefault<string>("-refresh");
 
                 Assert.Fail();
             }
-            catch (InvalidOperationException)
+            catch (InvalidCastException)
             {
                 Assert.Pass();
             }

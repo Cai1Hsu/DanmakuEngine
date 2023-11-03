@@ -5,18 +5,30 @@ using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;
 
-public class ArgumentTemplate : IArgumentTemplate
+public class ParamTemplate : Paramaters
 {
     [Description("Specify the refresh rate of the game")]
     public Argument RefreshRate =
         new Argument("-refresh", typeof(int), 60);
 
+    [Description("Specify the refresh rate of the game")]
+    public Argument Vsync =
+        new("-vsync", typeof(bool), true);
+
+    [Description("Specify the refresh rate of the game")]
+    public Argument Fullscreen =
+        new("-fullscreen", typeof(bool), false);
+
     [Description("Enable debug-mode")]
     public Argument Debug =
-        new("-debug", _ =>
+        new("-debug", typeof(bool), false, _ =>
         {
             Logger.Debug("Debug-mode enabled");
         });
+
+    [Description("Specify the directory of the log files")]
+    public Argument LogDirectory =
+        new("-log", typeof(string), Environment.CurrentDirectory);
 
     [Description("Print the help screen")]
     public Argument Help;
@@ -26,7 +38,7 @@ public class ArgumentTemplate : IArgumentTemplate
     public Argument HelpShort;
 
     // For some arguments need non-static support.
-    public ArgumentTemplate()
+    public ParamTemplate()
     {
         Help = new("-help", _ => PrintHelp());
 

@@ -1,6 +1,5 @@
 // All keys must be lower-cased
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
 namespace DanmakuEngine.Arguments;
 
@@ -14,7 +13,7 @@ public class Argument
 
     public Action<Argument> Operation = null!;
 
-    // public Func<string, object> CustomConvertor = null!;
+    public Func<string, object> CustomConvertor = null!;
 
     public Argument(string key)
     {
@@ -27,7 +26,7 @@ public class Argument
         this.Value = Convert(value);
     }
 
-    public Argument(string key, Type valueType, object value, Action<Argument> operation = null!/*, Func<string, object> convertor = null!*/)
+    public Argument(string key, Type valueType, object value, Action<Argument> operation = null!, Func<string, object> convertor = null!)
     {
         this.Key = key.ToLower();
 
@@ -35,7 +34,7 @@ public class Argument
         this.Value = Convert(value);
 
         this.Operation = operation;
-        // this.CustomConvertor = convertor;
+        this.CustomConvertor = convertor;
     }
 
     private object Convert(object value)
@@ -62,24 +61,29 @@ public class Argument
         if (this.TValue == typeof(bool))
             return bool.Parse(v.ToLower());
 
-        // To support custom convertor is not worthwhile.
-        // users can parse arguments later.
+        if (this.CustomConvertor == null)
+            throw new NotSupportedException($"Unsupported value type for flag \"{this.Key}\": {this.TValue}");
 
-        // if (this.CustomConvertor == null)
-        throw new NotSupportedException($"Unsupported value type for flag \"{this.Key}\": {this.TValue}");
+        var converted = CustomConvertor.Invoke(v);
 
-        // var converted = CustomConvertor.Invoke(v);
+        if (converted.GetType() != TValue)
+            throw new ValidationException($"Return type does NOT match the give TValue, expect: {TValue}, but was: {converted.GetType()}");
 
-        // if (converted.GetType() != TValue)
-        //     throw new ValidationException($"Return type does NOT match the give TValue, expect: {TValue}, but was: {converted.GetType()}");
-
-        // return converted;
+        return converted;
     }
 
     public Argument(string key, Action<Argument> action)
     {
         this.Key = key.ToLower();
         this.Operation = action;
+    }
+
+    public object GetValue()
+    {
+        if (!HasValue)
+            throw new InvalidOperationException("This argument does NOT contain a value.");
+
+        return Value;
     }
 
     public TValue GetValue<TValue>()

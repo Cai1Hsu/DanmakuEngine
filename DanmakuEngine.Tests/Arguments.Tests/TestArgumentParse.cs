@@ -1,4 +1,5 @@
 using DanmakuEngine.Arguments;
+using NUnit.Framework;
 
 namespace DanmakuEngine.Test.Arguments;
 
@@ -118,7 +119,7 @@ public class TestArgumentParse
         }
     }
 
-    private class TestArgumentTemplate : IArgumentTemplate
+    private class TestArgumentTemplate : Paramaters
     {
         public Argument argument_int =
             new("-int", typeof(int), 1);
