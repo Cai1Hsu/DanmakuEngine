@@ -11,11 +11,11 @@ public class ParamTemplate : Paramaters
     public Argument RefreshRate =
         new Argument("-refresh", typeof(int), 60);
 
-    [Description("Specify the refresh rate of the game")]
+    [Description("Specify whether to enable Vsync")]
     public Argument Vsync =
         new("-vsync", typeof(bool), true);
 
-    [Description("Specify the refresh rate of the game")]
+    [Description("Specify whether to play the game under fullscreen mode")]
     public Argument Fullscreen =
         new("-fullscreen", typeof(bool), false);
 
