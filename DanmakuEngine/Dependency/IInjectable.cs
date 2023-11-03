@@ -9,7 +9,7 @@ public interface IInjectable
         foreach (var fieldInfo in this.GetType().GetFields())
         {
             var attributes = fieldInfo.GetCustomAttributes(false)
-                .Where(a => a is InjectAttribute);
+                .Where(a => a is InjectAttribute).ToArray();
             
             if (!attributes.Any())
                 continue;
@@ -33,7 +33,7 @@ public interface IInjectable
         foreach (var propInfo in this.GetType().GetProperties())
         {
             var attributes = propInfo.GetCustomAttributes(false)
-                .Where(a => a is InjectAttribute);
+                .Where(a => a is InjectAttribute).ToArray();
             
             if (!attributes.Any())
                 continue;
