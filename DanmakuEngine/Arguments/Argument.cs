@@ -19,10 +19,10 @@ public class Argument
     {
         this.Key = key.ToLower();
     }
-    public Argument(string key, Type TValue, object value)
+    public Argument(string key, Type T, object value)
     {
         this.Key = key.ToLower();
-        this.TValue = TValue;
+        this.TValue = T;
         this.Value = Convert(value);
     }
 
@@ -40,8 +40,8 @@ public class Argument
     private object Convert(object value)
     {
         if (this.TValue == typeof(string)
-            && value.GetType() == typeof(string))
-            return ((string)value).Trim('\"');
+            && value is string s)
+            return s.Trim('\"');
 
         if (value.GetType() == TValue)
             return value;
