@@ -38,7 +38,7 @@ public class ConfigManager : IInjectable
 
             var value = argProvider.GetValue(flag);
 
-            propInfo.SetValue(_configManager, value);
+            propInfo.SetValue(this, value);
         }
     }
 
@@ -64,12 +64,4 @@ public class ConfigManager : IInjectable
             this.Flag = flag;
         }
     }
-
-    public void Inject(DependencyContainer container)
-    {
-        _configManager = container.Get<ConfigManager>();
-    }
-
-    [Inject]
-    private ConfigManager _configManager = null!;
 }
