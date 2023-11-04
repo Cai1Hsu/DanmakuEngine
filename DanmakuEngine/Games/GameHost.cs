@@ -132,7 +132,7 @@ public class GameHost : IDisposable
     public double RenderDelta { get; private set; }
     public double UpdateDelta { get; private set; }
 
-    private DrawableContainer DrawRoot;
+    // private DrawableContainer DrawRoot = null!;
 
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
@@ -152,7 +152,7 @@ public class GameHost : IDisposable
 
             _gl.Enable(EnableCap.DepthTest);
 
-            // TODO: ront pass
+            // TODO: Front pass
             // buffer.Object.DrawOpaqueInteriorSubTree(Renderer, depthValue);
 
             _gl.Enable(EnableCap.Blend);
@@ -168,7 +168,7 @@ public class GameHost : IDisposable
         // Do render
     }
 
-    private DrawableContainer Root;
+    private DrawableContainer Root = null!;
     private void OnUpdate(double delta)
     {
         UpdateDelta = delta;
