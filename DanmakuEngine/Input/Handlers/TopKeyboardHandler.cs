@@ -28,11 +28,17 @@ public class TopKeyboardHandler : IInputHandler
 
     public void KeyDown(IKeyboard arg1, Key arg2, int arg3)
     {
-        _screens.Peek().keyboardHandler.KeyDown(arg1, arg2, arg3);
+        if (_screens.Empty())
+            return;
+
+        _screens.Peek().keyboardHandler?.KeyDown(arg1, arg2, arg3);
     }
 
     public void KeyUp(IKeyboard arg1, Key arg2, int arg3)
     {
-        _screens.Peek().keyboardHandler.KeyUp(arg1, arg2, arg3);
+        if (_screens.Empty())
+            return;
+
+        _screens.Peek().keyboardHandler?.KeyUp(arg1, arg2, arg3);
     }
 }

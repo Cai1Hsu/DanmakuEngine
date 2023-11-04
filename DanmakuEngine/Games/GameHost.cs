@@ -3,6 +3,7 @@ using System.Runtime;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
@@ -28,6 +29,8 @@ public class GameHost : IDisposable
     public InputManager InputManager { get; private set; } = null!;
 
     public DependencyContainer Dependencies { get; private set; } = null!;
+
+    private ScreenStack screens = null!;
 
     public void Run(Game game)
     {
@@ -97,11 +100,6 @@ public class GameHost : IDisposable
 
         window.Update += OnUpdate;
         window.Render += OnRender;
-        
-        if (ConfigManager.HasConsole)
-            window.Update += UpdateFps;
-
-        window.Update += _ => OnRequesetedClose();
     }
 
     public void RunUntilExit()
@@ -138,6 +136,10 @@ public class GameHost : IDisposable
         InputManager = new InputManager(window.CreateInput());
 
         Dependencies.Cache(InputManager);
+
+        screens = Game.screens;
+
+        Game.Begin();
     }
 
     private void OnResize(Vector2D<int> size)
@@ -187,10 +189,15 @@ public class GameHost : IDisposable
     private void OnUpdate(double delta)
     {
         UpdateDelta = delta;
+        
+        if (ConfigManager.HasConsole)
+            UpdateFps(delta);
 
-        if (window == null)
-            return;
-
+        OnRequesetedClose();
+        
+        if (!screens.Empty())
+            screens.Peek().Update(delta);
+        
         if (Root == null)
             return;
 
@@ -227,7 +234,7 @@ public class GameHost : IDisposable
         var name = Game.Name;
 
         if (ConfigManager.DebugBuild)
-            return name + $" - Debug {ver!.Build}";
+            return name + $" - Debug {ver}";
 
         return name + $" - ver {ver}";
     }
