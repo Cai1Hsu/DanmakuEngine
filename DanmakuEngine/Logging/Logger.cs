@@ -1,3 +1,5 @@
+using DanmakuEngine.Configuration;
+
 namespace DanmakuEngine.Logging;
 
 public class Logger
@@ -100,6 +102,9 @@ public class Logger
 
     private static void PrintLog(Log log)
     {
+        if (!ConfigManager.DebugBuild)
+            return;
+
         lock (_synccolor)
         {
             colorMap[log.level].Invoke();

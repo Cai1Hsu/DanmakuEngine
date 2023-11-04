@@ -42,7 +42,7 @@ public class ConfigManager : IInjectable
         }
     }
 
-    public bool DebugBuild
+    public static bool DebugBuild
     {
         get
         {
