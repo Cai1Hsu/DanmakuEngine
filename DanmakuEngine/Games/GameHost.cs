@@ -34,7 +34,7 @@ public class GameHost : IDisposable
         SetUpDependency();
 
         this.Game = game;
-        Dependencies.Cache(Game);
+        Dependencies.CacheAndInject(Game);
 
         LoadConfig();
 
@@ -127,7 +127,7 @@ public class GameHost : IDisposable
         //Set-up input context.
         InputManager = new InputManager(window.CreateInput());
 
-        Dependencies.CacheAndInject(InputManager);
+        Dependencies.Cache(InputManager);
     }
 
     public double ActualFPS { get; private set; }
@@ -146,7 +146,7 @@ public class GameHost : IDisposable
         if (clearOnRender)
             _gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 
-        _gl.Viewport(0, 0, (uint)window.Size.X, (uint)window.Size.Y);
+        // _gl.Viewport(0, 0, (uint)window.Size.X, (uint)window.Size.Y);
 
         if (doFrontToBackPass)
         {
