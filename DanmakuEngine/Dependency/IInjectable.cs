@@ -58,5 +58,8 @@ public interface IInjectable
             
             propInfo.SetValue(this, value);
         }
+
+        if (this is IAutoloadable autoloadable)
+            autoloadable.OnLoad();
     }
 }
