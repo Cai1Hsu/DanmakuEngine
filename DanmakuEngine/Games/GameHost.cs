@@ -67,11 +67,14 @@ public class GameHost : IDisposable
     {
         var options = WindowOptions.Default;
 
-        options.Size = new Vector2D<int>(640, 480);
+        var size = new Vector2D<int>(640, 480);
+        
+        // for windowed mode, we need to set the size to the size of the window
+        options.Size = size;
 
         options.WindowBorder = WindowBorder.Fixed;
         options.WindowState = ConfigManager.FullScreen ? WindowState.Fullscreen : WindowState.Normal;
-        options.VideoMode = new VideoMode(ConfigManager.RefreshRate);
+        options.VideoMode = new VideoMode(size, ConfigManager.RefreshRate);
         options.VSync = ConfigManager.Vsync;
 
         options.Title = GetWindowName();
