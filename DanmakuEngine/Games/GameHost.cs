@@ -11,7 +11,7 @@ using Silk.NET.Windowing;
 
 namespace DanmakuEngine.Games;
 
-public class GameHost : IDisposable, IInjectable
+public class GameHost : IDisposable
 {
     private static GameHost _instance = null!;
 
@@ -30,14 +30,14 @@ public class GameHost : IDisposable, IInjectable
     public void Run(Game game)
     {
         SetUpDependency();
-        
+
         this.Game = game;
         Dependencies.CacheAndInject(Game);
 
         LoadConfig();
-        
+
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
-        
+
         CreateWindow();
 
         RegisterEvents();
@@ -81,7 +81,7 @@ public class GameHost : IDisposable, IInjectable
 
         window.Load += OnLoad;
         window.Update += OnUpdate;
-        window.Update += delta => Logger.Write($"FPS: {1 / delta:F2}\r", true);
+        window.Update += UpdateFps;
 
         window.Render += OnRender;
 
@@ -97,8 +97,8 @@ public class GameHost : IDisposable, IInjectable
 
     public void PerformExit()
     {
-        if (!window.IsClosing)
-            window.Close();
+        window.IsClosing = true;
+        window.Close();
 
         window.Dispose();
 
@@ -108,10 +108,10 @@ public class GameHost : IDisposable, IInjectable
     private void OnLoad()
     {
         _gl = window.CreateOpenGL();
-        
+
         //Set-up input context.
         InputManager = new InputManager(window.CreateInput());
-        
+
         Dependencies.CacheAndInject(InputManager);
     }
 
@@ -125,6 +125,22 @@ public class GameHost : IDisposable, IInjectable
         //Here all updates to the program should be done.
 
         // Call Game.Update... 
+    }
+
+    private double count_time = 0;
+    private int count_frame = 0;
+    private void UpdateFps(double delta)
+    {
+        count_time += delta;
+        count_frame++;
+
+        if (count_time < 1)
+            return;
+        
+        Logger.Write($"FPS: {count_frame / count_time:F2}\r", true);
+
+        count_frame = 0;
+        count_time = 0;
     }
 
     private string GetWindowName()
@@ -156,11 +172,5 @@ public class GameHost : IDisposable, IInjectable
             return;
 
         window?.Dispose();
-    }
-
-    public void Inject(DependencyContainer container)
-    {
-        // Don't need
-        // this.Dependencies = container;
     }
 }
