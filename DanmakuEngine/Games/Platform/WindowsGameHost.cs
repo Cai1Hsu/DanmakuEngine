@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace DanmakuEngine.Games.Platform;
 
@@ -12,6 +13,9 @@ public class WindowsGameHost : DesktopGameHost
 
     public static bool HasConsole()
     {
+        if (!IsWindows)
+            return true;
+
         return GetConsoleWindow() != IntPtr.Zero;
     }
 
@@ -21,6 +25,9 @@ public class WindowsGameHost : DesktopGameHost
             return;
 
         if (Configuration.ConfigManager.DebugBuild)
+            return;
+
+        if (!IsWindows)
             return;
 
         AllocConsole();
