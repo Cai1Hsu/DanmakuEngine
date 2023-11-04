@@ -21,9 +21,10 @@ public class ParamTemplate : Paramaters
 
     [Description("Enable debug-mode")]
     public Argument Debug =
-        new("-debug", typeof(bool), false, _ =>
+        new("-debug", typeof(bool), false, arg =>
         {
-            Logger.Debug("Debug-mode enabled");
+            var status = arg.GetValue<bool>() ? "enabled" : "disabled";
+            Logger.Debug($"Debug mode {status}");
         });
 
     [Description("Specify the directory of the log files")]
