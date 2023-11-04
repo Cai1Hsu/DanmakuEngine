@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
@@ -59,6 +60,7 @@ public class GameHost : IDisposable
         ConfigManager.LoadFromArguments(argProvider);
 
         doFrontToBackPass = ConfigManager.DebugMode;
+        clearOnRender = ConfigManager.ClearScreen;
     }
 
     private void CreateWindow()
@@ -208,7 +210,7 @@ public class GameHost : IDisposable
 
     private string GetWindowName()
     {
-        var ver = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+        var ver = Assembly.GetExecutingAssembly().GetName().Version;
         var name = Game.Name;
 
         if (ConfigManager.DebugBuild)

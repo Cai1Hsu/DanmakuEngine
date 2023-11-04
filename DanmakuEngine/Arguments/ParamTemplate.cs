@@ -26,6 +26,10 @@ public class ParamTemplate : Paramaters
             var status = arg.GetValue<bool>() ? "enabled" : "disabled";
             Logger.Debug($"Debug mode {status}");
         });
+    
+    [Description("Clear screen before rendering the next frame")]
+    public Argument ClearScreen =
+        new("-clear", typeof(bool), false);
 
     [Description("Specify the directory of the log files")]
     public Argument LogDirectory =
@@ -44,6 +48,18 @@ public class ParamTemplate : Paramaters
         Help = new("-help", _ => PrintHelp());
 
         HelpShort = new("-h", _ => PrintHelp());
+
+        Children = new()
+        {
+            { RefreshRate, "Specify the refresh rate of the game" },
+            { Vsync, "Specify whether to enable Vsync" },
+            { Fullscreen, "Specify whether to play the game under fullscreen mode" },
+            { Debug, "Enable debug-mode" },
+            { LogDirectory, "Specify the directory of the log files" },
+            { Help, "Print the help screen" },
+            { HelpShort, "Print the help screen" },
+            { ClearScreen, "Clear screen before rendering the next frame" },
+        };
     }
 
     private void PrintHelp()

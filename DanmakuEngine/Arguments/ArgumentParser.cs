@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;
 
@@ -31,14 +33,9 @@ public class ArgumentParser : IDisposable
 
     private void LoadTemplateArguments()
     {
-        foreach (var argInfo in argumentTemplate.GetType().GetFields())
+        foreach (var arg in argumentTemplate.Children.Keys)
         {
-            var arg = argInfo.GetValue(argumentTemplate);
-
-            if (arg is not Argument)
-                continue;
-
-            avaliableArguments.Add(((Argument)arg).Key, (Argument)arg);
+            avaliableArguments.Add(arg.Key, arg);
         }
     }
 
@@ -129,10 +126,8 @@ public class ArgumentParser : IDisposable
     {
         var helps = new List<string>(help_template);
 
-        foreach (var argInfo in argumentTemplate.GetType().GetFields())
+        foreach (var arg in argumentTemplate.Children.Keys)
         {
-            var arg = (Argument)argInfo.GetValue(argumentTemplate)!;
-
             string keyInfo = arg.Key;
 
             if (arg.HasValue)
@@ -142,9 +137,7 @@ public class ArgumentParser : IDisposable
 
             helps.Add(keyInfo);
 
-            string description = indent + argInfo
-                                            .GetCustomAttribute<DescriptionAttribute>()!
-                                            .Description;
+            string description = indent + argumentTemplate.Children[arg];
 
             helps.Add(description);
 
@@ -174,10 +167,8 @@ public class ArgumentParser : IDisposable
 
         bool found = false;
 
-        foreach (var argInfo in argumentTemplate.GetType().GetFields())
+        foreach (var arg in argumentTemplate.Children.Keys)
         {
-            var arg = (Argument)argInfo.GetValue(argumentTemplate)!;
-
             if (arg.Key != flag)
                 continue;
 
@@ -190,9 +181,7 @@ public class ArgumentParser : IDisposable
 
             usages.Add(keyInfo);
 
-            string description = indent + argInfo
-                                            .GetCustomAttribute<DescriptionAttribute>()!
-                                            .Description;
+            string description = indent + argumentTemplate.Children[arg];
 
             usages.Add(description);
 

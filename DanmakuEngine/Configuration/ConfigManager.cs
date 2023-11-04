@@ -18,6 +18,9 @@ public class ConfigManager : IInjectable
     [LoadFromArgument("-vsync")]
     public bool Vsync { get; private set; }
 
+    [LoadFromArgument("-clear")]
+    public bool ClearScreen { get; private set; }
+
     public void LoadFromArguments(ArgumentProvider argProvider)
     {
         foreach (var propInfo in typeof(ConfigManager).GetProperties())

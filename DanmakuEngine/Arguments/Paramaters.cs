@@ -19,4 +19,6 @@ public abstract class Paramaters
 
         throw new NotSupportedException("");
     }
+
+    public virtual Dictionary<Argument, string> Children { get; protected set; } = new();
 }
