@@ -82,6 +82,7 @@ public class GameHost : IDisposable
     private void RegisterEvents()
     {
         window.Load += OnLoad;
+        window.Resize += OnResize;
 
         window.Update += OnUpdate;
         window.Render += OnRender;
@@ -130,6 +131,11 @@ public class GameHost : IDisposable
         Dependencies.Cache(InputManager);
     }
 
+    private void OnResize(Vector2D<int> size)
+    {
+        _gl.Viewport(0, 0, (uint)size.X, (uint)size.Y);
+    }
+
     public double ActualFPS { get; private set; }
     public double RenderDelta { get; private set; }
     public double UpdateDelta { get; private set; }
@@ -145,8 +151,6 @@ public class GameHost : IDisposable
 
         if (clearOnRender)
             _gl.Clear((uint)ClearBufferMask.ColorBufferBit);
-
-        // _gl.Viewport(0, 0, (uint)window.Size.X, (uint)window.Size.Y);
 
         if (doFrontToBackPass)
         {
