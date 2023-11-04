@@ -11,7 +11,9 @@ public interface IInjectable
     /// <exception cref="Exception">Raises when unable to inject a dependency</exception>
     public void AutoInject(bool inherit = false)
     {
-        foreach (var fieldInfo in this.GetType().GetFields())
+        const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+
+        foreach (var fieldInfo in this.GetType().GetFields(flags))
         {
             var attributes = fieldInfo.GetCustomAttributes(inherit)
                 .Where(a => a is InjectAttribute).ToArray();
@@ -32,7 +34,7 @@ public interface IInjectable
             fieldInfo.SetValue(this, value);
         }
 
-        foreach (var propInfo in this.GetType().GetProperties())
+        foreach (var propInfo in this.GetType().GetProperties(flags))
         {
             var attributes = propInfo.GetCustomAttributes(inherit)
                 .Where(a => a is InjectAttribute).ToArray();

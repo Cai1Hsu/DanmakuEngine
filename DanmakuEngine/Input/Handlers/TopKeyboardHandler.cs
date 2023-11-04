@@ -12,10 +12,10 @@ public class TopKeyboardHandler : IInputHandler
     }
 
     [Inject]
-    public ScreenStack _screens = null!;
+    private ScreenStack _screens = null!;
 
     [Inject]
-    public IInputContext _input = null!;
+    private IInputContext _input = null!;
 
     public void OnLoad()
     {

@@ -10,7 +10,7 @@ public class Game : IInjectable, ICacheHookable
     public ScreenStack screens;
 
     [Inject]
-    public GameHost _host = null!;
+    private GameHost _host = null!;
 
     public Game()
     {
