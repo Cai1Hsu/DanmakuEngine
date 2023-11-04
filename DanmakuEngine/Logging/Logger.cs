@@ -102,7 +102,7 @@ public class Logger
 
     private static void PrintLog(Log log)
     {
-        if (!ConfigManager.DebugBuild)
+        if (!ConfigManager.HasConsole)
             return;
 
         lock (_synccolor)
@@ -122,6 +122,9 @@ public class Logger
 
     public static void Write(string str, bool resetColor = false, bool writeLine = false)
     {
+        if (!ConfigManager.HasConsole)
+            return;
+        
         lock (_syncconsole)
         {
             if (resetColor && !defaultcolor)
@@ -138,13 +141,12 @@ public class Logger
                 WriteLine(str);
             else
                 Write(str);
-
         }
     }
 
-    private static void Write(string str) => Console.Write(str);
+    public static void Write(string str) => Console.Write(str);
 
-    private static void WriteLine(string str) => Console.WriteLine(str);
+    public static void WriteLine(string str) => Console.WriteLine(str);
 
     private static void PeriodSave()
     {

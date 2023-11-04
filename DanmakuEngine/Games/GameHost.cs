@@ -36,6 +36,8 @@ public class GameHost : IDisposable
         this.Game = game;
         Dependencies.CacheAndInject(Game);
 
+        SetUpConsole();
+
         LoadConfig();
 
         GCSettings.LatencyMode = GCLatencyMode.SustainedLowLatency;
@@ -45,6 +47,11 @@ public class GameHost : IDisposable
         RegisterEvents();
 
         RunUntilExit();
+    }
+
+    protected virtual void SetUpConsole()
+    {
+        
     }
 
     private void SetUpDependency() => Dependencies = new DependencyContainer(this);
@@ -68,7 +75,7 @@ public class GameHost : IDisposable
         var options = WindowOptions.Default;
 
         var size = new Vector2D<int>(640, 480);
-        
+
         // for windowed mode, we need to set the size to the size of the window
         options.Size = size;
 
@@ -89,14 +96,11 @@ public class GameHost : IDisposable
 
         window.Update += OnUpdate;
         window.Render += OnRender;
-
-        Console.CursorVisible = false;
-        window.Update += UpdateFps;
+        
+        if (ConfigManager.HasConsole)
+            window.Update += UpdateFps;
 
         window.Update += _ => OnRequesetedClose();
-
-        Console.CancelKeyPress += (_, e) =>
-            window.IsClosing = e.Cancel = true;
     }
 
     public void RunUntilExit()
@@ -112,8 +116,9 @@ public class GameHost : IDisposable
         window.Close();
 
         window.Dispose();
-
-        Console.CursorVisible = true;
+        
+        if (ConfigManager.HasConsole)
+            Console.CursorVisible = true;
     }
 
     private void OnRequesetedClose()

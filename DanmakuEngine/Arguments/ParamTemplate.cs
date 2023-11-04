@@ -1,6 +1,8 @@
 // This file defines all avaliable arguments and default value
 
 using System.ComponentModel;
+using DanmakuEngine.Configuration;
+using DanmakuEngine.Games.Platform;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;
@@ -23,7 +25,12 @@ public class ParamTemplate : Paramaters
     public Argument Debug =
         new("-debug", typeof(bool), false, arg =>
         {
-            var status = arg.GetValue<bool>() ? "enabled" : "disabled";
+            var enabled = arg.GetValue<bool>();
+            
+            if (enabled && DesktopGameHost.IsWindows && !ConfigManager.HasConsole)
+                WindowsGameHost.CreateConsole();
+            
+            var status = enabled ? "enabled" : "disabled";
             Logger.Debug($"Debug mode {status}");
         });
     
