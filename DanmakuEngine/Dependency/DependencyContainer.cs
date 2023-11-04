@@ -21,7 +21,7 @@ public class DependencyContainer
         lock (_lock)
         {
             var added = _cache.TryAdd(T, obj);
-            
+
             if (!added)
                 throw new Exception($"Unable to cache {T}");
 
@@ -29,7 +29,7 @@ public class DependencyContainer
                 hookable.OnCache(this);
         }
     }
-    
+
     public void CacheAndInject<T>(T obj)
         where T : IInjectable
     {
@@ -37,7 +37,7 @@ public class DependencyContainer
 
         obj.Inject(this);
     }
-    
+
     public void CacheAndInject(Type T, object obj)
     {
         if (!typeof(IInjectable).IsAssignableFrom(T))
@@ -62,7 +62,7 @@ public class DependencyContainer
 
     public void AutoInject(IInjectable obj)
         => obj.AutoInject();
-    
+
     public void Inject(IInjectable obj)
         => obj.Inject(this);
 
@@ -70,9 +70,9 @@ public class DependencyContainer
     {
         if (Instance != null)
             throw new InvalidOperationException("Already created a dependency container");
-            
+
         Instance = this;
-        
+
         if (h != null)
             Cache(h);
     }

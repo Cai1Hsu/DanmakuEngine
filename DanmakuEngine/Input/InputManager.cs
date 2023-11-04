@@ -15,7 +15,7 @@ public class InputManager : IInjectable, ICacheHookable
     public InputManager(IInputContext input)
     {
         this.Input = input;
-        
+
         foreach (var t in Input.Keyboards)
         {
             t.KeyDown += KeyDown;
@@ -25,7 +25,7 @@ public class InputManager : IInjectable, ICacheHookable
         {
             //Check to close the window on escape.
             if (arg2 == Key.Escape)
-                _host.PerformExit();
+                _host.window.IsClosing = true;
         }
     }
 

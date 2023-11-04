@@ -1,18 +1,15 @@
+using System.ComponentModel;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Graphics;
 
 namespace DanmakuEngine.Games;
 
-public class Game : IInjectable
+public class Game
 {
     public readonly string Name = "Danmaku!";
-    
+
     public Game()
     {
 
-    }
-
-    public void Inject(DependencyContainer container)
-    {
-        // throw new NotImplementedException();
     }
 }

@@ -2,6 +2,7 @@ using System.Runtime;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Graphics;
 using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;
@@ -32,7 +33,7 @@ public class GameHost : IDisposable
         SetUpDependency();
 
         this.Game = game;
-        Dependencies.CacheAndInject(Game);
+        Dependencies.Cache(Game);
 
         LoadConfig();
 
@@ -56,13 +57,14 @@ public class GameHost : IDisposable
         using var argProvider = argParser.CreateArgumentProvider();
 
         ConfigManager.LoadFromArguments(argProvider);
+
+        doFrontToBackPass = ConfigManager.DebugMode;
     }
 
     private void CreateWindow()
     {
         var options = WindowOptions.Default;
 
-        // TODO
         options.Size = new Vector2D<int>(640, 480);
 
         options.WindowBorder = WindowBorder.Fixed;
@@ -77,15 +79,18 @@ public class GameHost : IDisposable
 
     private void RegisterEvents()
     {
-        Console.CursorVisible = false;
-
         window.Load += OnLoad;
-        window.Update += OnUpdate;
-        window.Update += UpdateFps;
 
+        window.Update += OnUpdate;
         window.Render += OnRender;
 
-        Console.CancelKeyPress += (_, _) => PerformExit();
+        Console.CursorVisible = false;
+        window.Update += UpdateFps;
+
+        window.Update += _ => OnRequesetedClose();
+
+        Console.CancelKeyPress += (_, e) =>
+            window.IsClosing = e.Cancel = true;
     }
 
     public void RunUntilExit()
@@ -105,6 +110,14 @@ public class GameHost : IDisposable
         Console.CursorVisible = true;
     }
 
+    private void OnRequesetedClose()
+    {
+        if (!window.IsClosing)
+            return;
+
+        PerformExit();
+    }
+
     private void OnLoad()
     {
         _gl = window.CreateOpenGL();
@@ -115,16 +128,65 @@ public class GameHost : IDisposable
         Dependencies.CacheAndInject(InputManager);
     }
 
-    private void OnRender(double time)
+    public double ActualFPS { get; private set; }
+    public double RenderDelta { get; private set; }
+    public double UpdateDelta { get; private set; }
+
+    private DrawableContainer DrawRoot;
+
+    private bool doFrontToBackPass = false;
+    private bool clearOnRender = false;
+
+    private void OnRender(double delta)
     {
-        //Here all rendering should be done.
+        RenderDelta = delta;
+
+        if (clearOnRender)
+            _gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+
+        _gl.Viewport(0, 0, (uint)window.Size.X, (uint)window.Size.Y);
+
+        if (doFrontToBackPass)
+        {
+            _gl.Disable(EnableCap.Blend);
+
+            _gl.Enable(EnableCap.DepthTest);
+
+            // TODO: ront pass
+            // buffer.Object.DrawOpaqueInteriorSubTree(Renderer, depthValue);
+
+            _gl.Enable(EnableCap.Blend);
+
+            _gl.DepthMask(false);
+        }
+        else
+        {
+            _gl.Disable(EnableCap.DepthTest);
+        }
+
+        // TODO
+        // Do render
     }
 
-    private void OnUpdate(double time)
+    private DrawableContainer Root;
+    private void OnUpdate(double delta)
     {
-        //Here all updates to the program should be done.
+        UpdateDelta = delta;
 
-        // Call Game.Update... 
+        if (window == null)
+            return;
+
+        if (Root == null)
+            return;
+
+        if (window.WindowState != WindowState.Minimized)
+            Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
+
+        // Root.UpdateSubTree();
+        // Root.UpdateSubTreeMasking(Root, Root.ScreenSpaceDrawQuad.AABBFloat);
+
+        // using (var buffer = DrawRoots.GetForWrite())
+        //     buffer.Object = Root.GenerateDrawNodeSubtree(buffer.Index, false);
     }
 
     private double count_time = 0;
@@ -136,8 +198,9 @@ public class GameHost : IDisposable
 
         if (count_time < 1)
             return;
-        
-        Logger.Write($"FPS: {count_frame / count_time:F2}\r", true);
+
+        ActualFPS = count_frame / count_time;
+        Logger.Write($"FPS: {ActualFPS:F2}\r", true);
 
         count_frame = 0;
         count_time = 0;

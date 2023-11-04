@@ -24,7 +24,7 @@ public class ConfigManager : IInjectable
         {
             var attribute = propInfo.GetCustomAttributes(typeof(LoadFromArgumentAttribute), false);
 
-            if (attribute.Length == 0 
+            if (attribute.Length == 0
                       || !attribute.Any(a => a is LoadFromArgumentAttribute))
                 continue;
 
@@ -66,7 +66,7 @@ public class ConfigManager : IInjectable
     {
         _configManager = container.Get<ConfigManager>();
     }
-    
+
     [Inject]
     private ConfigManager _configManager = null!;
 }
