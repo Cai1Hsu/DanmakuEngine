@@ -1,19 +1,19 @@
-﻿namespace DanmakuEngine.Dependency;
+﻿using System.Reflection;
+
+namespace DanmakuEngine.Dependency;
 
 public interface IInjectable
 {
-    public void Inject(DependencyContainer container);
-
     /// <summary>
     /// Auto inject dependency with <see cref="InjectAttribute"/>
     /// </summary>
     /// <exception cref="InvalidOperationException"></exception>
     /// <exception cref="Exception">Raises when unable to inject a dependency</exception>
-    public void AutoInject()
+    public void AutoInject(bool inherit = false)
     {
         foreach (var fieldInfo in this.GetType().GetFields())
         {
-            var attributes = fieldInfo.GetCustomAttributes(false)
+            var attributes = fieldInfo.GetCustomAttributes(inherit)
                 .Where(a => a is InjectAttribute).ToArray();
 
             if (!attributes.Any())
@@ -23,9 +23,6 @@ public interface IInjectable
                 continue;
 
             var type = fieldInfo.FieldType;
-
-            if (!typeof(IInjectable).IsAssignableFrom(type))
-                throw new InvalidOperationException("Can not inject a non IInjectable object");
 
             var value = DependencyContainer.Instance.Get(type);
 
@@ -37,7 +34,7 @@ public interface IInjectable
 
         foreach (var propInfo in this.GetType().GetProperties())
         {
-            var attributes = propInfo.GetCustomAttributes(false)
+            var attributes = propInfo.GetCustomAttributes(inherit)
                 .Where(a => a is InjectAttribute).ToArray();
 
             if (!attributes.Any())
@@ -47,9 +44,6 @@ public interface IInjectable
                 continue;
 
             var type = propInfo.PropertyType;
-
-            if (!typeof(IInjectable).IsAssignableFrom(type))
-                throw new InvalidOperationException("Can not inject a non IInjectable object");
 
             var value = DependencyContainer.Instance.Get(type);
 

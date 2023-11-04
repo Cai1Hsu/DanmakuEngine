@@ -1,11 +1,11 @@
-﻿using System.Reflection;
-using DanmakuEngine.Games;
+﻿using DanmakuEngine.Games;
 
 namespace DanmakuEngine.Dependency;
 
 public class DependencyContainer
 {
     public static DependencyContainer Instance { get; private set; } = null!;
+
     private readonly object _lock = new();
 
     private readonly Dictionary<Type, object?> _cache = new();
@@ -35,7 +35,7 @@ public class DependencyContainer
     {
         Cache(obj);
 
-        obj.Inject(this);
+        obj.AutoInject();
     }
 
     public void CacheAndInject(Type T, object obj)
@@ -44,7 +44,7 @@ public class DependencyContainer
             throw new InvalidOperationException("Can not inject a non IInjectable object");
 
         Cache(T, obj);
-        ((IInjectable)obj).Inject(this);
+        ((IInjectable)obj).AutoInject();
     }
 
     public T Get<T>() => (T)Get(typeof(T));
@@ -60,11 +60,8 @@ public class DependencyContainer
         }
     }
 
-    public void AutoInject(IInjectable obj)
+    public static void AutoInject(IInjectable obj)
         => obj.AutoInject();
-
-    public void Inject(IInjectable obj)
-        => obj.Inject(this);
 
     public DependencyContainer(GameHost? h = null!)
     {

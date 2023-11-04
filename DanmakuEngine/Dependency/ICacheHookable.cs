@@ -2,5 +2,5 @@
 
 public interface ICacheHookable
 {
-    public void OnCache(DependencyContainer container);
+    public void OnCache(DependencyContainer dependencies);
 }
