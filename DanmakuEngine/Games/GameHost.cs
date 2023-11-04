@@ -51,7 +51,8 @@ public class GameHost : IDisposable
 
     protected virtual void SetUpConsole()
     {
-        
+        if (ConfigManager.HasConsole)
+            Console.CursorVisible = false;
     }
 
     private void SetUpDependency() => Dependencies = new DependencyContainer(this);

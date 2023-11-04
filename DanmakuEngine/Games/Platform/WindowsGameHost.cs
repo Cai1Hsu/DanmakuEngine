@@ -44,5 +44,7 @@ public class WindowsGameHost : DesktopGameHost
 
         Console.CancelKeyPress += (_, e) =>
             window.IsClosing = e.Cancel = true;
+        
+        base.SetUpConsole();
     }
 }
