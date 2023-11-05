@@ -1,17 +1,17 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Games.Screens.LoadingScreen;
+using DanmakuEngine.Graphics;
+
 
 namespace DanmakuEngine.Games;
 
-public class Game : IInjectable, ICacheHookable
+public class Game : IInjectable
 {
     public readonly string Name = "Danmaku!";
 
-    public ScreenStack screens = new();
-
-    // [Inject]
-    // private GameHost _host = null!;
+    [Inject]
+    private ScreenStack screens = null!;
 
     public Game()
     {
@@ -23,11 +23,6 @@ public class Game : IInjectable, ICacheHookable
     /// </summary>
     public void Begin()
     {
-        screens.Push(new LoadingScreen());
-    }
-
-    public void OnCache(DependencyContainer dependencies)
-    {
-        dependencies.Cache(screens);
+        screens.Push(new LoadingScreen(screens));
     }
 }

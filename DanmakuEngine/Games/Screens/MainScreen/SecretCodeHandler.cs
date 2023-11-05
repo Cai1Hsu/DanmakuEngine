@@ -1,3 +1,4 @@
+using DanmakuEngine.Dependency;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;
 
@@ -5,6 +6,13 @@ namespace DanmakuEngine.Games.Screens.MainScreen;
 
 public class SecretCodeHandler
 {
+    private ScreenClock Clock;
+
+    public SecretCodeHandler(ScreenClock clock)
+    {
+        this.Clock = clock;
+    }
+
     private readonly Key[] secretCode = new Key[]
     {
         Key.Up,
@@ -23,18 +31,18 @@ public class SecretCodeHandler
 
     private int secretCodeIndex = 0;
 
-    private DateTime lastKeyDown = DateTime.MinValue;
+    private double lastKeyDown = -1f;
 
     public bool HandleKey(Key key)
     {
-        if (DateTime.UtcNow - lastKeyDown > TimeSpan.FromSeconds(1))
+        if (Clock.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
-        lastKeyDown = DateTime.UtcNow;
+        lastKeyDown = Clock.CurrentTime;
 
         if (key == secretCode[secretCodeIndex])
         {
-            // Logger.Debug($"SecretCode: Handled key {key}, Index: {secretCodeIndex}");
+            Logger.Debug($"SecretCode: Handled key {key}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
             secretCodeIndex++;
         }    
         else

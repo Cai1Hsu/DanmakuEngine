@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using DanmakuEngine.Arguments;
@@ -7,6 +8,7 @@ using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Timing;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -14,7 +16,7 @@ using Silk.NET.Windowing;
 
 namespace DanmakuEngine.Games;
 
-public class GameHost : IDisposable
+public class GameHost : Time, IDisposable
 {
     private static GameHost _instance = null!;
 
@@ -37,7 +39,8 @@ public class GameHost : IDisposable
         SetUpDependency();
 
         this.Game = game;
-        Dependencies.CacheAndInject(Game);
+
+        Dependencies.Cache(Game);
 
         SetUpConsole();
 
@@ -58,8 +61,12 @@ public class GameHost : IDisposable
             Console.CursorVisible = false;
     }
 
-    private void SetUpDependency() => Dependencies = new DependencyContainer(this);
+    private void SetUpDependency()
+    {
+        Dependencies = new DependencyContainer(this);
 
+        Dependencies.Cache((Time)this);
+    }
     private void LoadConfig()
     {
         ConfigManager = new ConfigManager();
@@ -104,7 +111,7 @@ public class GameHost : IDisposable
         window.Render += OnRender;
 
         window.Update += UpdateFps;
-        window.Update += _ => OnRequesetedClose();
+        window.Render += _ => OnRequesetedClose();
     }
 
     public void RunUntilExit()
@@ -120,7 +127,7 @@ public class GameHost : IDisposable
         window.Close();
 
         window.Dispose();
-        
+
         if (ConfigManager.HasConsole)
             Console.CursorVisible = true;
     }
@@ -144,9 +151,13 @@ public class GameHost : IDisposable
         //Set-up input context.
         InputManager = new InputManager(window.CreateInput());
 
-        Dependencies.Cache(InputManager);
+        Root = new DrawableContainer(null!);
 
-        screens = Game.screens;
+        screens = new(Root);
+
+        Dependencies.Cache(screens);
+        Dependencies.Cache(InputManager);
+        DependencyContainer.AutoInject(Game);
 
         Game.Begin();
     }
@@ -155,10 +166,6 @@ public class GameHost : IDisposable
     {
         _gl.Viewport(0, 0, (uint)size.X, (uint)size.Y);
     }
-
-    public double ActualFPS { get; private set; }
-    public double RenderDelta { get; private set; }
-    public double UpdateDelta { get; private set; }
 
     // private DrawableContainer DrawRoot = null!;
 
@@ -198,40 +205,26 @@ public class GameHost : IDisposable
     private void OnUpdate(double delta)
     {
         UpdateDelta = delta;
-        
-        if (!screens.Empty())
-            screens.Peek().Update(delta);
-        
+
+        if (ConfigManager.HasConsole)
+            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+
         if (Root == null)
             return;
 
-        if (window.WindowState != WindowState.Minimized)
-            Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
+        if (screens.Empty())
+            window.IsClosing = true;
+        else
+            screens.Peek()!.update();
 
-        // Root.UpdateSubTree();
+        // if (window.WindowState != WindowState.Minimized)
+        //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
+
+        Root.UpdateSubTree();
         // Root.UpdateSubTreeMasking(Root, Root.ScreenSpaceDrawQuad.AABBFloat);
 
         // using (var buffer = DrawRoots.GetForWrite())
         //     buffer.Object = Root.GenerateDrawNodeSubtree(buffer.Index, false);
-    }
-
-    private double count_time = 0;
-    private int count_frame = 0;
-    private void UpdateFps(double delta)
-    {
-        count_time += delta;
-        count_frame++;
-
-        if (count_time < 1)
-            return;
-
-        ActualFPS = count_frame / count_time;
-        
-        if (ConfigManager.HasConsole)
-            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
-
-        count_frame = 0;
-        count_time = 0;
     }
 
     private string GetWindowName()

@@ -1,4 +1,5 @@
 ﻿using DanmakuEngine.Dependency;
+using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Games.Screens.LoadingScreen;
@@ -7,6 +8,10 @@ public class LoadingScreen : Screen, IInjectable
 {
     [Inject]
     private readonly ScreenStack screens = null!;
+
+    public LoadingScreen(ScreenStack parent) : base(parent)
+    {
+    }
 
     // This method is called before the screen is pushed to the stack
     // After the dependency injection is done
@@ -25,14 +30,13 @@ public class LoadingScreen : Screen, IInjectable
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
-        await Task.Delay(5000);
+        await Task.Delay(3000);
 
-        screens.Pop();
-        screens.Push(new MainScreen.MainScreen());
+        screens.Switch(new MainScreen.MainScreen(screens));
     }
 
     // This method is called every frame in the Update loop
-    public override void Update(double delta)
+    public override void Update()
     {
 
     }

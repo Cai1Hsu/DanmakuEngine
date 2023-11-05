@@ -1,30 +1,74 @@
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Games.Screens;
 
-public class ScreenStack
+public class ScreenStack : CompositeDrawable
 {
     private Stack<Screen> screens = new();
+    private object _lock = new();
 
+    public ScreenStack(CompositeDrawable parent) : base(parent)
+    {
+    }
+
+    public void Switch(Screen screen)
+    {
+        if (Empty())
+            throw new InvalidOperationException("Cannot switch to a screen when the stack is empty");
+
+        if (screen is IInjectable injectable)
+            injectable.AutoInject();
+
+        screen.load();
+
+        lock (_lock)
+        {
+            screens.Pop();
+            screens.Push(screen);
+        }
+
+#if DEBUG
+        Logger.Debug($"ScreenStack: Switchd to {screen.GetType().Name}");
+#endif
+
+        screen.start();
+    }
+
+    /// <summary>
+    /// If you have to pop the screen, use Switch instead
+    /// </summary>
+    /// <param name="screen"></param>
     public void Push(Screen screen)
     {
         if (screen is IInjectable injectable)
             injectable.AutoInject();
-        
-        screen.Load();
 
-        screens.Push(screen);
+        screen.load();
+
+        lock (_lock)
+        {
+            screens.Push(screen);
+        }
 
 #if DEBUG
         Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}");
 #endif
 
-        screen.Start();
+        screen.start();
     }
 
-    public Screen Peek()
-        => screens.Peek();
+    public Screen? Peek()
+    {
+        if (Empty())
+            return null;
+
+        lock (_lock)
+        {
+            return (Screen?)screens.Peek();
+        }
+    }
 
     public Screen Pop()
     {
@@ -38,5 +82,21 @@ public class ScreenStack
     }
 
     public bool Empty()
-        => screens.Count == 0;
+    {
+        lock (_lock)
+        {
+            return screens.Count == 0;
+        }
+    }
+
+    public override bool UpdateSubTree()
+    {
+        if (Empty())
+            return true;
+
+        if (Peek()!.UpdateSubTree())
+            return true;
+
+        return false;
+    }
 }
