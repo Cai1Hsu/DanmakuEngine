@@ -29,7 +29,7 @@ public interface IInjectable
             var value = DependencyContainer.Instance.Get(type);
 
             if (value == null)
-                throw new Exception($"Unable to inject {type}");
+                throw new Exception($"Unable to inject {type} for {fieldInfo.Name}");
 
             fieldInfo.SetValue(this, value);
         }
@@ -50,7 +50,7 @@ public interface IInjectable
             var value = DependencyContainer.Instance.Get(type);
 
             if (value == null)
-                throw new Exception($"Unable to inject {type}");
+                throw new Exception($"Unable to inject {type} for {propInfo.Name}");
 
             propInfo.SetValue(this, value);
         }
