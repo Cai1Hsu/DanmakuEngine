@@ -18,6 +18,9 @@ public class Game : IInjectable, ICacheHookable
         
     }
     
+    /// <summary>
+    /// The game logic starts here
+    /// </summary>
     public void Begin()
     {
         screens.Push(new LoadingScreen());

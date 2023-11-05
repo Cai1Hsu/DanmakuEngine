@@ -1,9 +1,13 @@
 using DanmakuEngine.Configuration;
+using DanmakuEngine.Dependency;
 
 namespace DanmakuEngine.Logging;
 
-public class Logger
+public class Logger : IInjectable
 {
+    [Inject]
+    private ConfigManager ConfigManager = null!;
+
     private static readonly Logger _instence = null!;
 
     private static readonly object _synclog = new();
@@ -32,7 +36,19 @@ public class Logger
 
     public static void Verbose(string message) => Log(message, LogLevel.Verbose);
 
-    public static void Debug(string message) => Log(message, LogLevel.Debug);
+    public static void Debug(string message)
+    {
+        var logger = GetLogger();
+
+        if (!ConfigManager.DebugBuild )
+            return;
+
+        if (logger.ConfigManager != null
+            && !logger.ConfigManager.DebugMode)
+            return;
+
+        Log(message, LogLevel.Debug);
+    }
 
     public static void Warning(string message) => Log(message, LogLevel.Warning);
 

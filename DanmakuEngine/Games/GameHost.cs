@@ -72,6 +72,8 @@ public class GameHost : IDisposable
 
         doFrontToBackPass = ConfigManager.DebugMode;
         clearOnRender = ConfigManager.ClearScreen;
+
+        DependencyContainer.AutoInject(Logger.GetLogger());
     }
 
     private void CreateWindow()
@@ -100,6 +102,9 @@ public class GameHost : IDisposable
 
         window.Update += OnUpdate;
         window.Render += OnRender;
+
+        window.Update += UpdateFps;
+        window.Update += _ => OnRequesetedClose();
     }
 
     public void RunUntilExit()
@@ -131,6 +136,10 @@ public class GameHost : IDisposable
     private void OnLoad()
     {
         _gl = window.CreateOpenGL();
+
+        if (ConfigManager.HasConsole)
+            Console.CancelKeyPress += (_, e) =>
+                window.IsClosing = e.Cancel = true;
 
         //Set-up input context.
         InputManager = new InputManager(window.CreateInput());
@@ -190,11 +199,6 @@ public class GameHost : IDisposable
     {
         UpdateDelta = delta;
         
-        if (ConfigManager.HasConsole)
-            UpdateFps(delta);
-
-        OnRequesetedClose();
-        
         if (!screens.Empty())
             screens.Peek().Update(delta);
         
@@ -222,7 +226,9 @@ public class GameHost : IDisposable
             return;
 
         ActualFPS = count_frame / count_time;
-        Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+        
+        if (ConfigManager.HasConsole)
+            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
 
         count_frame = 0;
         count_time = 0;
