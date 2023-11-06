@@ -42,6 +42,7 @@ public class WindowsGameHost : DesktopGameHost
 
         Console.CursorVisible = false;
 
+        // TODO: Duplicate? 
         Console.CancelKeyPress += (_, e) =>
             window.IsClosing = e.Cancel = true;
         
