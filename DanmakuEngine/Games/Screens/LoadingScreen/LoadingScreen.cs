@@ -10,8 +10,9 @@ public class LoadingScreen : Screen
     {
     }
 
-    // This method is called before the screen is pushed to the stack
-    // After the dependency injection is done
+    // All of the three methods below run in the `Update` loop
+
+    // This method is called when the screen(or average object) is loading
     // You can do some initialization here
     public override void Load()
     {
@@ -24,6 +25,8 @@ public class LoadingScreen : Screen
         Logger.Log("少女祈祷中");
         Logger.Log("    Now loading...");
 
+        Logger.Log("This will took about 2s");
+
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
@@ -32,7 +35,7 @@ public class LoadingScreen : Screen
         ScreenStack.Switch(new MainScreen(Parent));
     }
 
-    // This method is called every frame in the Update loop
+    // This method is called every frame
     public override void Update()
     {
 
