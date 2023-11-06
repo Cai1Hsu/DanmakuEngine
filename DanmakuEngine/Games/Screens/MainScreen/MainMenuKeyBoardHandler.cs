@@ -8,7 +8,7 @@ namespace DanmakuEngine.Games.Screens;
 public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, IInjectable
 {
     [Inject]
-    private GameHost _host = null!;
+    private ScreenStack screens = null!;
 
     public SecretCodeHandler secretCodeHandler = null!;
 
@@ -18,7 +18,10 @@ public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, II
     {
         // DEMO: Pressing escape closes the game
         if (arg2 == Key.Escape)
-            _host.window.IsClosing = true;
+        {
+            while (!screens.Empty())
+                screens.Pop();
+        }
 
         if (secretCodeHandler != null)
         {
