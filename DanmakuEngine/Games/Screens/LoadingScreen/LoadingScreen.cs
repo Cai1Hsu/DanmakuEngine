@@ -1,6 +1,4 @@
-﻿using DanmakuEngine.Dependency;
-using DanmakuEngine.Graphics;
-using DanmakuEngine.Logging;
+﻿using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Games.Screens.LoadingScreen;
 
@@ -20,7 +18,7 @@ public class LoadingScreen : Screen
     }
 
     // This method is called when the screen actually starts to run
-    public override void Start()
+    public override async void Start()
     {
         Logger.Log("少女祈祷中");
         Logger.Log("    Now loading...");
@@ -30,7 +28,7 @@ public class LoadingScreen : Screen
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
-        Task.Delay(2000).Wait();
+        await Task.Delay(2000);
 
         ScreenStack.Switch(new MainScreen(Parent));
     }
