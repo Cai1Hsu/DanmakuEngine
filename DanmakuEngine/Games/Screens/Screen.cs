@@ -10,6 +10,8 @@ public class Screen : CompositeDrawable, IInjectable
 {
     public override ScreenStack Parent => (ScreenStack)base.Parent;
 
+    protected ScreenStack ScreenStack => Parent;
+
     public IKeyboardHandler keyboardHandler = null!;
 
     public ScreenClock Clock { get; } = new();

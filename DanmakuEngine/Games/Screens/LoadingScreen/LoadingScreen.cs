@@ -6,9 +6,6 @@ namespace DanmakuEngine.Games.Screens.LoadingScreen;
 
 public class LoadingScreen : Screen
 {
-    [Inject]
-    private readonly ScreenStack screens = null!;
-
     public LoadingScreen(ScreenStack parent) : base(parent)
     {
     }
@@ -32,7 +29,7 @@ public class LoadingScreen : Screen
         // Assume that we are loading something
         Task.Delay(2000).Wait();
 
-        screens.Switch(new MainScreen(screens));
+        ScreenStack.Switch(new MainScreen(Parent));
     }
 
     // This method is called every frame in the Update loop
