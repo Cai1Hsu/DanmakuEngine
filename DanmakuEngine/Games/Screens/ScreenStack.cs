@@ -22,14 +22,21 @@ public class ScreenStack : CompositeDrawable
         if (screen is IInjectable injectable)
             injectable.AutoInject();
 
+#if DEBUG
+        Screen last = null!;
+#endif
+
         lock (_lock)
         {
+#if DEBUG
+            last = 
+#endif
             screens.Pop();
             screens.Push(screen);
         }
 
 #if DEBUG
-        Logger.Debug($"ScreenStack: Switchd to(poped peek and pushed) {screen.GetType().Name}");
+        Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}");
 #endif
     }
 
@@ -52,8 +59,6 @@ public class ScreenStack : CompositeDrawable
 #if DEBUG
         Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}");
 #endif
-
-        screen.start();
     }
 
     public Screen? Peek()
