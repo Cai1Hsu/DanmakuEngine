@@ -24,7 +24,7 @@ public class CompositeDrawable : Drawable
         if (base.UpdateSubTree())
             return true;
 
-        if (children.Any(c => c.UpdateSubTree()))
+        if (!children.All(c => !c.UpdateSubTree()))
             return true;
 
         // TODO: Something else?
