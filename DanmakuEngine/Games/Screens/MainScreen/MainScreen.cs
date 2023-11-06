@@ -1,6 +1,6 @@
 using DanmakuEngine.Logging;
 
-namespace DanmakuEngine.Games.Screens.MainScreen;
+namespace DanmakuEngine.Games.Screens;
 
 public class MainScreen : Screen
 {
@@ -14,13 +14,11 @@ public class MainScreen : Screen
 
     public override void Load()
     {
-        base.Load();
+
     }
 
     public override void Start()
     {
-        base.Start();
-
         Logger.Info("Keyboard is handled in this screen.");
         Logger.Info("You can exit the game by pressing ESC.");
     }

@@ -36,7 +36,7 @@ public class Drawable : IDisposable
 
     public virtual CompositeDrawable Parent { get; private set; } = null!;
 
-    public LoadState LoadState { get; private set; } = LoadState.NotLoaded;
+    protected LoadState LoadState { get; private set; } = LoadState.NotLoaded;
 
     public Drawable(CompositeDrawable parent)
     {
@@ -79,6 +79,9 @@ public class Drawable : IDisposable
 
     private void start()
     {
+        if (LoadState != LoadState.Ready)
+            return;
+
         LoadState = LoadState.Complete;
 
         Start();

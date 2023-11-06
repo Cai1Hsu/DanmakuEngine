@@ -64,8 +64,10 @@ public class Screen : CompositeDrawable, IInjectable
 
     }
 
-    public void load()
+    public new void load()
     {
+        base.load();
+
         DependencyContainer.AutoInject(this);
 
         Load();

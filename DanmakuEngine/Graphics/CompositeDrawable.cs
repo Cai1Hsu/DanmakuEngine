@@ -1,3 +1,4 @@
+using DanmakuEngine.Logging;
 using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics;

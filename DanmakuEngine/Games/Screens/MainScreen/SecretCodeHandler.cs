@@ -2,7 +2,7 @@ using DanmakuEngine.Dependency;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;
 
-namespace DanmakuEngine.Games.Screens.MainScreen;
+namespace DanmakuEngine.Games.Screens;
 
 public class SecretCodeHandler
 {

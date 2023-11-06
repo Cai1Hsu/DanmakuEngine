@@ -1,5 +1,4 @@
 using DanmakuEngine.Dependency;
-using DanmakuEngine.Games.Screens.MainScreen;
 using DanmakuEngine.Input.Handlers;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;

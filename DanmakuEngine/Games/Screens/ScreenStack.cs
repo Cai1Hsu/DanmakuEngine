@@ -22,8 +22,6 @@ public class ScreenStack : CompositeDrawable
         if (screen is IInjectable injectable)
             injectable.AutoInject();
 
-        screen.load();
-
         lock (_lock)
         {
             screens.Pop();
@@ -33,14 +31,12 @@ public class ScreenStack : CompositeDrawable
 #if DEBUG
         Logger.Debug($"ScreenStack: Switchd to {screen.GetType().Name}");
 #endif
-
-        screen.start();
     }
 
     /// <summary>
-    /// If you have to pop the screen, use Switch instead
+    /// If you have to pop the screen, use <see cref="Switch"/> instead
     /// </summary>
-    /// <param name="screen"></param>
+    /// <param name="screen">Screen to push</param>
     public void Push(Screen screen)
     {
         if (screen is IInjectable injectable)
