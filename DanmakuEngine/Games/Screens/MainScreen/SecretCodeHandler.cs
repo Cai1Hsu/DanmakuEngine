@@ -1,4 +1,3 @@
-using DanmakuEngine.Dependency;
 using DanmakuEngine.Logging;
 using Silk.NET.Input;
 
@@ -38,10 +37,10 @@ public class SecretCodeHandler
         if (Clock.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
-        lastKeyDown = Clock.CurrentTime;
-
         if (key == secretCode[secretCodeIndex])
         {
+            lastKeyDown = Clock.CurrentTime;
+
             Logger.Debug($"SecretCode: Handled key {key}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
             secretCodeIndex++;
         }    
