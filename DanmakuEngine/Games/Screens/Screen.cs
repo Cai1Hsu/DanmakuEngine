@@ -1,13 +1,14 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input.Handlers;
+using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;
 
 public class Screen : CompositeDrawable, IInjectable
 {
-    public override ScreenStack Parent => (ScreenStack) base.Parent;
+    public override ScreenStack Parent => (ScreenStack)base.Parent;
 
     public IKeyboardHandler keyboardHandler = null!;
 
@@ -15,16 +16,27 @@ public class Screen : CompositeDrawable, IInjectable
 
     public Screen(ScreenStack parent) : base(parent)
     {
+        // TODO: Should we have this?
+        this.load();
     }
 
-    public override bool UpdateSubTree()
+    public bool updateSubTree()
     {
-        if (Parent.Peek() != this)
-            return true;
-
+        // FIXME: this doesn't work properly
+        // it always return true
         if (base.UpdateSubTree())
             return true;
 
+        update();
+
+        // TODO: update children
+
+        return UpdateSubTree();
+    }
+
+    // TODO: Whether we should have this
+    public override bool UpdateSubTree()
+    {
         return false;
     }
 
@@ -37,7 +49,7 @@ public class Screen : CompositeDrawable, IInjectable
 
     public override void Update()
     {
-        
+
     }
 
     public void start()
@@ -49,7 +61,7 @@ public class Screen : CompositeDrawable, IInjectable
 
     public override void Start()
     {
-        
+
     }
 
     public void load()
@@ -61,6 +73,6 @@ public class Screen : CompositeDrawable, IInjectable
 
     public override void Load()
     {
-        
+
     }
 }

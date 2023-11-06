@@ -155,9 +155,13 @@ public class GameHost : Time, IDisposable
 
         screens = new(Root);
 
+        Root.Add(screens);
+
         Dependencies.Cache(screens);
         Dependencies.Cache(InputManager);
         DependencyContainer.AutoInject(Game);
+
+        Root.load();
 
         Game.Begin();
     }
@@ -206,16 +210,17 @@ public class GameHost : Time, IDisposable
     {
         UpdateDelta = delta;
 
-        if (ConfigManager.HasConsole)
-            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
-
         if (Root == null)
             return;
 
         if (screens.Empty())
             window.IsClosing = true;
-        else
-            screens.Peek()!.update();
+
+        // FIXME
+        // This should not be here
+        // as we have already added screens to the root
+        // else
+        //     screens.Peek()!.update();
 
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
@@ -225,6 +230,23 @@ public class GameHost : Time, IDisposable
 
         // using (var buffer = DrawRoots.GetForWrite())
         //     buffer.Object = Root.GenerateDrawNodeSubtree(buffer.Index, false);
+    }
+
+    protected void UpdateFps(double delta)
+    {
+        count_time += delta;
+        count_frame++;
+
+        if (count_time < 1)
+            return;
+
+        if (ConfigManager.HasConsole)
+            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+
+        ActualFPS = count_frame / count_time;
+
+        count_frame = 0;
+        count_time = 0;
     }
 
     private string GetWindowName()

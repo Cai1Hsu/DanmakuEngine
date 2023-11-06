@@ -11,6 +11,7 @@ public class ScreenStack : CompositeDrawable
 
     public ScreenStack(CompositeDrawable parent) : base(parent)
     {
+        this.load();
     }
 
     public void Switch(Screen screen)
@@ -94,7 +95,7 @@ public class ScreenStack : CompositeDrawable
         if (Empty())
             return true;
 
-        if (Peek()!.UpdateSubTree())
+        if (Peek()!.updateSubTree())
             return true;
 
         return false;

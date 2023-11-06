@@ -98,6 +98,18 @@ public class Drawable : IDisposable
 
     }
 
+    public void load()
+    {
+        if (LoadState != LoadState.NotLoaded)
+            return;
+
+        LoadState = LoadState.Ready;
+
+        Load();
+
+        OnLoad?.Invoke(this);
+    }
+
     public virtual void Load()
     {
 
