@@ -29,7 +29,7 @@ public class ScreenStack : CompositeDrawable
         }
 
 #if DEBUG
-        Logger.Debug($"ScreenStack: Switchd to {screen.GetType().Name}");
+        Logger.Debug($"ScreenStack: Switchd to(poped peek and pushed) {screen.GetType().Name}");
 #endif
     }
 
