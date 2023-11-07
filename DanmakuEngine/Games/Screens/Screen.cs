@@ -17,7 +17,7 @@ public class Screen : CompositeDrawable, IInjectable
 
     public IKeyboardHandler keyboardHandler = null!;
 
-    public ScreenClock Clock { get; } = new();
+    public Clock Clock { get; } = new();
 
     public Screen() : base(null!)
     {

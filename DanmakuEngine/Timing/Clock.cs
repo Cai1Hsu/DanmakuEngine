@@ -1,6 +1,6 @@
-namespace DanmakuEngine.Games.Screens;
+namespace DanmakuEngine.Timing;
 
-public class ScreenClock
+public class Clock
 {
     public double CurrentTime { get; private set; }
 

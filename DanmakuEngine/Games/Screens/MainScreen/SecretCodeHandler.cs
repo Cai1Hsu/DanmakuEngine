@@ -1,13 +1,14 @@
 using DanmakuEngine.Logging;
+using DanmakuEngine.Timing;
 using Silk.NET.Input;
 
 namespace DanmakuEngine.Games.Screens;
 
 public class SecretCodeHandler
 {
-    private ScreenClock Clock;
+    private Clock Clock;
 
-    public SecretCodeHandler(ScreenClock clock)
+    public SecretCodeHandler(Clock clock)
     {
         this.Clock = clock;
     }
