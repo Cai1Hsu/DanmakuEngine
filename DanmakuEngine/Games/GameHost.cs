@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using DanmakuEngine.Arguments;
@@ -143,6 +142,10 @@ public class GameHost : Time, IDisposable
     private void OnLoad()
     {
         _gl = window.CreateOpenGL();
+
+        var api = window.API;
+
+        Logger.Info($"api: {api.API}, version: {api.Version.MajorVersion}.{api.Version.MinorVersion}, profile: {api.Profile}, flags: {api.Flags}");
 
         if (ConfigManager.HasConsole)
             Console.CancelKeyPress += (_, e) =>
