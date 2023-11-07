@@ -15,11 +15,11 @@ public class InputManager : ICacheHookable
     {
         this.Input = input;
     }
-    
+
     public void OnCache(DependencyContainer dependencies)
     {
         dependencies.Cache(Input);
-        
+
         Handlers = new List<IInputHandler>()
         {
             new TopKeyboardHandler(),

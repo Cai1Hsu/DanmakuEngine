@@ -15,9 +15,9 @@ public class Game : IInjectable
 
     public Game()
     {
-        
+
     }
-    
+
     /// <summary>
     /// The game logic starts here
     /// </summary>

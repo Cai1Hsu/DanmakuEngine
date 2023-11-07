@@ -40,7 +40,7 @@ public class Logger : IInjectable
     {
         var logger = GetLogger();
 
-        if (!ConfigManager.DebugBuild )
+        if (!ConfigManager.DebugBuild)
             return;
 
         if (logger.ConfigManager != null
@@ -126,7 +126,7 @@ public class Logger : IInjectable
             colorMap[log.level].Invoke();
 
             defaultcolor = false;
-        
+
             Write(log.ToString(), false, true);
         }
 
@@ -140,7 +140,7 @@ public class Logger : IInjectable
     {
         if (!ConfigManager.HasConsole)
             return;
-        
+
         lock (_syncconsole)
         {
             if (resetColor && !defaultcolor)

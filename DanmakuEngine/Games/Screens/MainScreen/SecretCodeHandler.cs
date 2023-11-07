@@ -43,7 +43,7 @@ public class SecretCodeHandler
 
             Logger.Debug($"SecretCode: Handled key {key}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
             secretCodeIndex++;
-        }    
+        }
         else
             secretCodeIndex = 0;
 

@@ -23,6 +23,6 @@ public class MainScreen : Screen
     // This method is called every frame for the screen(and it's children object)
     public override void Update()
     {
-        
+
     }
 }

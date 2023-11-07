@@ -29,7 +29,7 @@ public class ScreenStack : CompositeDrawable
         lock (_lock)
         {
 #if DEBUG
-            last = 
+            last =
 #endif
             screens.Pop();
             screens.Push(screen);

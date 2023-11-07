@@ -45,7 +45,7 @@ public class WindowsGameHost : DesktopGameHost
         // TODO: Duplicate? 
         Console.CancelKeyPress += (_, e) =>
             window.IsClosing = e.Cancel = true;
-        
+
         base.SetUpConsole();
     }
 }
