@@ -1,30 +1,27 @@
-using DanmakuEngine.Logging;
 using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics;
 
-public class CompositeDrawable : Drawable
+public abstract class CompositeDrawable : Drawable
 {
     public Vector2D<float> Size = new(0, 0);
 
-    private readonly List<Drawable> children = new();
+    protected virtual ICollection<Drawable> Children { get; set; } = null!;
 
     public CompositeDrawable(CompositeDrawable parent) : base(parent)
     {
+        this.Children = new LinkedList<Drawable>();
     }
 
-    public IReadOnlyList<Drawable> Children
-        => children.AsReadOnly();
-
     public void Add(Drawable child)
-        => children.Add(child);
+        => Children.Add(child);
 
     public override bool UpdateSubTree()
     {
         if (base.UpdateSubTree())
             return true;
 
-        if (!children.All(c => !c.UpdateSubTree()))
+        if (!Children.All(c => !c.UpdateSubTree()))
             return true;
 
         // TODO: Something else?
@@ -34,6 +31,6 @@ public class CompositeDrawable : Drawable
 
     public override void Update()
     {
-        
+
     }
 }

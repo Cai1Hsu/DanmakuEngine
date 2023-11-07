@@ -8,6 +8,8 @@ public class ScreenStack : CompositeDrawable
     private Stack<Screen> screens = new();
     private object _lock = new();
 
+    protected override ICollection<Drawable> Children { get => (ICollection<Drawable>)screens; }
+
     protected override bool AlwaysPresent => true;
 
     public ScreenStack(CompositeDrawable parent) : base(parent)
