@@ -126,9 +126,9 @@ public class Logger : IInjectable
             colorMap[log.level].Invoke();
 
             defaultcolor = false;
+        
+            Write(log.ToString(), false, true);
         }
-
-        Write(log.ToString(), false, true);
 
         // TODO: Whether we should reset the color
         // Only needed when we develop the TUI debugging
