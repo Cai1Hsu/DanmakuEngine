@@ -47,7 +47,7 @@ public class DependencyContainer
         ((IInjectable)obj).AutoInject();
     }
 
-    public T Get<T>() => (T)Get(typeof(T));
+    public static T Get<T>() => (T)Instance.Get(typeof(T));
 
     public object Get(Type T)
     {

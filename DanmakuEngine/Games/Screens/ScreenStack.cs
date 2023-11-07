@@ -1,4 +1,3 @@
-using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 
@@ -9,6 +8,8 @@ public class ScreenStack : CompositeDrawable
     private Stack<Screen> screens = new();
     private object _lock = new();
 
+    protected override bool AlwaysPresent => true;
+
     public ScreenStack(CompositeDrawable parent) : base(parent)
     {
         this.load();
@@ -18,9 +19,6 @@ public class ScreenStack : CompositeDrawable
     {
         if (Empty())
             throw new InvalidOperationException("Cannot switch to a screen when the stack is empty");
-
-        if (screen is IInjectable injectable)
-            injectable.AutoInject();
 
 #if DEBUG
         Screen last = null!;
@@ -36,7 +34,7 @@ public class ScreenStack : CompositeDrawable
         }
 
 #if DEBUG
-        Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}");
+        Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {screens.Count}");
 #endif
     }
 
@@ -46,18 +44,13 @@ public class ScreenStack : CompositeDrawable
     /// <param name="screen">Screen to push</param>
     public void Push(Screen screen)
     {
-        if (screen is IInjectable injectable)
-            injectable.AutoInject();
-
-        screen.load();
-
         lock (_lock)
         {
             screens.Push(screen);
         }
 
 #if DEBUG
-        Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}");
+        Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {screens.Count}");
 #endif
     }
 
@@ -77,7 +70,7 @@ public class ScreenStack : CompositeDrawable
         var screen = screens.Pop();
 
 #if DEBUG
-        Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}");
+        Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {screens.Count}");
 #endif
 
         return screen;

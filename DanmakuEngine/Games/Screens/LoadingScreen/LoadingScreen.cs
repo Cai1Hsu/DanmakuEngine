@@ -4,12 +4,9 @@ namespace DanmakuEngine.Games.Screens.LoadingScreen;
 
 public class LoadingScreen : Screen
 {
-    public LoadingScreen(ScreenStack parent) : base(parent)
-    {
-    }
-
     // All of the three methods below run in the `Update` loop
 
+    // called by `load` in constructor for screen and manually called for other objects
     // This method is called when the screen(or average object) is loading
     // You can do some initialization here
     public override void Load()
@@ -17,7 +14,7 @@ public class LoadingScreen : Screen
         keyboardHandler = null!;
     }
 
-    // This method is called when the screen actually starts to run
+    // This method is called the first frame when the screen(or average object) is completely loaded
     public override async void Start()
     {
         Logger.Log("少女祈祷中");
@@ -28,12 +25,12 @@ public class LoadingScreen : Screen
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
-        await Task.Delay(2000);
+        await Task.Delay(5000);
 
-        ScreenStack.Switch(new MainScreen(Parent));
+        ScreenStack.Switch(new MainScreen());
     }
 
-    // This method is called every frame
+    // This method is called every frame, the first call is after `Start` method
     public override void Update()
     {
 

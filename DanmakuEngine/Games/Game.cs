@@ -23,6 +23,6 @@ public class Game : IInjectable
     /// </summary>
     public void Begin()
     {
-        screens.Push(new LoadingScreen(screens));
+        screens.Push(new LoadingScreen());
     }
 }

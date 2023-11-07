@@ -4,10 +4,6 @@ namespace DanmakuEngine.Games.Screens;
 
 public class MainScreen : Screen
 {
-    public MainScreen(ScreenStack parent) : base(parent)
-    {   
-    }
-
     // This method is called when the screen(or average object) is loading
     public override void Load()
     {

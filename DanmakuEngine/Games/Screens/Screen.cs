@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input.Handlers;
@@ -8,7 +9,10 @@ namespace DanmakuEngine.Games.Screens;
 
 public class Screen : CompositeDrawable, IInjectable
 {
-    public override ScreenStack Parent => (ScreenStack)base.Parent;
+    [Inject]
+    private ScreenStack _parent = null!;
+
+    public override ScreenStack Parent => _parent;
 
     protected ScreenStack ScreenStack => Parent;
 
@@ -16,10 +20,13 @@ public class Screen : CompositeDrawable, IInjectable
 
     public ScreenClock Clock { get; } = new();
 
-    public Screen(ScreenStack parent) : base(parent)
+    public Screen() : base(null!)
     {
-        // TODO: Should we have this?
+        _parent = DependencyContainer.Get<ScreenStack>();
+
         this.load();
+
+        Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
     }
 
     public bool updateSubTree()
