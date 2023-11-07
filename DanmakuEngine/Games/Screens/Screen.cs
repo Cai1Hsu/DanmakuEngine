@@ -2,7 +2,6 @@ using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input.Handlers;
-using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;

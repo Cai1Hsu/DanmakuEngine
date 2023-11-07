@@ -216,12 +216,6 @@ public class GameHost : Time, IDisposable
         if (screens.Empty())
             window.IsClosing = true;
 
-        // FIXME
-        // This should not be here
-        // as we have already added screens to the root
-        // else
-        //     screens.Peek()!.update();
-
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
 
