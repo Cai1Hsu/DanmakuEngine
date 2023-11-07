@@ -31,11 +31,5 @@ public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, II
                 cheating = true;
             }
         }
-
-    }
-
-    public override void KeyUp(IKeyboard arg1, Key arg2, int arg3)
-    {
-
     }
 }
