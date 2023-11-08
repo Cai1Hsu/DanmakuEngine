@@ -1,7 +1,6 @@
 using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
 
-namespace DanmakuEngine.Games.Platform;
+namespace DanmakuEngine.Engine.Platform;
 
 public class WindowsGameHost : DesktopGameHost
 {
@@ -41,10 +40,6 @@ public class WindowsGameHost : DesktopGameHost
             return;
 
         Console.CursorVisible = false;
-
-        // TODO: Duplicate? 
-        Console.CancelKeyPress += (_, e) =>
-            window.IsClosing = e.Cancel = true;
 
         base.SetUpConsole();
     }

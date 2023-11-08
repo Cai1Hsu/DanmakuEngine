@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Runtime.InteropServices;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Dependency;
-using DanmakuEngine.Games.Platform;
+using DanmakuEngine.Engine.Platform;
 
 namespace DanmakuEngine.Configuration;
 
@@ -13,6 +13,8 @@ public class ConfigManager : IInjectable
     [LoadFromArgument("-debug")] public bool DebugMode { get; private set; }
 
     [LoadFromArgument("-fullscreen")] public bool FullScreen { get; private set; }
+
+    [LoadFromArgument("-exclusive")] public bool Exclusive { get; private set; }
 
     [LoadFromArgument("-vsync")] public bool Vsync { get; private set; }
 

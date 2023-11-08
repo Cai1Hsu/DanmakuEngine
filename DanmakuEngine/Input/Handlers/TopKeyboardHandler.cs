@@ -1,7 +1,8 @@
+using System.Diagnostics;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine;
 using DanmakuEngine.Games.Screens;
-using DanmakuEngine.Graphics;
-using Silk.NET.Input;
+using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
@@ -10,25 +11,34 @@ public class TopKeyboardHandler : IInputHandler
     [Inject]
     private ScreenStack screens = null!;
 
-    [Inject]
-    private IInputContext _input = null!;
-
-    public void OnLoad()
+    public TopKeyboardHandler()
     {
-        foreach (var k in _input.Keyboards)
-        {
-            k.KeyDown += KeyDown;
-            k.KeyUp += KeyUp;
-        }
+        DependencyContainer.AutoInject(this);
     }
 
-    public void KeyDown(IKeyboard arg1, Key arg2, int arg3)
+    public void KeyDown(KeyboardEvent e)
     {
-        screens.Peek()?.keyboardHandler?.KeyDown(arg1, arg2, arg3);
+        Debug.Assert(e.Type == (uint)EventType.Keydown);
+
+        var repeat = e.Repeat != 0;
+        var keysym = e.Keysym;
+
+        screens.Peek()?.keyboardHandler?.KeyDown(keysym, repeat);
     }
 
-    public void KeyUp(IKeyboard arg1, Key arg2, int arg3)
+    public void KeyUp(KeyboardEvent e)
     {
-        screens.Peek()?.keyboardHandler?.KeyUp(arg1, arg2, arg3);
+        Debug.Assert(e.Type == (uint)EventType.Keyup);
+
+        var repeat = e.Repeat != 0;
+        var keysym = e.Keysym;
+
+        screens.Peek()?.keyboardHandler?.KeyUp(keysym, repeat);
+    }
+
+    public void Register(GameHost host)
+    {
+        host.KeyDown += KeyDown;
+        host.KeyUp += KeyUp;
     }
 }

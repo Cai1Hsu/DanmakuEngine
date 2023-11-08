@@ -1,7 +1,7 @@
 ﻿// A library to create STG game
 // and magnificent *Danmaku*
 using DanmakuEngine.Games;
-using DanmakuEngine.Games.Platform;
+using DanmakuEngine.Engine.Platform;
 
 using (var host = DesktopGameHost.GetSuitableHost())
 {

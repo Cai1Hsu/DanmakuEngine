@@ -1,4 +1,4 @@
-﻿using DanmakuEngine.Games;
+﻿using DanmakuEngine.Engine;
 
 namespace DanmakuEngine.Dependency;
 
@@ -15,8 +15,11 @@ public class DependencyContainer
 
     public void Cache(Type T, object obj)
     {
+        if (obj == null)
+            throw new ArgumentNullException(nameof(obj));
+
         if (!T.IsInstanceOfType(obj))
-            throw new InvalidOperationException("Can not cache a instance of another type");
+            throw new InvalidOperationException($"Can not cache a instance of another type, expected {T} got {obj.GetType()}");
 
         lock (_lock)
         {

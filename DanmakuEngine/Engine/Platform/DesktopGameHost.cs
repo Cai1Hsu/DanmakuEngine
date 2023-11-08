@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace DanmakuEngine.Games.Platform;
+namespace DanmakuEngine.Engine.Platform;
 
 public class DesktopGameHost : GameHost
 {

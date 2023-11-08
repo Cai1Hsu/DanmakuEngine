@@ -13,9 +13,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>false</PublishAot>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SDL2-CS" Version="2.0.0" />
     <PackageReference Include="Silk.NET" Version="2.18.0" />
   </ItemGroup>
 

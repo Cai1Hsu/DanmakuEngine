@@ -7,6 +7,6 @@ public class Time
 
     public double ActualFPS { get; protected set; }
 
-    public static double RenderDelta { get; protected set; }
-    public static double UpdateDelta { get; protected set; }
+    public static double RenderDelta { get; protected set; } = 1 / 60;
+    public static double UpdateDelta { get; protected set; } = 1 / 60;
 }

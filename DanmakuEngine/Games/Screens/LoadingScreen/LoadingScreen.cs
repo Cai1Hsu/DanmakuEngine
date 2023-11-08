@@ -1,6 +1,7 @@
 ﻿using DanmakuEngine.Logging;
+using DanmakuEngine.Games.Screens.MainMenu;
 
-namespace DanmakuEngine.Games.Screens.LoadingScreen;
+namespace DanmakuEngine.Games.Screens.Welcome;
 
 public class LoadingScreen : Screen
 {

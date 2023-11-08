@@ -1,8 +1,6 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Games.Screens;
-using DanmakuEngine.Games.Screens.LoadingScreen;
-using DanmakuEngine.Graphics;
-
+using DanmakuEngine.Games.Screens.Welcome;
 
 namespace DanmakuEngine.Games;
 

@@ -1,11 +1,11 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Input.Handlers;
 using DanmakuEngine.Logging;
-using Silk.NET.Input;
+using Silk.NET.SDL;
 
-namespace DanmakuEngine.Games.Screens;
+namespace DanmakuEngine.Games.Screens.MainMenu;
 
-public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, IInjectable
+public class MainMenuKeyBoardHandler : UserKeyboardHandler
 {
     [Inject]
     private ScreenStack screens = null!;
@@ -14,10 +14,11 @@ public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, II
 
     private bool cheating = false;
 
-    public override void KeyDown(IKeyboard arg1, Key arg2, int arg3)
+    public override void KeyDown(Keysym key, bool _)
     {
         // DEMO: Pressing escape closes the game
-        if (arg2 == Key.Escape)
+        
+        if (key.Sym == (int)KeyCode.KEscape)
         {
             while (!screens.Empty())
                 screens.Pop();
@@ -25,7 +26,7 @@ public class MainMenuKeyBoardHandler : UserKeyboardHandler, IKeyboardHandler, II
 
         if (secretCodeHandler != null)
         {
-            if (!cheating && secretCodeHandler.HandleKey(arg2))
+            if (!cheating && secretCodeHandler.HandleKey(key))
             {
                 Logger.Error("😠 You are cheating!");
                 cheating = true;

@@ -1,21 +1,38 @@
 using DanmakuEngine.Dependency;
-using Silk.NET.Input;
+using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public class UserKeyboardHandler : IKeyboardHandler, IInjectable
+public abstract class UserKeyboardHandler : IInjectable
 {
     public UserKeyboardHandler()
     {
         ((IInjectable)this).AutoInject();
     }
 
-    public virtual void KeyDown(IKeyboard arg1, Key arg2, int arg3)
+
+    /// <summary>
+    /// This method is called when a key is pressed down.
+    /// the event is transferred by the <see cref="TopKeyboardHandler"/>.
+    /// when handling a key down event, you should always uses sym instead of scancode
+    /// because scancode is platform dependent.
+    /// </summary>
+    /// <param name="keysym">the SDL_Keysym representing the key that was pressed</param>
+    /// <param name="repeat">non-zero if this is a key repeat</param>
+    public virtual void KeyDown(Keysym keysym, bool repeat)
     {
 
     }
 
-    public virtual void KeyUp(IKeyboard arg1, Key arg2, int arg3)
+    /// <summary>
+    /// This method is called when a key is released.
+    /// the event is transferred by the <see cref="TopKeyboardHandler"/>
+    /// see <see cref="KeyDown"/> for more information.
+    /// </summary>
+    /// <param name="keysym">the SDL_Keysym representing the key that was released</param>
+    /// <param name="repeat">non-zero if this is a key repeat</param>
+    public virtual void KeyUp(Keysym keysym, bool repeat)
     {
+        
     }
 }

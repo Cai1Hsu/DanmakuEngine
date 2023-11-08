@@ -1,44 +1,45 @@
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 using Silk.NET.Input;
+using Silk.NET.SDL;
 
-namespace DanmakuEngine.Games.Screens;
+namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class SecretCodeHandler
 {
-    private Clock Clock;
+    private readonly Clock Clock;
 
     public SecretCodeHandler(Clock clock)
     {
         this.Clock = clock;
     }
 
-    private readonly Key[] secretCode = new Key[]
+    private readonly KeyCode[] secretCode = new KeyCode[]
     {
-        Key.Up,
-        Key.Up,
-        Key.Down,
-        Key.Down,
-        Key.Left,
-        Key.Right,
-        Key.Left,
-        Key.Right,
-        Key.B,
-        Key.A,
-        Key.B,
-        Key.A
+        KeyCode.KUp,
+        KeyCode.KUp,
+        KeyCode.KDown,
+        KeyCode.KDown,
+        KeyCode.KLeft,
+        KeyCode.KRight,
+        KeyCode.KLeft,
+        KeyCode.KRight,
+        KeyCode.KB,
+        KeyCode.KA,
+        KeyCode.KB,
+        KeyCode.KA
     };
 
     private int secretCodeIndex = 0;
 
     private double lastKeyDown = -1f;
 
-    public bool HandleKey(Key key)
+    public bool HandleKey(Keysym key)
     {
         if (Clock.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
-        if (key == secretCode[secretCodeIndex])
+        if (key.Sym == (int)secretCode[secretCodeIndex])
         {
             lastKeyDown = Clock.CurrentTime;
 

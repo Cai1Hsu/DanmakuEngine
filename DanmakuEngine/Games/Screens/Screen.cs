@@ -15,7 +15,7 @@ public class Screen : CompositeDrawable, IInjectable
 
     protected ScreenStack ScreenStack => Parent;
 
-    public IKeyboardHandler keyboardHandler = null!;
+    public UserKeyboardHandler keyboardHandler = null!;
 
     public Clock Clock { get; } = new();
 

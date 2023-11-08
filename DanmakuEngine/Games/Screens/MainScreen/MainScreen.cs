@@ -1,6 +1,6 @@
 using DanmakuEngine.Logging;
 
-namespace DanmakuEngine.Games.Screens;
+namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class MainScreen : Screen
 {

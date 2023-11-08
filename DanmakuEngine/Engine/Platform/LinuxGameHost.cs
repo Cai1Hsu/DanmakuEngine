@@ -1,4 +1,4 @@
-namespace DanmakuEngine.Games.Platform;
+namespace DanmakuEngine.Engine.Platform;
 
 public class LinuxGameHost : DesktopGameHost
 {

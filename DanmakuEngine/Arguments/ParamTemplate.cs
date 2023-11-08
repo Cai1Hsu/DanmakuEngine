@@ -2,7 +2,7 @@
 
 using System.ComponentModel;
 using DanmakuEngine.Configuration;
-using DanmakuEngine.Games.Platform;
+using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;
@@ -20,6 +20,10 @@ public class ParamTemplate : Paramaters
     [Description("Specify whether to play the game under fullscreen mode")]
     public Argument Fullscreen =
         new("-fullscreen", typeof(bool), false);
+
+    [Description("Specify whether to play the game under exclusive fullscreen mode, only works when fullscreen is enabled")]
+    public Argument Exclusive =
+        new("-exclusive", typeof(bool), true);
 
     [Description("Enable debug-mode")]
     public Argument Debug =
@@ -66,6 +70,7 @@ public class ParamTemplate : Paramaters
             { Help, "Print the help screen" },
             { HelpShort, "Print the help screen" },
             { ClearScreen, "Clear screen before rendering the next frame" },
+            { Exclusive, "Specify whether to play the game under exclusive fullscreen mode, only works when fullscreen is enabled" },
         };
     }
 

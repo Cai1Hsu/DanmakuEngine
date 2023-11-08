@@ -1,25 +1,17 @@
 using DanmakuEngine.Input.Handlers;
 using DanmakuEngine.Dependency;
-using DanmakuEngine.Games;
+using DanmakuEngine.Engine;
 using Silk.NET.Input;
+using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Input;
 
-public class InputManager : ICacheHookable
+public class InputManager
 {
-    private IInputContext Input { get; }
-
     public List<IInputHandler> Handlers { get; private set; } = null!;
 
-    public InputManager(IInputContext input)
+    public InputManager()
     {
-        this.Input = input;
-    }
-
-    public void OnCache(DependencyContainer dependencies)
-    {
-        dependencies.Cache(Input);
-
         Handlers = new List<IInputHandler>()
         {
             new TopKeyboardHandler(),
@@ -27,5 +19,15 @@ public class InputManager : ICacheHookable
 
         foreach (var h in Handlers)
             h.AutoInject();
+    }
+
+    public void RegisterHandlers(GameHost host)
+    {
+        foreach (var h in Handlers)
+        {
+            Logger.Debug($"Registering {h.GetType()}");
+
+            h.Register(host);
+        }
     }
 }
