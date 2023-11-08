@@ -33,6 +33,6 @@ public abstract class UserKeyboardHandler : IInjectable
     /// <param name="repeat">non-zero if this is a key repeat</param>
     public virtual void KeyUp(Keysym keysym, bool repeat)
     {
-        
+
     }
 }

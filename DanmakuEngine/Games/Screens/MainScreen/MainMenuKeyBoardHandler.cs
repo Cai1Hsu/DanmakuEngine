@@ -17,7 +17,7 @@ public class MainMenuKeyBoardHandler : UserKeyboardHandler
     public override void KeyDown(Keysym key, bool _)
     {
         // DEMO: Pressing escape closes the game
-        
+
         if (key.Sym == (int)KeyCode.KEscape)
         {
             while (!screens.Empty())

@@ -17,72 +17,72 @@ public class WindowManager
             case WindowEventID.Shown:
                 WindowShown?.Invoke();
                 break;
-            
+
             case WindowEventID.Hidden:
                 WindowHidden?.Invoke();
                 break;
-            
+
             case WindowEventID.Exposed:
                 WindowExposed?.Invoke();
                 break;
-            
+
             case WindowEventID.Moved:
                 WindowMoved?.Invoke();
                 break;
-            
+
             case WindowEventID.Resized:
                 WindowResized?.Invoke();
                 break;
-            
+
             // This handles both Resized and SizeChanged
             case WindowEventID.SizeChanged:
                 WindowSizeChanged?.Invoke();
                 break;
-            
+
             case WindowEventID.Minimized:
                 WindowMinimized?.Invoke();
                 break;
-            
+
             case WindowEventID.Maximized:
                 WindowMaximized?.Invoke();
                 break;
-            
+
             case WindowEventID.Restored:
                 WindowRestored?.Invoke();
                 break;
-            
+
             case WindowEventID.Enter:
                 WindowEnter?.Invoke();
                 break;
-            
+
             case WindowEventID.Leave:
                 WindowLeave?.Invoke();
                 break;
-            
+
             case WindowEventID.FocusGained:
                 WindowFocusGained?.Invoke();
                 break;
-            
+
             case WindowEventID.FocusLost:
                 WindowFocusLost?.Invoke();
                 break;
-            
+
             case WindowEventID.Close:
                 WindowClose?.Invoke();
                 break;
-            
+
             case WindowEventID.TakeFocus:
                 WindowTakeFocus?.Invoke();
                 break;
-            
+
             case WindowEventID.HitTest:
                 WindowHitTest?.Invoke();
                 break;
-            
+
             case WindowEventID.IccprofChanged:
                 WindowIccprofChanged?.Invoke();
                 break;
-            
+
             case WindowEventID.DisplayChanged:
                 WindowDisplayChanged?.Invoke();
                 break;
