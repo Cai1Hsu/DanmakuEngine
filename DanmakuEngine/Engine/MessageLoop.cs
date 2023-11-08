@@ -1,8 +1,4 @@
 using System.Diagnostics;
-using DanmakuEngine.Configuration;
-using DanmakuEngine.Dependency;
-using DanmakuEngine.Graphics;
-using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
 

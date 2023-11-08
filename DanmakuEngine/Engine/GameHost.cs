@@ -196,6 +196,8 @@ public unsafe partial class GameHost
             size.X, size.Y,
             (uint)windowFlag);
 
+        Logger.Debug($"Display mode: {ConfigManager.RefreshRate}Hz");
+
         DisplayMode deisplayMode = new DisplayMode(null, size.X, size.Y, ConfigManager.RefreshRate, null);
 
         _sdl.SetWindowDisplayMode(window, deisplayMode);
@@ -276,6 +278,9 @@ public unsafe partial class GameHost
 
         // // TODO
         // // Do render
+
+        _sdl.RenderPresent(renderer);
+        _sdl.UpdateWindowSurface(window);
     }
 
     protected void UpdateFps(double delta)
