@@ -3,7 +3,7 @@ using DanmakuEngine.Dependency;
 
 namespace DanmakuEngine.Logging;
 
-public class Logger : IInjectable
+public class Logger : IInjectable, IAutoloadable
 {
     [Inject]
     private ConfigManager ConfigManager = null!;
@@ -40,11 +40,7 @@ public class Logger : IInjectable
     {
         var logger = GetLogger();
 
-        if (!ConfigManager.DebugBuild)
-            return;
-
-        if (logger.ConfigManager != null
-            && !logger.ConfigManager.DebugMode)
+        if (logger.ConfigManager != null && !logger.ConfigManager.DebugMode)
             return;
 
         Log(message, LogLevel.Debug);
@@ -160,9 +156,9 @@ public class Logger : IInjectable
         }
     }
 
-    public static void Write(string str) => Console.Write(str);
+    private static void Write(string str) => Console.Write(str);
 
-    public static void WriteLine(string str) => Console.WriteLine(str);
+    private static void WriteLine(string str) => Console.WriteLine(str);
 
     private static void PeriodSave()
     {
@@ -192,6 +188,14 @@ public class Logger : IInjectable
         _instence.logLevel = logLevel;
 
         Logger.Log($"Log level updated, current: {_instence.logLevel}");
+    }
+
+    public void OnInjected()
+    {
+        if (ConfigManager == null)
+        {
+            Logger.Debug("ConfigManager is not injected, DebugMode is always enabled");
+        }
     }
 
     /// <summary>

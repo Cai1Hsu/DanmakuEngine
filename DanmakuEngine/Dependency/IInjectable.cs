@@ -56,6 +56,6 @@ public interface IInjectable
         }
 
         if (this is IAutoloadable autoloadable)
-            autoloadable.OnLoad();
+            autoloadable.OnInjected();
     }
 }

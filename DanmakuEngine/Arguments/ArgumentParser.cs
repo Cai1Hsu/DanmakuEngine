@@ -74,7 +74,7 @@ public class ArgumentParser : IDisposable
                     throw missingValueException;
 
                 var usages = GetUsage(arg);
-                usages.ForEach(s => Logger.WriteLine(s));
+                usages.ForEach(s => Logger.Write(s, true, true));
 
                 throw missingValueException;
             }
@@ -208,7 +208,7 @@ public class ArgumentParser : IDisposable
     {
         var helps = GenerateHelp();
 
-        helps.ForEach(s => Logger.WriteLine(s));
+        helps.ForEach(s => Logger.Write(s, true, true));
     }
 
     public ArgumentProvider CreateArgumentProvider()
