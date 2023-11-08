@@ -78,7 +78,7 @@ public partial class GameHost : Time, IDisposable
 
         DependencyContainer.AutoInject(Logger.GetLogger());
     }
-    private void SetUpSdl()
+    public virtual void SetUpSdl()
     {
         _sdl = Sdl.GetApi();
     }
@@ -155,7 +155,7 @@ public partial class GameHost : Time, IDisposable
             return;
 
         // TODO: dispose managed state (managed objects)
-        // Sdl.
+        PerformExit();
     }
 }
 
@@ -168,7 +168,7 @@ public unsafe partial class GameHost
 
     public Renderer* renderer { get; private set; }
 
-    private void RegisterEvents()
+    public virtual void RegisterEvents()
     {
         windowManager = new WindowManager(*window);
 
@@ -179,7 +179,7 @@ public unsafe partial class GameHost
         InputManager.RegisterHandlers(this);
     }
 
-    private unsafe void SetUpWindowAndRenderer()
+    public virtual unsafe void SetUpWindowAndRenderer()
     {
         var size = new Vector2D<int>(640, 480);
 
@@ -207,14 +207,14 @@ public unsafe partial class GameHost
                                             targettexture: false);
 
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
+
+        windowSurface = _sdl.GetWindowSurface(window);
     }
 
 
     private void DoLoad()
     {
         Logger.Debug("Loading game in progress...");
-
-        windowSurface = _sdl.GetWindowSurface(window);
 
         if (ConfigManager.HasConsole)
         {
@@ -242,7 +242,7 @@ public unsafe partial class GameHost
     }
 
     private DrawableContainer Root = null!;
-    private void DoUpdate()
+    protected void DoUpdate()
     {
         if (Root == null)
             return;
@@ -265,7 +265,7 @@ public unsafe partial class GameHost
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
 
-    private void DoRender()
+    protected void DoRender()
     {
         if (clearOnRender)
             _sdl.RenderClear(renderer);
@@ -304,8 +304,12 @@ public unsafe partial class GameHost
     {
         sw.Stop();
 
-        _sdl.DestroyRenderer(renderer);
-        _sdl.DestroyWindow(window);
+        // This helps HeadlessGameHost to stop
+        if (_sdl != null)
+        {
+            _sdl.DestroyRenderer(renderer);
+            _sdl.DestroyWindow(window);
+        }
 
         if (ConfigManager.HasConsole)
             Console.CursorVisible = true;

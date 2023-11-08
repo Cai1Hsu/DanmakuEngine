@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
 
@@ -8,14 +9,18 @@ public unsafe partial class GameHost
 {
     public WindowManager windowManager = null!;
     public void RequestClose()
-        => isRunning = false;
+    {
+        Logger.Info("Requesting close");
 
-    private bool isRunning = true;
+        isRunning = false;
+    }
 
-    private readonly Stopwatch sw = new();
+    protected bool isRunning = true;
 
-    private long lastUpdateTicks = 0;
-    private long lastRenderTicks = 0;
+    protected readonly Stopwatch sw = new();
+
+    protected long lastUpdateTicks = 0;
+    protected long lastRenderTicks = 0;
 
     public void RunUntilExit()
     {
@@ -24,6 +29,14 @@ public unsafe partial class GameHost
         sw.Reset();
         sw.Start();
 
+        HandleMessages();
+
+        sw.Stop();
+        PerformExit();
+    }
+
+    public virtual void HandleMessages()
+    {
         while (isRunning)
         {
             long currentTicks = sw.ElapsedTicks;
@@ -95,9 +108,6 @@ public unsafe partial class GameHost
 
             lastRenderTicks = currentTicks;
         }
-
-        sw.Stop();
-        PerformExit();
     }
 
     public event Action<KeyboardEvent> KeyDown = null!;
