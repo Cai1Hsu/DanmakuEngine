@@ -10,6 +10,7 @@ using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine;
@@ -66,7 +67,7 @@ public partial class GameHost : Time, IDisposable
     private void LoadConfig()
     {
         ConfigManager = new ConfigManager();
-        Dependencies.CacheAndInject(ConfigManager);
+        Dependencies.Cache(ConfigManager);
 
         using var argParser = new ArgumentParser(new ParamTemplate());
         using var argProvider = argParser.CreateArgumentProvider();
@@ -109,6 +110,8 @@ public partial class GameHost : Time, IDisposable
 
         flags |= WindowFlags.MouseCapture;
         flags |= WindowFlags.MouseFocus;
+
+        flags |= WindowFlags.Opengl;
 
         return flags;
     }
@@ -168,6 +171,8 @@ public unsafe partial class GameHost
 
     public Renderer* renderer { get; private set; }
 
+    public void* glContext;
+
     public virtual void RegisterEvents()
     {
         windowManager = new WindowManager(*window);
@@ -209,8 +214,16 @@ public unsafe partial class GameHost
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
 
         windowSurface = _sdl.GetWindowSurface(window);
-    }
 
+        glContext = _sdl.GLCreateContext(window);
+
+        if (glContext == null)
+        {
+            PerformExit();
+
+            throw new Exception("Failed to create GLContext");
+        }
+    }
 
     private void DoLoad()
     {
@@ -279,8 +292,10 @@ public unsafe partial class GameHost
         // // TODO
         // // Do render
 
+        _sdl.GLSwapWindow(window);
+
         _sdl.RenderPresent(renderer);
-        _sdl.UpdateWindowSurface(window);
+        _sdl.UpdateWindowSurface(window);    
     }
 
     protected void UpdateFps(double delta)
