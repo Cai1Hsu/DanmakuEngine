@@ -2,7 +2,6 @@ using System.Diagnostics;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
-
 namespace DanmakuEngine.Engine;
 
 public unsafe partial class GameHost

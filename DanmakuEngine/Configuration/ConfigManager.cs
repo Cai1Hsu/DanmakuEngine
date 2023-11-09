@@ -1,12 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.InteropServices;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine.Platform;
 
 namespace DanmakuEngine.Configuration;
 
-public class ConfigManager : IInjectable
+public partial class ConfigManager
 {
     [LoadFromArgument("-refresh")] public int RefreshRate { get; private set; }
 

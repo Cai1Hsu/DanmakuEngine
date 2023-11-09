@@ -5,7 +5,7 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
-public class MainMenuKeyBoardHandler : UserKeyboardHandler
+public partial class MainMenuKeyBoardHandler : UserKeyboardHandler
 {
     [Inject]
     private ScreenStack screens = null!;

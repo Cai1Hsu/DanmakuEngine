@@ -1,7 +1,5 @@
 using DanmakuEngine.Input.Handlers;
-using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
-using Silk.NET.Input;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Input;

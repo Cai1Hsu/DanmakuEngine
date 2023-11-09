@@ -14,16 +14,17 @@
     <Nullable>enable</Nullable>
     <PublishAot>false</PublishAot>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="SDL2-CS" Version="2.0.0" />
-    <PackageReference Include="Silk.NET" Version="2.18.0" />
+    <ProjectReference Include="..\DanmakuEngine.SourceGeneration\DanmakuEngine.SourceGeneration.csproj" 
+                      OutputItemType="Analyzer"
+                      ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
-    <TrimmerRootAssembly Include="Silk.NET.Windowing.Common" />
-    <TrimmerRootAssembly Include="Silk.NET.Input.Common" />
+    <PackageReference Include="Silk.NET" Version="2.18.0" />
   </ItemGroup>
 
 </Project>

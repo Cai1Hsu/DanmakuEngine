@@ -6,7 +6,7 @@ using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;
 
-public class Screen : CompositeDrawable, IInjectable
+public partial class Screen : CompositeDrawable, IInjectable
 {
     [Inject]
     private ScreenStack _parent = null!;

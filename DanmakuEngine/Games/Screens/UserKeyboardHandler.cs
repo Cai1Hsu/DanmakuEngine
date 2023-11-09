@@ -3,13 +3,13 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public abstract class UserKeyboardHandler : IInjectable
+public abstract partial class UserKeyboardHandler
 {
     public UserKeyboardHandler()
     {
-        ((IInjectable)this).AutoInject();
+        if (this is IInjectable injectable)
+            injectable.AutoInject();
     }
-
 
     /// <summary>
     /// This method is called when a key is pressed down.

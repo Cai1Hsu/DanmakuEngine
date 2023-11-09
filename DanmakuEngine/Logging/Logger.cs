@@ -3,7 +3,7 @@ using DanmakuEngine.Dependency;
 
 namespace DanmakuEngine.Logging;
 
-public class Logger : IInjectable, IAutoloadable
+public partial class Logger : IInjectable, IAutoloadable
 {
     [Inject]
     private ConfigManager ConfigManager = null!;
