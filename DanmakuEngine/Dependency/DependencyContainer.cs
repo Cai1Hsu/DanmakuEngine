@@ -6,6 +6,8 @@ public class DependencyContainer
 {
     public static DependencyContainer Instance { get; private set; } = null!;
 
+    private static object _instanceLock = new();
+
     private readonly object _lock = new();
 
     private readonly Dictionary<Type, object?> _cache = new();
@@ -50,30 +52,35 @@ public class DependencyContainer
         ((IInjectable)obj).AutoInject();
     }
 
-    public static T Get<T>() => (T)Instance.Get(typeof(T));
+    public static T Get<T>()
+    {
+        lock (_instanceLock)
+        {
+            return (T)Instance.Get(typeof(T));
+        }
+    }
 
     public object Get(Type T)
     {
         lock (_lock)
         {
-            if (!_cache.TryGetValue(T, out var value))
-                return null!;
+            if (_cache.TryGetValue(T, out var obj))
+            {
+                if (obj == null)
+                    throw new Exception($"Cached object of type {T} is null");
 
-            return value!;
+                return obj;
+            }
+
+            throw new Exception($"Target type not found in cache: {T}");
         }
     }
 
     public static void AutoInject(IInjectable obj)
         => obj.AutoInject();
 
-    public DependencyContainer(GameHost? h = null!)
+    static DependencyContainer()
     {
-        if (Instance != null)
-            throw new InvalidOperationException("Already created a dependency container");
-
-        Instance = this;
-
-        if (h != null)
-            Cache(h);
+        Instance = new DependencyContainer();
     }
 }

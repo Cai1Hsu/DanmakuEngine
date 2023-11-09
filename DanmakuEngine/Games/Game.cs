@@ -11,16 +11,13 @@ public partial class Game : IInjectable
     [Inject]
     private ScreenStack screens = null!;
 
-    public Game()
-    {
-        AutoInject();
-    }
-
     /// <summary>
     /// The game logic starts here
     /// </summary>
     public void Begin()
     {
+        AutoInject();
+
         screens.Push(new LoadingScreen());
     }
 }

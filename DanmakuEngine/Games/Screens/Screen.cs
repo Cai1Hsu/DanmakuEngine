@@ -21,7 +21,7 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public Screen() : base(null!)
     {
-        _parent = DependencyContainer.Get<ScreenStack>();
+        this.AutoInject();
 
         this.load();
 

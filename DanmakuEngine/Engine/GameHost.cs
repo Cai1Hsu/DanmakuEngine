@@ -27,7 +27,7 @@ public partial class GameHost : Time, IDisposable
 
     public InputManager InputManager { get; private set; } = null!;
 
-    public DependencyContainer Dependencies { get; private set; } = null!;
+    public DependencyContainer Dependencies { get; private set; } = DependencyContainer.Instance;
 
     private ScreenStack screens = null!;
 
@@ -60,10 +60,11 @@ public partial class GameHost : Time, IDisposable
 
     private void SetUpDependency()
     {
-        Dependencies = new DependencyContainer(this);
+        Dependencies.Cache(this);
 
         Dependencies.Cache((Time)this);
     }
+
     private void LoadConfig()
     {
         ConfigManager = new ConfigManager();
@@ -105,7 +106,7 @@ public partial class GameHost : Time, IDisposable
         if (alwaysOnTop)
             flags |= WindowFlags.AlwaysOnTop;
 
-        flags |= WindowFlags.InputGrabbed;
+        // flags |= WindowFlags.InputGrabbed;
         flags |= WindowFlags.InputFocus;
 
         flags |= WindowFlags.MouseCapture;
