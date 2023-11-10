@@ -23,12 +23,12 @@ public class LoadingScreen : Screen
         Logger.Log("少女祈祷中");
         Logger.Log("    Now loading...");
 
-        Logger.Log("This will took about 2s");
+        Logger.Log("This will took about 5s");
 
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
-        await Task.Delay(2000);
+        await Task.Delay(5000);
 
         ScreenStack.Switch(new MainScreen());
     }
