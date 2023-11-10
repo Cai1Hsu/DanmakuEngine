@@ -294,9 +294,10 @@ public unsafe partial class GameHost
         // // Do render
 
         _sdl.GLSwapWindow(window);
-
-        _sdl.RenderPresent(renderer);
-        _sdl.UpdateWindowSurface(window);    
+        
+        // We dont use sdl render api anymore
+        // _sdl.RenderPresent(renderer);
+        // _sdl.UpdateWindowSurface(window);    
     }
 
     protected void UpdateFps(double delta)
