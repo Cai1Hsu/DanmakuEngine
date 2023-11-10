@@ -1,3 +1,4 @@
+using DanmakuEngine.Configuration;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 
@@ -22,22 +23,17 @@ public class ScreenStack : CompositeDrawable
         if (Empty())
             throw new InvalidOperationException("Cannot switch to a screen when the stack is empty");
 
-#if DEBUG
         Screen last = null!;
-#endif
 
         lock (_lock)
         {
-#if DEBUG
             last =
-#endif
             screens.Pop();
             screens.Push(screen);
         }
 
-#if DEBUG
-        Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {screens.Count}");
-#endif
+        if (ConfigManager.HasConsole)
+            Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {screens.Count}");
     }
 
     /// <summary>
@@ -51,9 +47,8 @@ public class ScreenStack : CompositeDrawable
             screens.Push(screen);
         }
 
-#if DEBUG
-        Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {screens.Count}");
-#endif
+        if (ConfigManager.HasConsole)
+            Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {screens.Count}");
     }
 
     public Screen? Peek()
@@ -71,9 +66,8 @@ public class ScreenStack : CompositeDrawable
     {
         var screen = screens.Pop();
 
-#if DEBUG
-        Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {screens.Count}");
-#endif
+        if (ConfigManager.HasConsole)
+            Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {screens.Count}");
 
         return screen;
     }

@@ -212,11 +212,15 @@ public unsafe partial class GameHost
                                             Vsync: ConfigManager.Vsync,
                                             targettexture: false);
 
+        // we dont use sdl render api anymore
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
 
         windowSurface = _sdl.GetWindowSurface(window);
 
         glContext = _sdl.GLCreateContext(window);
+
+        if (!ConfigManager.Vsync)
+            _sdl.GLSetSwapInterval(0);
 
         if (glContext == null)
         {
@@ -329,6 +333,10 @@ public unsafe partial class GameHost
         }
 
         if (ConfigManager.HasConsole)
+        {
             Console.CursorVisible = true;
+
+            Console.ResetColor();
+        }
     }
 }

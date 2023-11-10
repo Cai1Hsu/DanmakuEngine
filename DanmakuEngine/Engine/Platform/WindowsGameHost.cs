@@ -31,7 +31,7 @@ public class WindowsGameHost : DesktopGameHost
 
         AllocConsole();
 
-        Configuration.ConfigManager.UpdateConsoleStatus();
+        Configuration.ConfigManager.UpdateConsoleStatus(true);
     }
 
     protected override void SetUpConsole()

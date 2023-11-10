@@ -39,9 +39,9 @@ public class HeadlessGameHost : GameHost
 
             DoUpdate();
 
-#if DEBUG
+// #if DEBUG
             UpdateFps(RenderDelta);
-#endif
+// #endif
 
             lastUpdateTicks = currentTicks;
 

@@ -64,8 +64,8 @@ public partial class ConfigManager
             return _hasConsole.Value;
         }
     }
-    public static void UpdateConsoleStatus()
-        => _hasConsole = WindowsGameHost.HasConsole();
+    public static void UpdateConsoleStatus(bool hasConsole)
+        => _hasConsole = hasConsole;
 
     static ConfigManager()
     {

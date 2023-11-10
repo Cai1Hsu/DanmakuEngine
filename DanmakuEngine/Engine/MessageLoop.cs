@@ -97,9 +97,7 @@ public unsafe partial class GameHost
 
             DoUpdate();
 
-#if DEBUG
             UpdateFps(RenderDelta);
-#endif
 
             lastUpdateTicks = currentTicks;
 
