@@ -10,8 +10,20 @@ using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 using Silk.NET.Maths;
-using Silk.NET.OpenGL;
 using Silk.NET.SDL;
+using Silk.NET.OpenGL;
+using SixLabors.Fonts;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Drawing.Processing;
+using PixelFormat = Silk.NET.OpenGL.PixelFormat;
+using PixelType = Silk.NET.OpenGL.PixelType;
+using SixLabors.ImageSharp.Advanced;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using SixLabors.ImageSharp.Memory;
+using Color = SixLabors.ImageSharp.Color;
+
 
 namespace DanmakuEngine.Engine;
 
@@ -83,6 +95,13 @@ public partial class GameHost : Time, IDisposable
     public virtual void SetUpSdl()
     {
         _sdl = Sdl.GetApi();
+
+        _sdl.GLSetAttribute(GLattr.RedSize, 8);
+        _sdl.GLSetAttribute(GLattr.GreenSize, 8);
+        _sdl.GLSetAttribute(GLattr.BlueSize, 8);
+        _sdl.GLSetAttribute(GLattr.AccumAlphaSize, 0);
+        _sdl.GLSetAttribute(GLattr.DepthSize, 16);
+        _sdl.GLSetAttribute(GLattr.StencilSize, 8);
     }
 
     public WindowFlags GenerateWindowFlags(bool FullScreen = false, bool exclusive = true, bool resiable = false, bool allowHighDpi = true, bool alwaysOnTop = false)
@@ -106,7 +125,10 @@ public partial class GameHost : Time, IDisposable
         if (alwaysOnTop)
             flags |= WindowFlags.AlwaysOnTop;
 
+        // TODO: Add argument for this
+        // This restricts the mouse to the window
         // flags |= WindowFlags.InputGrabbed;
+
         flags |= WindowFlags.InputFocus;
 
         flags |= WindowFlags.MouseCapture;
@@ -136,7 +158,7 @@ public partial class GameHost : Time, IDisposable
         var name = Game.Name;
 
         if (ConfigManager.DebugBuild)
-            return name + $" - Debug {ver}";
+            return name + $" - dev {ver}";
 
         return name + $" - ver {ver}";
     }
@@ -172,7 +194,11 @@ public unsafe partial class GameHost
 
     public Renderer* renderer { get; private set; }
 
-    public void* glContext;
+    public void* glContext { get; private set; }
+
+    public SdlGlContext sdlGlContext { get; private set; } = null!;
+
+    public GL gl { get; private set; } = null!;
 
     public virtual void RegisterEvents()
     {
@@ -215,12 +241,25 @@ public unsafe partial class GameHost
         // we dont use sdl render api anymore
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
 
-        windowSurface = _sdl.GetWindowSurface(window);
-
-        glContext = _sdl.GLCreateContext(window);
+        initlizeOpenGL();
 
         if (!ConfigManager.Vsync)
             _sdl.GLSetSwapInterval(0);
+        else
+            _sdl.GLSetSwapInterval(1);
+    }
+
+    private void initlizeOpenGL()
+    {
+        windowSurface = _sdl.GetWindowSurface(window);
+
+        _sdl.GLSetAttribute(GLattr.ContextProfileMask, (int)GLprofile.Core);
+
+        // Minimum OpenGL version for core profile:
+        _sdl.GLSetAttribute(GLattr.ContextMajorVersion, 3);
+        _sdl.GLSetAttribute(GLattr.ContextMinorVersion, 2);
+
+        glContext = _sdl.GLCreateContext(window);
 
         if (glContext == null)
         {
@@ -228,7 +267,103 @@ public unsafe partial class GameHost
 
             throw new Exception("Failed to create GLContext");
         }
+
+        sdlGlContext = new SdlGlContext(_sdl);
+
+        gl = GL.GetApi(sdlGlContext);
+
+        if (gl == null)
+            throw new Exception("Failed to get GL api");
+
+        // We are using opengl on this *window*
+        _sdl.GLMakeCurrent(window, glContext);
+
+        _vao = gl.GenVertexArray();
+        gl.BindVertexArray(_vao);
+
+        // The quad vertices data.
+        // You may have noticed an addition - texture coordinates!
+        // Texture coordinates are a value between 0-1 (see more later about this) which tell the GPU which part
+        // of the texture to use for each vertex.
+        float[] vertices =
+        {
+            // aPosition--------   aTexCoords
+             0.7f, -1.0f -0.2f, 0.0f,  0.0f, 0.0f, // 左下角
+             0.7f, -0.7f -0.2f, 0.0f,  0.0f, 1.0f, // 左上角
+             1.0f, -0.7f -0.2f, 0.0f,  1.0f, 1.0f, // 右上角
+             1.0f, -1.0f -0.2f, 0.0f,  1.0f, 0.0f  // 右下角
+        };
+
+        // Create the VBO.
+        _vbo = gl.GenBuffer();
+        gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
+
+        // Upload the vertices data to the VBO.
+        fixed (float* buf = vertices)
+            gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(vertices.Length * sizeof(float)), buf, BufferUsageARB.StaticDraw);
+
+        // The quad indices data.
+        uint[] indices =
+        {
+                0u, 1u, 3u,
+                1u, 2u, 3u
+        };
+
+        // Create the EBO.
+        _ebo = gl.GenBuffer();
+        gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, _ebo);
+
+        // Upload the indices data to the EBO.
+        fixed (uint* buf = indices)
+            gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(indices.Length * sizeof(uint)), buf, BufferUsageARB.StaticDraw);
+
+
+        uint vertexShader = gl.CreateShader(ShaderType.VertexShader);
+        gl.ShaderSource(vertexShader, vertexShaderSource);
+        gl.CompileShader(vertexShader);
+
+        uint fragmentShader = gl.CreateShader(ShaderType.FragmentShader);
+        gl.ShaderSource(fragmentShader, fragmentShaderSource);
+        gl.CompileShader(fragmentShader);
+
+        shaderProgram = gl.CreateProgram();
+        gl.AttachShader(shaderProgram, vertexShader);
+        gl.AttachShader(shaderProgram, fragmentShader);
+        gl.LinkProgram(shaderProgram);
     }
+
+    private static uint _vao;
+    private static uint _vbo;
+    private static uint _ebo;
+
+    private uint shaderProgram;
+
+    string vertexShaderSource = @"
+#version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec2 aTexCoord;
+
+out vec2 TexCoord;
+
+void main()
+{
+    gl_Position = vec4(aPos, 1.0);
+    TexCoord = aTexCoord;
+}";
+
+    // 片段着色器
+    string fragmentShaderSource = @"
+#version 330 core
+out vec4 FragColor;
+
+in vec2 TexCoord;
+
+uniform sampler2D texture1;
+
+void main()
+{
+    FragColor = texture(texture1, vec2(TexCoord.x, 1.0 - TexCoord.y));
+}";
 
     private void DoLoad()
     {
@@ -283,8 +418,12 @@ public unsafe partial class GameHost
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
 
+    private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
+    private Font font = SystemFonts.CreateFont("Consolas", 22);
     protected void DoRender()
     {
+        gl.Clear((uint)ClearBufferMask.ColorBufferBit | (uint)ClearBufferMask.DepthBufferBit);
+
         if (clearOnRender)
             _sdl.RenderClear(renderer);
 
@@ -294,14 +433,52 @@ public unsafe partial class GameHost
             // buffer.Object.DrawOpaqueInteriorSubTree(Renderer, depthValue);
         }
 
-        // // TODO
-        // // Do render
+        // TODO
+        // Do render
+
+        gl.BindVertexArray(_vao);
+        gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
+        gl.EnableVertexAttribArray(0);
+        gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        gl.EnableVertexAttribArray(1);
+
+        gl.UseProgram(shaderProgram);
+
+        int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
+
+        gl.Uniform1(textureLocation, 0);
+
+        uint textureId = gl.GenTexture();
+
+        gl.ActiveTexture(TextureUnit.Texture0);
+        gl.BindTexture(GLEnum.Texture2D, textureId);
+
+        IMemoryGroup<Rgba32> pixelDataGroup = fpsText.GetPixelMemoryGroup();
+        foreach (Memory<Rgba32> memory in pixelDataGroup)
+        {
+            Span<Rgba32> span = memory.Span;
+            unsafe
+            {
+                fixed (Rgba32* pixelPtr = &span.GetPinnableReference())
+                {
+                    gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)fpsText.Width, (uint)fpsText.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixelPtr);
+                }
+            }
+        }
+
+        // 设置纹理参数
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+
+        // 绘制纹理
+        gl.Enable(EnableCap.Texture2D);
+
+        // 绘制一个纹理映射的四边形
+        gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
 
         _sdl.GLSwapWindow(window);
-        
-        // We dont use sdl render api anymore
-        // _sdl.RenderPresent(renderer);
-        // _sdl.UpdateWindowSurface(window);    
     }
 
     protected void UpdateFps(double delta)
@@ -311,6 +488,9 @@ public unsafe partial class GameHost
 
         if (count_time < 1)
             return;
+
+        fpsText.Mutate(x => x.Clear(Color.Transparent));
+        fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
 
         if (ConfigManager.HasConsole)
             Logger.Write($"FPS: {ActualFPS:F2}\r", true);
@@ -328,6 +508,7 @@ public unsafe partial class GameHost
         // This helps HeadlessGameHost to stop
         if (_sdl != null)
         {
+            _sdl.GLDeleteContext(glContext);
             _sdl.DestroyRenderer(renderer);
             _sdl.DestroyWindow(window);
         }
