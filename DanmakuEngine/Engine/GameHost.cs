@@ -391,7 +391,7 @@ void main()
 
         RegisterEvents();
 
-        Game.Begin();
+        Game.begin();
     }
 
     private DrawableContainer Root = null!;
@@ -442,40 +442,32 @@ void main()
         gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
         gl.EnableVertexAttribArray(1);
 
-        gl.UseProgram(shaderProgram);
+        // gl.UseProgram(shaderProgram);
 
-        int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
+        // int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
 
-        gl.Uniform1(textureLocation, 0);
+        // gl.Uniform1(textureLocation, 0);
 
-        uint textureId = gl.GenTexture();
+        // uint textureId = gl.GenTexture();
 
-        gl.ActiveTexture(TextureUnit.Texture0);
-        gl.BindTexture(GLEnum.Texture2D, textureId);
+        // gl.ActiveTexture(TextureUnit.Texture0);
+        // gl.BindTexture(GLEnum.Texture2D, textureId);
+        
+        // fpsText.ProcessPixelRows(accessor => 
+        // {
+        //     for (int y = 0; y < fpsText.Height; y++)
+        //     {
+        //         fixed (void* data = accessor.GetRowSpan(y))
+        //         {
+        //             gl.TexSubImage2D(GLEnum.Texture2D, 0, 0, y, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
 
-        IMemoryGroup<Rgba32> pixelDataGroup = fpsText.GetPixelMemoryGroup();
-        foreach (Memory<Rgba32> memory in pixelDataGroup)
-        {
-            Span<Rgba32> span = memory.Span;
-            unsafe
-            {
-                fixed (Rgba32* pixelPtr = &span.GetPinnableReference())
-                {
-                    gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)fpsText.Width, (uint)fpsText.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixelPtr);
-                }
-            }
-        }
+        //             // gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+        //         }
+        //     }
+        // });
 
-        // 设置纹理参数
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
-        // 绘制纹理
         gl.Enable(EnableCap.Texture2D);
 
-        // 绘制一个纹理映射的四边形
         gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
 
         _sdl.GLSwapWindow(window);
