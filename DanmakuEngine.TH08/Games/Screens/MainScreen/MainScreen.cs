@@ -64,9 +64,6 @@ public class MainScreen : Screen
                 )
             ).LoopForever(),
         });
-
-        Console.Clear();
-        Console.ResetColor();
     }
 
     private void PrintSlider(int percentage)
@@ -92,24 +89,26 @@ public class MainScreen : Screen
     private void EnemySpell(double percentage)
     {
         const int height = 25;
+        const string spell = "難題「仏の御石の鉢　-砕けぬ意思-」";
 
-        int line = height - (int)(percentage * height);
+        int line = height - (int)Math.Round(percentage * height);
 
         Console.SetCursorPosition(0, 1);
         for (int i = 0; i < 26; i++)
         {
             if (i == line)
-                Logger.Write("難題「仏の御石の鉢　-砕けぬ意思-」", writeLine: true);
+                Logger.Write(spell, writeLine: true);
             else
-                Logger.Write(' '.Multiply(50), writeLine: true);
+                Logger.Write(' '.Multiply(spell.GetDisplayLength()), writeLine: true);
         }
     }
 
     private void UseSpell(double percentage)
     {
         const int height = 15;
+        const string spell = "恋符「マスタースパーク」";
 
-        int line = (int)(percentage * height);
+        int line = (int)Math.Round(percentage * height);
 
         Console.SetCursorPosition(0, 10);
         for (int i = 1; i <= 26; i++)
@@ -117,20 +116,26 @@ public class MainScreen : Screen
             Logger.Write("\u001b[50C");
 
             if (i == line)
-                Logger.Write("恋符「マスタースパーク」", writeLine: true);
+                Logger.Write(spell, writeLine: true);
             else
-                Logger.Write(' '.Multiply(100), writeLine: true);
+                Logger.Write(' '.Multiply(spell.GetDisplayLength()), writeLine: true);
         }
     }
 
     private void ShowBGM(double percentage)
     {
-        // japanese causes width issue so we uses english
+        // japanese causes width issue
+        // when we meet CJK characters, the whole character will be shown or disappear
+        // this lead to the animation speed not constant
         const string bgm = "BGM: Taketori Hishou ~ Lunatic Princess";
+        int wholeDisplayLength = bgm.GetDisplayLength();
 
         int chars = (int)Math.Round(percentage * bgm.Length);
+        string displayString = bgm.Substring(0, chars);
 
-        string line = ' '.Multiply(50 - chars) + bgm[0..chars];
+        int displayLength = displayString.GetDisplayLength();
+
+        string line = ' '.Multiply(wholeDisplayLength - displayLength) + displayString;
 
         Console.SetCursorPosition(50, 1);
         Console.Write(line);
@@ -142,6 +147,7 @@ public class MainScreen : Screen
         Logger.Info("Keyboard is handled in this screen.");
         Logger.Info("You can exit the game by pressing ESC.");
 
+        Console.Clear();
         Console.ResetColor();
         foreach (var transformation in transformations)
         {
