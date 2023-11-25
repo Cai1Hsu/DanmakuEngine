@@ -82,7 +82,7 @@ public unsafe partial class GameHost
                         break;
 
                     case EventType.Windowevent:
-                        windowManager?.HandleWindowEvent((WindowEventID)e.Window.Event);
+                        windowManager?.HandleWindowEvent(e.Window);
                         break;
 
                     case EventType.AppWillenterbackground:

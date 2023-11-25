@@ -10,9 +10,9 @@ public class WindowManager
         this.window = window;
     }
 
-    public void HandleWindowEvent(WindowEventID eventID)
+    public void HandleWindowEvent(WindowEvent windowEvent)
     {
-        switch (eventID)
+        switch ((WindowEventID)windowEvent.Event)
         {
             case WindowEventID.Shown:
                 WindowShown?.Invoke();
@@ -27,16 +27,16 @@ public class WindowManager
                 break;
 
             case WindowEventID.Moved:
-                WindowMoved?.Invoke();
+                WindowMoved?.Invoke(windowEvent.Data1, windowEvent.Data2);
                 break;
 
             case WindowEventID.Resized:
-                WindowResized?.Invoke();
+                WindowResized?.Invoke(windowEvent.Data1, windowEvent.Data2);
                 break;
 
             // This handles both Resized and SizeChanged
             case WindowEventID.SizeChanged:
-                WindowSizeChanged?.Invoke();
+                WindowSizeChanged?.Invoke(windowEvent.Data1, windowEvent.Data2);
                 break;
 
             case WindowEventID.Minimized:
@@ -114,11 +114,11 @@ public class WindowManager
 
     public event Action WindowExposed = null!;
 
-    public event Action WindowMoved = null!;
+    public event Action<int, int> WindowMoved = null!;
 
-    public event Action WindowResized = null!;
+    public event Action<int, int> WindowResized = null!;
 
-    public event Action WindowSizeChanged = null!;
+    public event Action<int, int> WindowSizeChanged = null!;
 
     public event Action WindowMinimized = null!;
 

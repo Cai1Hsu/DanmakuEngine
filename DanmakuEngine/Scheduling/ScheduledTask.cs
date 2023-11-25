@@ -6,7 +6,7 @@ public class ScheduledTask : IDisposable
 
     private bool IsDisposed = false;
 
-    public bool ShouldRun => throw new NotImplementedException("sad");
+    public virtual bool ShouldRun => true;
 
     public ScheduledTask(Action action)
     {
@@ -14,7 +14,12 @@ public class ScheduledTask : IDisposable
     }
 
     public void Run()
-        => action.Invoke();
+    {
+        if (IsDisposed)
+            throw new InvalidOperationException("Can NOT run a disposed task!");
+        
+        action.Invoke();
+    }
 
     public void Dispose()
     {
@@ -30,10 +35,5 @@ public class ScheduledTask : IDisposable
         this.action = null!;
 
         IsDisposed = true;
-    }
-
-    public void update()
-    {
-
     }
 }

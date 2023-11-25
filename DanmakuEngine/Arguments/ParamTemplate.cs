@@ -53,6 +53,10 @@ public class ParamTemplate : Paramaters
     [Description("Print the help screen")]
     public Argument HelpShort;
 
+    [Description("Represents and controls the update frequency of the fps in debug console")]
+    public Argument FpsUpdateFrequency =
+        new("-frequency", typeof(double), 1.00);
+
     // For some arguments need non-static support.
     public ParamTemplate()
     {
@@ -71,6 +75,7 @@ public class ParamTemplate : Paramaters
             { HelpShort, "Print the help screen" },
             { ClearScreen, "Clear screen before rendering the next frame" },
             { Exclusive, "Specify whether to play the game under exclusive fullscreen mode, only works when fullscreen is enabled" },
+            { FpsUpdateFrequency, "Represents and controls the update frequency of the fps in debug console"},
         };
     }
 

@@ -89,6 +89,7 @@ public partial class GameHost : Time, IDisposable
 
         doFrontToBackPass = ConfigManager.DebugMode;
         clearOnRender = ConfigManager.ClearScreen;
+        UpdateFrequency = ConfigManager.FpsUpdateFrequency;
 
         DependencyContainer.AutoInject(Logger.GetLogger());
     }
@@ -209,10 +210,13 @@ public unsafe partial class GameHost
         Dependencies.Cache(InputManager);
 
         InputManager.RegisterHandlers(this);
+
+        windowManager.WindowSizeChanged += Coordinate.OnResized;
     }
 
     public virtual unsafe void SetUpWindowAndRenderer()
     {
+        // TODO: load form comfig manager
         var size = new Vector2D<int>(640, 480);
 
         var windowFlag = GenerateWindowFlags(FullScreen: ConfigManager.FullScreen,
@@ -237,6 +241,9 @@ public unsafe partial class GameHost
         var rendererFlag = GetRendererFlags(accelerated: true,
                                             Vsync: ConfigManager.Vsync,
                                             targettexture: false);
+
+        // set the default value
+        Coordinate.OnResized(size.X, size.Y);
 
         // we dont use sdl render api anymore
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
@@ -277,93 +284,7 @@ public unsafe partial class GameHost
 
         // We are using opengl on this *window*
         _sdl.GLMakeCurrent(window, glContext);
-
-        _vao = gl.GenVertexArray();
-        gl.BindVertexArray(_vao);
-
-        // The quad vertices data.
-        // You may have noticed an addition - texture coordinates!
-        // Texture coordinates are a value between 0-1 (see more later about this) which tell the GPU which part
-        // of the texture to use for each vertex.
-        float[] vertices =
-        {
-            // aPosition--------   aTexCoords
-             0.7f, -1.0f -0.2f, 0.0f,  0.0f, 0.0f, // 左下角
-             0.7f, -0.7f -0.2f, 0.0f,  0.0f, 1.0f, // 左上角
-             1.0f, -0.7f -0.2f, 0.0f,  1.0f, 1.0f, // 右上角
-             1.0f, -1.0f -0.2f, 0.0f,  1.0f, 0.0f  // 右下角
-        };
-
-        // Create the VBO.
-        _vbo = gl.GenBuffer();
-        gl.BindBuffer(BufferTargetARB.ArrayBuffer, _vbo);
-
-        // Upload the vertices data to the VBO.
-        fixed (float* buf = vertices)
-            gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(vertices.Length * sizeof(float)), buf, BufferUsageARB.StaticDraw);
-
-        // The quad indices data.
-        uint[] indices =
-        {
-                0u, 1u, 3u,
-                1u, 2u, 3u
-        };
-
-        // Create the EBO.
-        _ebo = gl.GenBuffer();
-        gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, _ebo);
-
-        // Upload the indices data to the EBO.
-        fixed (uint* buf = indices)
-            gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(indices.Length * sizeof(uint)), buf, BufferUsageARB.StaticDraw);
-
-
-        uint vertexShader = gl.CreateShader(ShaderType.VertexShader);
-        gl.ShaderSource(vertexShader, vertexShaderSource);
-        gl.CompileShader(vertexShader);
-
-        uint fragmentShader = gl.CreateShader(ShaderType.FragmentShader);
-        gl.ShaderSource(fragmentShader, fragmentShaderSource);
-        gl.CompileShader(fragmentShader);
-
-        shaderProgram = gl.CreateProgram();
-        gl.AttachShader(shaderProgram, vertexShader);
-        gl.AttachShader(shaderProgram, fragmentShader);
-        gl.LinkProgram(shaderProgram);
     }
-
-    private static uint _vao;
-    private static uint _vbo;
-    private static uint _ebo;
-
-    private uint shaderProgram;
-
-    string vertexShaderSource = @"
-#version 330 core
-layout (location = 0) in vec3 aPos;
-layout (location = 1) in vec2 aTexCoord;
-
-out vec2 TexCoord;
-
-void main()
-{
-    gl_Position = vec4(aPos, 1.0);
-    TexCoord = aTexCoord;
-}";
-
-    // 片段着色器
-    string fragmentShaderSource = @"
-#version 330 core
-out vec4 FragColor;
-
-in vec2 TexCoord;
-
-uniform sampler2D texture1;
-
-void main()
-{
-    FragColor = texture(texture1, vec2(TexCoord.x, 1.0 - TexCoord.y));
-}";
 
     private void DoLoad()
     {
@@ -418,8 +339,6 @@ void main()
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
 
-    private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
-    private Font font = SystemFonts.CreateFont("Consolas", 22);
     protected void DoRender()
     {
         gl.Clear((uint)ClearBufferMask.ColorBufferBit | (uint)ClearBufferMask.DepthBufferBit);
@@ -436,48 +355,6 @@ void main()
         // TODO
         // Do render
 
-        gl.BindVertexArray(_vao);
-        gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
-        gl.EnableVertexAttribArray(0);
-        gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        gl.EnableVertexAttribArray(1);
-
-        gl.UseProgram(shaderProgram);
-
-        int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
-
-        gl.Uniform1(textureLocation, 0);
-
-        uint textureId = gl.GenTexture();
-
-        gl.ActiveTexture(TextureUnit.Texture0);
-        gl.BindTexture(GLEnum.Texture2D, textureId);
-
-        IMemoryGroup<Rgba32> pixelDataGroup = fpsText.GetPixelMemoryGroup();
-        foreach (Memory<Rgba32> memory in pixelDataGroup)
-        {
-            Span<Rgba32> span = memory.Span;
-            unsafe
-            {
-                fixed (Rgba32* pixelPtr = &span.GetPinnableReference())
-                {
-                    gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)fpsText.Width, (uint)fpsText.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixelPtr);
-                }
-            }
-        }
-
-        // 设置纹理参数
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-        gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
-
-        // 绘制纹理
-        gl.Enable(EnableCap.Texture2D);
-
-        // 绘制一个纹理映射的四边形
-        gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
-
         _sdl.GLSwapWindow(window);
     }
 
@@ -488,9 +365,6 @@ void main()
 
         if (count_time < 1)
             return;
-
-        fpsText.Mutate(x => x.Clear(Color.Transparent));
-        fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
 
         if (ConfigManager.HasConsole)
             Logger.Write($"FPS: {ActualFPS:F2}\r", true);

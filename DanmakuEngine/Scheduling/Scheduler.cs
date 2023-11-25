@@ -23,12 +23,16 @@ public class Scheduler
 
         lock (taskLock)
         {
-            // TODO: Implement this
-            // while (tasks.Count > 0 && tasks.Peek().Time <= Clock.Time)
-            // {
-            //     tasks.Dequeue().Run();
-            // }
+            while (tasks.Count > 0)
+            {
+                var task = tasks.Dequeue();
+
+                if (task.ShouldRun)
+                    task.Run();
+            }
         }
+
+        Update();
     }
 
     public virtual void Update()

@@ -20,6 +20,10 @@ public partial class MainMenuKeyBoardHandler : UserKeyboardHandler
 
         if (key.Sym == (int)KeyCode.KEscape)
         {
+            // TODO: add this action to Scheduler
+            // We should handle actions in the Update loop
+            // This is needed to avoid concurrency issues
+            // as we are planning to use multiple threads
             while (!screens.Empty())
                 screens.Pop();
         }

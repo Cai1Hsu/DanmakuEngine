@@ -43,7 +43,9 @@ public class SecretCodeHandler
         {
             lastKeyDown = Clock.CurrentTime;
 
-            Logger.Debug($"SecretCode: Handled key {key}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+            Logger.Debug($"SecretCode: Handled key {((KeyCode)key.Sym).ToString().
+                            // since there is no 'K' key in our list, we could safely trim it
+                            TrimStart('K')}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
             secretCodeIndex++;
         }
         else

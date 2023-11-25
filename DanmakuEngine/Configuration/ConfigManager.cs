@@ -6,17 +6,26 @@ namespace DanmakuEngine.Configuration;
 
 public partial class ConfigManager
 {
-    [LoadFromArgument("-refresh")] public int RefreshRate { get; private set; }
+    [LoadFromArgument("-refresh")]
+    public int RefreshRate { get; private set; }
 
-    [LoadFromArgument("-debug")] public bool DebugMode { get; private set; }
+    [LoadFromArgument("-debug")]
+    public bool DebugMode { get; private set; }
 
-    [LoadFromArgument("-fullscreen")] public bool FullScreen { get; private set; }
+    [LoadFromArgument("-fullscreen")]
+    public bool FullScreen { get; private set; }
 
-    [LoadFromArgument("-exclusive")] public bool Exclusive { get; private set; }
+    [LoadFromArgument("-exclusive")]
+    public bool Exclusive { get; private set; }
 
-    [LoadFromArgument("-vsync")] public bool Vsync { get; private set; }
+    [LoadFromArgument("-vsync")]
+    public bool Vsync { get; private set; }
 
-    [LoadFromArgument("-clear")] public bool ClearScreen { get; private set; }
+    [LoadFromArgument("-clear")]
+    public bool ClearScreen { get; private set; }
+
+    [LoadFromArgument("-frequency")]
+    public double FpsUpdateFrequency { get; private set; }
 
     public void LoadFromArguments(ArgumentProvider argProvider)
     {
