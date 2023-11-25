@@ -49,7 +49,6 @@ public class ParamTemplate : Paramaters
     [Description("Print the help screen")]
     public Argument Help;
 
-
     [Description("Print the help screen")]
     public Argument HelpShort;
 
