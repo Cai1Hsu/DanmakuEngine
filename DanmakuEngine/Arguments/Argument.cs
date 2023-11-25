@@ -7,6 +7,8 @@ public class Argument
 {
     public bool HasValue => this.TValue != null && this.Value != null;
 
+    public object JsonConvert { get; private set; }
+
     public readonly string Key;
     public readonly Type TValue = null!;
     private readonly object Value = null!;
@@ -102,13 +104,11 @@ public class Argument
     /// </summary>
     /// <param name="format">defines whether to return the value or the whole class</param>
     /// <returns>the string version of the value or the whole class</returns>
-    /// <exception cref="NotImplementedException"></exception>
-
     public string ToString(bool format = false)
     {
         if (!format)
             return Value.ToString()!;
 
-        throw new NotImplementedException();
+        return $"{this.Key}={Value}";
     }
 }

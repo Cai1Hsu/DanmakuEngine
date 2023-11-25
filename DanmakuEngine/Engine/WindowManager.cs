@@ -146,12 +146,9 @@ public class WindowManager
 
     public event Action AppWillenterbackground = null!;
 
-
     public event Action AppWillenterforeground = null!;
 
-
     public event Action AppDidenterbackground = null!;
-
 
     public event Action AppDidenterforeground = null!;
 }

@@ -24,7 +24,6 @@ using System.Runtime.InteropServices;
 using SixLabors.ImageSharp.Memory;
 using Color = SixLabors.ImageSharp.Color;
 
-
 namespace DanmakuEngine.Engine;
 
 public partial class GameHost : Time, IDisposable
@@ -354,7 +353,6 @@ public unsafe partial class GameHost
 
         // TODO
         // Do render
-
 
         // private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
         // private Font font = SystemFonts.CreateFont("Consolas", 22);

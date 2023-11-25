@@ -8,7 +8,6 @@ using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics.Primitives;
 
-
 [Serializable, StructLayout(LayoutKind.Sequential)]
 public struct RectangleI : IEquatable<RectangleI>
 {

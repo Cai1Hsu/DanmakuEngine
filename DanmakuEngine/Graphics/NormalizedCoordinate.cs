@@ -12,7 +12,6 @@ public readonly struct Coordinate : IEquatable<Coordinate>
         => this.X == other.X
         && this.Y == other.Y;
 
-
     // We set a default value to prevent unwanted issue
     public static int windowWidth { get; private set; } = 640;
     public static int windowHeight { get; private set; } = 480;

@@ -23,7 +23,6 @@ public unsafe class GLRenderer : IRenderer
     /// </summary>
     public uint Width { get; private set; }
 
-
     /// <summary>
     /// Represent the height of the graph to draw
     /// </summary>
@@ -43,8 +42,6 @@ public unsafe class GLRenderer : IRenderer
             Vendor:     {ByteExtensions.BytesToString(gl.GetString(StringName.Vendor))}
             GLSL:       {ByteExtensions.BytesToString(gl.GetString(StringName.ShadingLanguageVersion))}
             ");
-
-
     }
 
     public void SwapBuffers()

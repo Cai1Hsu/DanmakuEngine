@@ -76,14 +76,6 @@ public partial class ConfigManager
     public static void UpdateConsoleStatus(bool hasConsole)
         => _hasConsole = hasConsole;
 
-    static ConfigManager()
-    {
-        // if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-        // {
-        //     HasConsole = GetConsoleWindow() != IntPtr.Zero;
-        // }
-    }
-
     [AttributeUsage(AttributeTargets.Property)]
     private class LoadFromArgumentAttribute : Attribute
     {

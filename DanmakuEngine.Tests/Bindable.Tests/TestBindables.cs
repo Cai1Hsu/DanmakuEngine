@@ -133,7 +133,6 @@ public class TestBindables
         Assert.That(flag, Is.False);
     }
 
-
     [Test]
     public void TestEnabledChanged()
     {
@@ -277,7 +276,6 @@ public class TestBindables
         Assert.That(b2.Value, Is.EqualTo(1));
         Assert.That(b1.Value, Is.EqualTo(b2.Value));
     }
-
 
     [Test]
     public void TestBindEnabledSync()

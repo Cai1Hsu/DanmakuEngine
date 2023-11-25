@@ -12,7 +12,6 @@ public class SineInQuad : ITransformFunction
         => Math.Sin(time * Math.PI * 0.5);
 }
 
-
 public class SineOutQuad : ITransformFunction
 {
     /// <summary>
