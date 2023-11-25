@@ -212,7 +212,9 @@ public partial class Logger : IInjectable, IAutoloadable
         _instence = new Logger();
 
         log_directory = Environment.CurrentDirectory;
-        log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH:mm}.log";
+        log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH-mm}.log";
+
+        Logger.Debug($"Log file: {FullLogFile}");
     }
 }
 
