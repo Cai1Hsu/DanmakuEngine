@@ -1,4 +1,5 @@
 using DanmakuEngine.Logging;
+using Silk.NET.Input;
 
 namespace DanmakuEngine.Transfomation;
 
@@ -85,6 +86,9 @@ public class TransformSequence : ITransformable
 
         return this;
     }
+
+    public TransformSequence Then()
+        => Delay(0);
 
     public TransformSequence Delay(double duration)
     {
