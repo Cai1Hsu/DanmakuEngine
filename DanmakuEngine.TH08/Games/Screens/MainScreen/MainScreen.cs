@@ -1,4 +1,5 @@
 using System.Text;
+using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 using DanmakuEngine.Transfomation;
@@ -53,12 +54,12 @@ public class MainScreen : Screen
             new TransformSequence(
                 new Transformer(1000, new SineIn(), (percentage) =>
                     {
-                        PrintSlider((int)Math.Round(percentage * 100));
+                        PrintSlider((int)Math.Round(percentage * 99));
                     }
                 ),
                 new Transformer(1000, new SineOut(), (percentage) =>
                     {
-                        PrintSlider((int)Math.Round(percentage * 100));
+                        PrintSlider((int)Math.Round(percentage * 99));
                     }
                 )
             ).LoopForever(),
@@ -100,7 +101,7 @@ public class MainScreen : Screen
             if (i == line)
                 Logger.Write("難題「仏の御石の鉢　-砕けぬ意思-」", writeLine: true);
             else
-                Logger.Write((new string(' ', 50)), writeLine: true);
+                Logger.Write(' '.Multiply(50), writeLine: true);
         }
     }
 
@@ -118,7 +119,7 @@ public class MainScreen : Screen
             if (i == line)
                 Logger.Write("恋符「マスタースパーク」", writeLine: true);
             else
-                Logger.Write((new string(' ', 100)), writeLine: true);
+                Logger.Write(' '.Multiply(100), writeLine: true);
         }
     }
 
@@ -129,9 +130,7 @@ public class MainScreen : Screen
 
         int chars = (int)Math.Round(percentage * bgm.Length);
 
-        string line = new(' ', 50 - chars);
-
-        line += bgm[0..chars];
+        string line = ' '.Multiply(50 - chars) + bgm[0..chars];
 
         Console.SetCursorPosition(50, 1);
         Console.Write(line);
