@@ -127,15 +127,29 @@ public class MainScreen : Screen
         // japanese causes width issue
         // when we meet CJK characters, the whole character will be shown or disappear
         // this lead to the animation speed not constant
-        const string bgm = "BGM: Taketori Hishou ~ Lunatic Princess";
+        const string bgm = "BGM: 竹取飛翔　～ Lunatic Princess";
         int wholeDisplayLength = bgm.GetDisplayLength();
 
-        int chars = (int)Math.Round(percentage * bgm.Length);
-        string displayString = bgm.Substring(0, chars);
+        int displayChars = (int)Math.Round(percentage * wholeDisplayLength);
+        string displayString = "";
+        int currentDisplayLength = 0;
 
-        int displayLength = displayString.GetDisplayLength();
+        for (int i = 0; i < bgm.Length; i++)
+        {
+            int charDisplayLength = bgm[i] < 128 ? 1 : 2;
+            if (currentDisplayLength + charDisplayLength > displayChars)
+            {
+                if (currentDisplayLength + 1 == displayChars)
+                    displayString += "\u2005";  // 添加一个半字符宽度的空格
 
-        string line = ' '.Multiply(wholeDisplayLength - displayLength) + displayString;
+                break;
+            }
+
+            displayString += bgm[i];
+            currentDisplayLength += charDisplayLength;
+        }
+
+        string line = ' '.Multiply(wholeDisplayLength - currentDisplayLength) + displayString;
 
         Console.SetCursorPosition(50, 1);
         Console.Write(line);
