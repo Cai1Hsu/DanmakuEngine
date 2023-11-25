@@ -312,7 +312,7 @@ public unsafe partial class GameHost
 
         RegisterEvents();
 
-        Game.Begin();
+        Game.begin();
     }
 
     private DrawableContainer Root = null!;
@@ -355,6 +355,44 @@ public unsafe partial class GameHost
         // TODO
         // Do render
 
+
+        // private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
+        // private Font font = SystemFonts.CreateFont("Consolas", 22);
+
+        // gl.BindVertexArray(_vao);
+        // gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
+        // gl.EnableVertexAttribArray(0);
+        // gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        // gl.EnableVertexAttribArray(1);
+
+        // gl.UseProgram(shaderProgram);
+
+        // int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
+
+        // gl.Uniform1(textureLocation, 0);
+
+        // uint textureId = gl.GenTexture();
+
+        // gl.ActiveTexture(TextureUnit.Texture0);
+        // gl.BindTexture(GLEnum.Texture2D, textureId);
+
+        // fpsText.ProcessPixelRows(accessor => 
+        // {
+        //     for (int y = 0; y < fpsText.Height; y++)
+        //     {
+        //         fixed (void* data = accessor.GetRowSpan(y))
+        //         {
+        //             gl.TexSubImage2D(GLEnum.Texture2D, 0, 0, y, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+
+        //             // gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
+        //         }
+        //     }
+        // });
+
+        // gl.Enable(EnableCap.Texture2D);
+
+        // gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
+
         _sdl.GLSwapWindow(window);
     }
 
@@ -366,7 +404,10 @@ public unsafe partial class GameHost
         if (count_time < 1)
             return;
 
-        if (ConfigManager.HasConsole)
+        // fpsText.Mutate(x => x.Clear(Color.Transparent));
+        // fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
+
+        if (ConfigManager.HasConsole && ConfigManager.DebugMode)
             Logger.Write($"FPS: {ActualFPS:F2}\r", true);
 
         ActualFPS = count_frame / count_time;

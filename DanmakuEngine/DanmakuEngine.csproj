@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Condition="'$(Configuration)'=='Debug'">
-    <OutputType>Exe</OutputType>
+    <OutputType>library</OutputType>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PublishAot>true</PublishAot>
@@ -18,13 +18,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DanmakuEngine.SourceGeneration\DanmakuEngine.SourceGeneration.csproj" 
-                      OutputItemType="Analyzer"
-                      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\DanmakuEngine.SourceGeneration\DanmakuEngine.SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="OpenTK" Version="4.8.1" />
     <PackageReference Include="Silk.NET" Version="2.18.0" />
+    <PackageReference Include="SixLabors.Fonts" Version="2.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.0.1" />
   </ItemGroup>
 
 </Project>

@@ -28,7 +28,7 @@ public class LoadingScreen : Screen
         Logger.Info("Keyboard is not handled in this screen.");
 
         // Assume that we are loading something
-        await Task.Delay(5000);
+        await Task.Delay(0);
 
         ScreenStack.Switch(new MainScreen());
     }

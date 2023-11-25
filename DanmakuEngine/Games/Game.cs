@@ -1,23 +1,30 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Games.Screens;
-using DanmakuEngine.Games.Screens.Welcome;
 
 namespace DanmakuEngine.Games;
 
 public partial class Game : IInjectable
 {
-    public readonly string Name = "Danmaku!";
+    public virtual string Name => @"Danmaku!";
 
     [Inject]
-    private ScreenStack screens = null!;
+    protected ScreenStack screens = null!;
+
+    /// <summary>
+    /// Prepare the game and start it
+    /// </summary>
+    public void begin()
+    {
+        AutoInject();
+
+        this.Begin();
+    }
 
     /// <summary>
     /// The game logic starts here
     /// </summary>
-    public void Begin()
+    protected virtual void Begin()
     {
-        AutoInject();
 
-        screens.Push(new LoadingScreen());
     }
 }
