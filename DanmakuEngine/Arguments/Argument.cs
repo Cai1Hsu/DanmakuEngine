@@ -7,8 +7,6 @@ public class Argument
 {
     public bool HasValue => this.TValue != null && this.Value != null;
 
-    public object JsonConvert { get; private set; }
-
     public readonly string Key;
     public readonly Type TValue = null!;
     private readonly object Value = null!;
