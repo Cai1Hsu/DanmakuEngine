@@ -1,5 +1,4 @@
 using DanmakuEngine.Logging;
-using Silk.NET.Input;
 
 namespace DanmakuEngine.Transfomation;
 
