@@ -52,7 +52,7 @@ public partial class Screen : CompositeDrawable, IInjectable
     {
         Clock.Update(Time.UpdateDelta);
 
-        Update();
+        base.Update();
     }
 
     public override void Update()
@@ -74,11 +74,9 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public new void load()
     {
-        base.load();
-
         DependencyContainer.AutoInject(this);
 
-        Load();
+        base.load();
     }
 
     public override void Load()

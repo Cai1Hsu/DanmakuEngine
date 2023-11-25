@@ -8,7 +8,7 @@ public partial class Game : IInjectable
     public virtual string Name => @"Danmaku!";
 
     [Inject]
-    private ScreenStack screens = null!;
+    protected ScreenStack screens = null!;
 
     /// <summary>
     /// Prepare the game and start it
