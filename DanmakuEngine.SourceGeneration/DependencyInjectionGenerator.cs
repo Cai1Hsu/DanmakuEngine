@@ -125,7 +125,7 @@ using DanmakuEngine.Dependency;
 
                     if (membersToInject.Any())
                     {
-                        
+
                         var code = GenerateMethodForInjection(classSymbol, membersToInject);
                         context.AddSource($"{classSymbol.Name}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
                     }

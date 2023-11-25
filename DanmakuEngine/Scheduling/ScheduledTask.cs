@@ -17,7 +17,7 @@ public class ScheduledTask : IDisposable
     {
         if (IsDisposed)
             throw new InvalidOperationException("Can NOT run a disposed task!");
-        
+
         action.Invoke();
     }
 

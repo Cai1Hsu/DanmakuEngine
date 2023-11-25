@@ -20,7 +20,7 @@ public readonly struct Quad : IConvexPolygon, IEquatable<Quad>
     public readonly Vector2D<float> BottomRight;
     public readonly Vector2D<float> TopRight;
 
-    public Quad(Vector2D<float> topLeft, Vector2D<float> topRight, 
+    public Quad(Vector2D<float> topLeft, Vector2D<float> topRight,
                 Vector2D<float> bottomLeft, Vector2D<float> bottomRight)
     {
         TopLeft = topLeft;
@@ -41,11 +41,11 @@ public readonly struct Quad : IConvexPolygon, IEquatable<Quad>
     public static implicit operator Quad(RectangleI r) => FromRectangle(r);
     public static implicit operator Quad(RectangleF r) => FromRectangle(r);
 
-        public static Quad FromRectangle(RectangleI rectangle) =>
-        new Quad(new Vector2D<float>(rectangle.Left, rectangle.Top),
-            new Vector2D<float>(rectangle.Right, rectangle.Top),
-            new Vector2D<float>(rectangle.Left, rectangle.Bottom),
-            new Vector2D<float>(rectangle.Right, rectangle.Bottom));
+    public static Quad FromRectangle(RectangleI rectangle) =>
+    new Quad(new Vector2D<float>(rectangle.Left, rectangle.Top),
+        new Vector2D<float>(rectangle.Right, rectangle.Top),
+        new Vector2D<float>(rectangle.Left, rectangle.Bottom),
+        new Vector2D<float>(rectangle.Right, rectangle.Bottom));
 
     public static Quad FromRectangle(RectangleF rectangle) =>
         new Quad(new Vector2D<float>(rectangle.Left, rectangle.Top),

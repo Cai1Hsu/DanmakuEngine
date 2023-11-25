@@ -91,7 +91,7 @@ public class Texture : IDisposable
 
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)MinFilter);
         _gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)MagFilter);
-    }    
+    }
 
     public void SetParameters(bool mipmap)
     {

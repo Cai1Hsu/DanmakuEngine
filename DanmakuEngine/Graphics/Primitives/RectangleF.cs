@@ -299,7 +299,7 @@ public struct RectangleF : IEquatable<RectangleF>
     // from ppy.osu.Framework.Graphics.Primitives.RectangleF
     public override int GetHashCode()
         => (int)(((uint)X ^ ((uint)Y << 13)) | (((uint)Y >> 0x13) ^ ((uint)Width << 0x1a)) | (((uint)Width >> 6) ^ ((uint)Height << 7)) | ((uint)Height >> 0x19));
- 
+
     public override string ToString()
         => $"RectangleF({X}f, {Y}f, {Width}f, {Height}f)";
 }

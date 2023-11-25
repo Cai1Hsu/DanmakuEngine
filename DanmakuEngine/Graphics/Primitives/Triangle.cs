@@ -24,7 +24,7 @@ public readonly struct Triangle : IEquatable<Triangle>
         => MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in P1), 3);
 
     public ReadOnlySpan<Vector2D<float>> GetVertices()
-        =>  MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in P1), 3);
+        => MemoryMarshal.CreateReadOnlySpan(ref Unsafe.AsRef(in P1), 3);
 
 
     public bool Contains(Vector2D<float> p)

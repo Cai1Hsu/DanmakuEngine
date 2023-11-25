@@ -11,5 +11,5 @@ public unsafe static class ByteExtensions
 
     public static string BytesToString(byte* bytes)
         => Encoding.UTF8.GetString(bytes, MaxStringLength);
-    
+
 }

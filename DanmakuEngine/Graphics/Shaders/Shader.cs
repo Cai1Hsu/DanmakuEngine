@@ -38,7 +38,7 @@ public class Shader : IDisposable
         _gl.DeleteShader(vertex);
         _gl.DeleteShader(fragment);
     }
-    
+
     /// <summary>
     /// Use the program
     /// </summary>
@@ -62,7 +62,7 @@ public class Shader : IDisposable
         int location = _gl.GetUniformLocation(_handle, name);
         if (location == -1)
             throw new Exception($"{name} uniform not found on shader.");
-        
+
         _gl.Uniform1(location, value);
     }
 

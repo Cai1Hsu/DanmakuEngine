@@ -9,7 +9,7 @@ public unsafe class SdlGlContext : INativeContext
 
     public SdlGlContext(Sdl sdl)
     {
-        if (sdl== null)
+        if (sdl == null)
             throw new ArgumentNullException(nameof(sdl));
 
         this.sdl = sdl;

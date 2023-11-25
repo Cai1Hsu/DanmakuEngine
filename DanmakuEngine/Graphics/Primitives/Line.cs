@@ -44,7 +44,7 @@ public readonly struct Line
         get
         {
             float num = 1f / Direction.Length;
-            
+
             return new Vector2D<float>
                 (Direction.X * num, Direction.Y * num);
         }

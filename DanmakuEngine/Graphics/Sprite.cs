@@ -4,6 +4,6 @@ public class Sprite : Drawable
 {
     public Sprite() : base(null!)
     {
-        
+
     }
 }

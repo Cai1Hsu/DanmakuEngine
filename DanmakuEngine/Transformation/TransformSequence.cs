@@ -73,7 +73,7 @@ public class TransformSequence : ITransformable
     }
 
     public TransformSequence Add(params ITransformable[] transformables)
-    {   
+    {
         transformers.AddRange(transformables);
 
         return this;
