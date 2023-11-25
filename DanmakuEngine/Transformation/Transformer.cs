@@ -20,6 +20,8 @@ public class Transformer : ITransformable
 
     public Action OnDone = null!;
 
+    private bool done = false;
+
     private bool disposed = false;
 
     public Transformer(double duration, ITransformFunction function, Action<double> onUpdate)
@@ -31,7 +33,6 @@ public class Transformer : ITransformable
         Function = function;
 
         OnDone += () => OnUpdate?.Invoke(Function!.Transform(1));
-        OnDone += () => OnDone = null!;
 
         OnUpdate += onUpdate;
     }
@@ -43,14 +44,13 @@ public class Transformer : ITransformable
 
         CurrentTime += deltaTime;
 
-        if (IsDone)
-        {
+        if (Function == null)
+            return;
+
+        if (!done && IsDone)
             OnDone?.Invoke();
 
-            return;
-        }
-
-        if (Function == null)
+        if (done)
             return;
 
         var value = Function.Transform(time);
@@ -77,6 +77,7 @@ public class Transformer : ITransformable
 
         disposed = true;
         OnUpdate = null!;
+        OnDone = null!;
         Function = null!;
     }
 }
