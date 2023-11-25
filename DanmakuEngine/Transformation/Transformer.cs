@@ -1,3 +1,5 @@
+using System.Diagnostics;
+using DanmakuEngine.Logging;
 using DanmakuEngine.Transfomation.Functions;
 
 namespace DanmakuEngine.Transfomation;
@@ -20,19 +22,18 @@ public class Transformer : ITransformable
 
     private bool disposed = false;
 
-    public Transformer(double duration, ITransformFunction function, bool loop = false)
+    public Transformer(double duration, ITransformFunction function, Action<double> onUpdate)
     {
-        if (Duration < 0)
+        if (duration < 0)
             throw new ArgumentException("Duration must be positive");
 
         Duration = duration;
         Function = function;
 
-        if (loop)
-            return;
-
+        OnDone += () => OnUpdate?.Invoke(Function!.Transform(1));
         OnDone += () => OnDone = null!;
-        OnDone += Dispose;
+
+        OnUpdate += onUpdate;
     }
 
     public void Update(double deltaTime)
@@ -52,10 +53,14 @@ public class Transformer : ITransformable
         if (Function == null)
             return;
 
-        if (time > 1)
-            OnUpdate?.Invoke(Function.Transform(1));
-        else
-            OnUpdate?.Invoke(Function.Transform(time));
+        var value = Function.Transform(time);
+
+        OnUpdate?.Invoke(value);
+    }
+
+    public void Reset()
+    {
+        CurrentTime = 0;
     }
 
     public void Dispose()

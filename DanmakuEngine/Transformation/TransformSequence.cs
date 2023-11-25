@@ -1,32 +1,57 @@
+using DanmakuEngine.Logging;
+
 namespace DanmakuEngine.Transfomation;
 
 public class TransformSequence : ITransformable
 {
     private readonly List<ITransformable> transformers = [];
 
-    private int index = 0;
+    private int _index = 0;
 
-    public bool IsDone => index >= transformers.Count;
+    public bool IsDone => !_loopForever && _currentLoop >= _loopCount;
 
-    private bool begun = false;
+    private bool _begun = true;
 
-    public TransformSequence(params Transformer[] transformers)
+    private int _loopCount = 1;
+
+    private int _currentLoop = 0;
+
+    private bool _loopForever = false;
+
+    public TransformSequence()
     {
-        this.transformers.AddRange(transformers);
+    }
+
+    public TransformSequence(params ITransformable[] transformables)
+    {
+        this.transformers.AddRange(transformables);
     }
 
     public void Update(double deltaTime)
     {
-        if (!begun)
+        if (!_begun)
             return;
 
         if (IsDone)
             return;
 
-        transformers[index].Update(deltaTime);
+        transformers[_index].Update(deltaTime);
 
-        if (transformers[index].IsDone)
-            index++;
+        if (transformers[_index].IsDone)
+        {
+            transformers[_index].Reset();
+            _index++;
+
+            if (_index >= transformers.Count)
+            {
+                if (!_loopForever && _currentLoop < _loopCount)
+                    _currentLoop++;
+
+                _index = 0;
+            }
+
+            return;
+        }
     }
 
     public void Dispose()
@@ -35,38 +60,58 @@ public class TransformSequence : ITransformable
             transformer.Dispose();
     }
 
-    public void Begin()
+    public void Pause()
     {
-        index = 0;
-
-        begun = true;    
+        _begun = false;
     }
 
-    public TransformSequence Add(Transformer transformer)
+    public void Begin()
     {
-        transformers.Add(transformer);
+        _index = 0;
+
+        _begun = true;
+    }
+
+    public TransformSequence Add(params ITransformable[] transformables)
+    {   
+        transformers.AddRange(transformables);
+
+        return this;
+    }
+
+    public TransformSequence Add(ITransformable transformable)
+    {
+        transformers.Add(transformable);
 
         return this;
     }
 
     public TransformSequence Delay(double duration)
     {
-        transformers.Add(new Transformer(duration, null!));
+        transformers.Add(new Transformer(duration, null!, null!));
 
         return this;
     }
 
     public TransformSequence Loop(int Count)
     {
-        throw new NotImplementedException();
+        _loopCount = Count;
 
         return this;
     }
 
     public TransformSequence LoopForever()
     {
-        throw new NotImplementedException();
+        _loopForever = true;
 
         return this;
+    }
+
+    public void Reset()
+    {
+        _currentLoop = 0;
+
+        foreach (var transformer in transformers)
+            transformer.Reset();
     }
 }

@@ -25,13 +25,13 @@ public class SineOutQuad : ITransformFunction
         => 1 - Math.Sin(time * Math.PI * 0.5);
 }
 
-public class SinIn : ITransformFunction
+public class SineIn : ITransformFunction
 {
     public double Transform(double time)
         => (Math.Sin((time - 0.5) * Math.PI) + 1) / 2;
 }
 
-public class SinOut : ITransformFunction
+public class SineOut : ITransformFunction
 {
     public double Transform(double time)
         => (Math.Sin((time + 0.5) * Math.PI) + 1) / 2;
