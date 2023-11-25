@@ -418,8 +418,6 @@ void main()
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
 
-    private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
-    private Font font = SystemFonts.CreateFont("Consolas", 22);
     protected void DoRender()
     {
         gl.Clear((uint)ClearBufferMask.ColorBufferBit | (uint)ClearBufferMask.DepthBufferBit);
@@ -436,11 +434,15 @@ void main()
         // TODO
         // Do render
 
-        gl.BindVertexArray(_vao);
-        gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
-        gl.EnableVertexAttribArray(0);
-        gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        gl.EnableVertexAttribArray(1);
+
+        // private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
+        // private Font font = SystemFonts.CreateFont("Consolas", 22);
+
+        // gl.BindVertexArray(_vao);
+        // gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
+        // gl.EnableVertexAttribArray(0);
+        // gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+        // gl.EnableVertexAttribArray(1);
 
         // gl.UseProgram(shaderProgram);
 
@@ -452,7 +454,7 @@ void main()
 
         // gl.ActiveTexture(TextureUnit.Texture0);
         // gl.BindTexture(GLEnum.Texture2D, textureId);
-        
+
         // fpsText.ProcessPixelRows(accessor => 
         // {
         //     for (int y = 0; y < fpsText.Height; y++)
@@ -466,9 +468,9 @@ void main()
         //     }
         // });
 
-        gl.Enable(EnableCap.Texture2D);
+        // gl.Enable(EnableCap.Texture2D);
 
-        gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
+        // gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
 
         _sdl.GLSwapWindow(window);
     }
@@ -481,10 +483,10 @@ void main()
         if (count_time < 1)
             return;
 
-        fpsText.Mutate(x => x.Clear(Color.Transparent));
-        fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
+        // fpsText.Mutate(x => x.Clear(Color.Transparent));
+        // fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
 
-        if (ConfigManager.HasConsole)
+        if (ConfigManager.HasConsole && ConfigManager.DebugMode)
             Logger.Write($"FPS: {ActualFPS:F2}\r", true);
 
         ActualFPS = count_frame / count_time;
