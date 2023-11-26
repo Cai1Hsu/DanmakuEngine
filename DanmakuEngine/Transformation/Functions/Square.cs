@@ -9,7 +9,7 @@ public class SquareIn : ITransformFunction
     /// <param name="time">time is a value between 0 and 1</param>
     /// <returns>the scaler, between 0 and 1</returns>
     public double Transform(double time)
-        => time * time;
+        => -(time * (time - 2));
 }
 
 public class SquareOut : ITransformFunction
@@ -21,5 +21,5 @@ public class SquareOut : ITransformFunction
     /// <param name="time">time is a value between 0 and 1</param>
     /// <returns>the scaler, between 0 and 1</returns>
     public double Transform(double time)
-        => -(time * (time - 2));
+        => 1 - time * time;
 }

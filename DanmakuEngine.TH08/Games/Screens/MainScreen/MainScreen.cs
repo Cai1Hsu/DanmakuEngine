@@ -9,7 +9,7 @@ namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class MainScreen : Screen
 {
-    protected List<TransformSequence> transformations = new();
+    protected List<TransformSequence> transformations = [];
 
     // This method is called when the screen(or average object) is loading
     public override void Load()
@@ -22,39 +22,36 @@ public class MainScreen : Screen
         transformations.AddRange(new TransformSequence[]
         {
             new TransformSequence(
-                new Transformer(1000, new SineInQuad(), (percentage) =>
+                new Transformer(1000, new SineInQuad(), (p) =>
                     {
-                        ShowBGM(percentage);
+                        ShowBGM(p);
                     }
                 ).Delay(2000),
-                new Transformer(1000, new SineOut(), (percentage) =>
+                new Transformer(1000, new SineOut(), (p) =>
                     {
-                        ShowBGM(percentage);
+                        ShowBGM(p);
                     }
                 ).Delay(1000)
             ).LoopForever(),
-            
-            new Transformer(1500, new SineInQuad(), (percentage) =>
+            new Transformer(1500, new SquareIn(), (p) =>
                 {
-                    UseSpell(percentage);
+                    UseSpell(p);
                 }
             ).Delay(1000).LoopForever(),
-            
-            new Transformer(1000, new SineInQuad(), (percentage) =>
+            new Transformer(600, new EaseInCubic(), (p) =>
                 {
-                    EnemySpell(percentage);
+                    EnemySpell(p);
                 }
             ).Delay(1000).LoopForever(),
-
             new TransformSequence(
-                new Transformer(1000, new SineIn(), (percentage) =>
+                new Transformer(1000, new SineIn(), (p) =>
                     {
-                        PrintSlider((int)Math.Round(percentage * 99));
+                        PrintSlider((int)Math.Round(p * 99));
                     }
                 ),
-                new Transformer(1000, new SineOut(), (percentage) =>
+                new Transformer(1000, new SineOut(), (p) =>
                     {
-                        PrintSlider((int)Math.Round(percentage * 99));
+                        PrintSlider((int)Math.Round(p * 99));
                     }
                 )
             ).LoopForever(),
