@@ -104,8 +104,8 @@ public class MainScreen : Screen
 
         Console.SetCursorPosition(0, 10);
         for (int i = 1; i <= 26; i++)
-        {
-            Logger.Write("\u001b[50C");
+        { 
+            Console.Write("\u001b[50C");
 
             if (i == line)
                 Logger.Write(spell, writeLine: true);
@@ -119,29 +119,39 @@ public class MainScreen : Screen
         // japanese causes width issue
         // when we meet CJK characters, the whole character will be shown or disappear
         // this lead to the animation speed not constant
-        const string bgm = "BGM: 竹取飛翔　～ Lunatic Princess";
-        int wholeDisplayLength = bgm.GetDisplayLength();
+        // const string bgm = "BGM: 竹取飛翔　～ Lunatic Princess";
+        // int wholeDisplayLength = bgm.GetDisplayLength();
+        // 
+        // int displayChars = (int)Math.Round(percentage * wholeDisplayLength);
+        // string displayString = "";
+        // int currentDisplayLength = 0;
+        // 
+        // for (int i = 0; i < bgm.Length; i++)
+        // {
+        //     int charDisplayLength = bgm[i] < 128 ? 1 : 2;
+        //     if (currentDisplayLength + charDisplayLength > displayChars)
+        //     {
+        //         if (currentDisplayLength + 1 == displayChars)
+        //             displayString += "\u2005";
+        // 
+        //         break;
+        //     }
+        // 
+        //     displayString += bgm[i];
+        //     currentDisplayLength += charDisplayLength;
+        // }
+        // 
+        // string line = ' '.Multiply(wholeDisplayLength - currentDisplayLength) + displayString
 
-        int displayChars = (int)Math.Round(percentage * wholeDisplayLength);
-        string displayString = "";
-        int currentDisplayLength = 0;
+        // Since '\u2005' is not supported in every terminal
+        const string bgm = "BGM: Taketori Hishou ~ Lunatic Princess";
+        int fullDisplayLength = bgm.GetDisplayLength();
 
-        for (int i = 0; i < bgm.Length; i++)
-        {
-            int charDisplayLength = bgm[i] < 128 ? 1 : 2;
-            if (currentDisplayLength + charDisplayLength > displayChars)
-            {
-                if (currentDisplayLength + 1 == displayChars)
-                    displayString += "\u2005";
+        int displayChars = (int)Math.Round(percentage * fullDisplayLength);
+        string displayString = bgm[..displayChars];
+        int displayLength = displayString.GetDisplayLength();
 
-                break;
-            }
-
-            displayString += bgm[i];
-            currentDisplayLength += charDisplayLength;
-        }
-
-        string line = ' '.Multiply(wholeDisplayLength - currentDisplayLength) + displayString;
+        string line = ' '.Multiply(fullDisplayLength - displayLength) + displayString;
 
         Console.SetCursorPosition(50, 1);
         Console.Write(line);
