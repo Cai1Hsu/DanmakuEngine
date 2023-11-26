@@ -80,4 +80,22 @@ public class Transformer : ITransformable
         OnDone = null!;
         Function = null!;
     }
+
+    public TransformSequence Add(params ITransformable[] transformables)
+        => new TransformSequence(this).Add(transformables);
+
+    public TransformSequence Add(ITransformable transformable)
+        => new TransformSequence(this).Add(transformable);
+
+    public TransformSequence Then()
+        => new TransformSequence(this).Then();
+
+    public TransformSequence Delay(double duration)
+        => new TransformSequence(this).Delay(duration);
+
+    public TransformSequence Loop(int count)
+        => new TransformSequence(this).Loop(count);
+
+    public TransformSequence LoopForever()
+        => new TransformSequence(this).LoopForever();
 }

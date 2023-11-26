@@ -22,35 +22,30 @@ public class MainScreen : Screen
         transformations.AddRange(new TransformSequence[]
         {
             new TransformSequence(
-                new TransformSequence(
-                    new Transformer(1000, new SineInQuad(), (percentage) =>
-                        {
-                            ShowBGM(percentage);
-                        }
-                    )
-                ).Delay(2000),
-                new TransformSequence(
-                    new Transformer(1000, new SineOut(), (percentage) =>
-                        {
-                            ShowBGM(percentage);
-                        }
-                    )
-                ).Delay(1000)
-            ).LoopForever(),
-            new TransformSequence(
-                new Transformer(1500, new SineInQuad(), (percentage) =>
-                    {
-                        UseSpell(percentage);
-                    }
-                )
-            ).Delay(1000).LoopForever(),
-            new TransformSequence(
                 new Transformer(1000, new SineInQuad(), (percentage) =>
                     {
-                        EnemySpell(percentage);
+                        ShowBGM(percentage);
                     }
-                )
+                ).Delay(2000),
+                new Transformer(1000, new SineOut(), (percentage) =>
+                    {
+                        ShowBGM(percentage);
+                    }
+                ).Delay(1000)
+            ).LoopForever(),
+            
+            new Transformer(1500, new SineInQuad(), (percentage) =>
+                {
+                    UseSpell(percentage);
+                }
             ).Delay(1000).LoopForever(),
+            
+            new Transformer(1000, new SineInQuad(), (percentage) =>
+                {
+                    EnemySpell(percentage);
+                }
+            ).Delay(1000).LoopForever(),
+
             new TransformSequence(
                 new Transformer(1000, new SineIn(), (percentage) =>
                     {
@@ -140,7 +135,7 @@ public class MainScreen : Screen
             if (currentDisplayLength + charDisplayLength > displayChars)
             {
                 if (currentDisplayLength + 1 == displayChars)
-                    displayString += "\u2005";  // 添加一个半字符宽度的空格
+                    displayString += "\u2005";
 
                 break;
             }
