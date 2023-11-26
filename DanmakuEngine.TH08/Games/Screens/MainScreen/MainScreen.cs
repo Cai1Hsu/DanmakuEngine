@@ -22,7 +22,7 @@ public class MainScreen : Screen
         transformations.AddRange(new TransformSequence[]
         {
             new TransformSequence(
-                new Transformer(1000, new SineInQuad(), (p) =>
+                new Transformer(1000, new SquareIn(), (p) =>
                     {
                         ShowBGM(p);
                     }
