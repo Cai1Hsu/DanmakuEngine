@@ -160,7 +160,12 @@ public partial class GameHost : Time, IDisposable
         if (ConfigManager.DebugBuild)
             return name + $" - dev {ver}";
 
-        return name + $" - ver {ver}";
+        var title = name + $" - ver {ver}";
+
+        if (ConfigManager.DebugMode)
+            title += "(debug mode)";
+
+        return title;
     }
 
     public GameHost()
@@ -394,7 +399,7 @@ public unsafe partial class GameHost
         _sdl.GLSwapWindow(window);
     }
 
-    protected void UpdateFps(double delta)
+    protected void UpdateTime(double delta)
     {
         count_time += delta;
         count_frame++;
