@@ -5,9 +5,9 @@ name: .NET CI
 
 on:
   push:
-    branches: [ "bootstrap-graph" ]
+    branches: [ '*' ]
   pull_request:
-    branches: [ "bootstrap-graph" ]
+    branches: [ '*' ]
 
 jobs:
   build:
