@@ -37,11 +37,9 @@ public class HeadlessGameHost : GameHost
             UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
             RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
 
-            DoUpdate();
+            UpdateTime(RenderDelta);
 
-            // #if DEBUG
-            UpdateFps(RenderDelta);
-            // #endif
+            DoUpdate();
 
             lastUpdateTicks = currentTicks;
 

@@ -95,9 +95,9 @@ public unsafe partial class GameHost
                 }
             }
 
-            DoUpdate();
+            UpdateTime(RenderDelta);
 
-            UpdateFps(RenderDelta);
+            DoUpdate();
 
             lastUpdateTicks = currentTicks;
 
