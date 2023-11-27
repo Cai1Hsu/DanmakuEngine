@@ -7,7 +7,7 @@ using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;
 
-public class ParamTemplate : Paramaters
+public partial class ParamTemplate : Paramaters
 {
     [Description("Specify the refresh rate of the game")]
     public Argument RefreshRate =
@@ -63,19 +63,7 @@ public class ParamTemplate : Paramaters
 
         HelpShort = new("-h", _ => PrintHelp());
 
-        Children = new()
-        {
-            { RefreshRate, "Specify the refresh rate of the game" },
-            { Vsync, "Specify whether to enable Vsync" },
-            { Fullscreen, "Specify whether to play the game under fullscreen mode" },
-            { Debug, "Enable debug-mode" },
-            { LogDirectory, "Specify the directory of the log files" },
-            { Help, "Print the help screen" },
-            { HelpShort, "Print the help screen" },
-            { ClearScreen, "Clear screen before rendering the next frame" },
-            { Exclusive, "Specify whether to play the game under exclusive fullscreen mode, only works when fullscreen is enabled" },
-            { FpsUpdateFrequency, "Represents and controls the update frequency of the fps in debug console"},
-        };
+        setupChildren();
     }
 
     private void PrintHelp()

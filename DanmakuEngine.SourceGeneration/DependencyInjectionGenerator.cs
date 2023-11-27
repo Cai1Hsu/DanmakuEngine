@@ -23,26 +23,7 @@ using DanmakuEngine.Dependency;
             return $@"{member} = DependencyContainer.Get<{fullyQualifiedTypeName}>();";
         }
 
-        private readonly Dictionary<Accessibility, string> accessbilityMap = new Dictionary<Accessibility, string>()
-        {
-            { Accessibility.NotApplicable, "" },
-            { Accessibility.Public, "public" },
-            { Accessibility.Private, "private" },
-            { Accessibility.Internal, "internal" },
-            { Accessibility.Protected, "protected" },
-        };
-
-        private string AccessibilityToString(Accessibility accessibility)
-        {
-            if (accessbilityMap.TryGetValue(accessibility, out string str))
-            {
-                return str;
-            }
-
-            return "private";
-        }
-
-        private string GenerateMethodForInjection(INamedTypeSymbol classSymbol, List<ISymbol> members)
+        private string HandleClass(INamedTypeSymbol classSymbol, List<ISymbol> members)
         {
             if (!classSymbol.CanBeReferencedByName)
             {
@@ -51,57 +32,62 @@ using DanmakuEngine.Dependency;
 
             string nsName = classSymbol.ContainingNamespace.ToDisplayString();
             string className = classSymbol.Name;
-            string accessibility = AccessibilityToString(classSymbol.DeclaredAccessibility);
+            string accessibility = GeneratorHelper.AccessibilityToString(classSymbol.DeclaredAccessibility);
 
             string nsDeclaration = $"namespace {nsName}";
 
             string abstract_modifier = classSymbol.IsAbstract ? "abstract " : "";
             string static_modifier = classSymbol.IsStatic ? "static " : "";
 
-            StringBuilder sb = new StringBuilder();
-            sb.AppendLine(usings);
-            sb.AppendLine($"{nsDeclaration}");
-            sb.AppendLine($"{{");
-            sb.AppendLine($"    {accessibility} {abstract_modifier} {static_modifier} partial class {className} : IInjectable");
-            sb.AppendLine($"    {{");
-            sb.AppendLine($"        {injection_method}");
-            sb.AppendLine($"        {{");
+            StringBuilder codeBuilder = new StringBuilder();
+            codeBuilder.AppendLine(usings);
+            codeBuilder.AppendLine($"{nsDeclaration}");
+            codeBuilder.AppendLine($"{{");
+            codeBuilder.AppendLine($"    {accessibility} {abstract_modifier} {static_modifier} partial class {className} : IInjectable");
+            codeBuilder.AppendLine($"    {{");
+            codeBuilder.AppendLine($"        {injection_method}");
+            codeBuilder.AppendLine($"        {{");
 
-            const string indent = "            ";
+            string indent = GeneratorHelper.GetIndent(4, 3);
 
             foreach (var m in members)
             {
-                string memberName;
-                ITypeSymbol typeName;
-
-                if (m is IFieldSymbol field)
-                {
-                    memberName = field.Name;
-                    typeName = field.Type;
-                }
-                else if (m is IPropertySymbol property)
-                {
-                    memberName = property.Name;
-                    typeName = property.Type;
-                }
-                else
-                    continue;
-
-                sb.Append(indent);
-
-                var code = CodeForGetByType(memberName, typeName);
-
-                sb.AppendLine(code);
+                HandleMember(m, codeBuilder, indent);
             }
 
             // end for injection method
-            sb.AppendLine($"        }}");
+            codeBuilder.AppendLine($"        }}");
             // end for class declaration
-            sb.AppendLine($"    }}");
+            codeBuilder.AppendLine($"    }}");
             // end for namespace declaration
-            sb.AppendLine($"}}");
+            codeBuilder.AppendLine($"}}");
 
-            return sb.ToString();
+            return codeBuilder.ToString();
+        }
+
+        private void HandleMember(ISymbol m, StringBuilder codeBuilder, string indent)
+        {
+            string memberName;
+            ITypeSymbol typeName;
+
+            if (m is IFieldSymbol field)
+            {
+                memberName = field.Name;
+                typeName = field.Type;
+            }
+            else if (m is IPropertySymbol property)
+            {
+                memberName = property.Name;
+                typeName = property.Type;
+            }
+            else
+                return;
+
+            codeBuilder.Append(indent);
+
+            var code = CodeForGetByType(memberName, typeName);
+
+            codeBuilder.AppendLine(code);
         }
 
         public void Execute(GeneratorExecutionContext context)
@@ -126,7 +112,7 @@ using DanmakuEngine.Dependency;
                     if (membersToInject.Any())
                     {
 
-                        var code = GenerateMethodForInjection(classSymbol, membersToInject);
+                        var code = HandleClass(classSymbol, membersToInject);
                         context.AddSource($"{classSymbol.Name}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
                     }
                 }

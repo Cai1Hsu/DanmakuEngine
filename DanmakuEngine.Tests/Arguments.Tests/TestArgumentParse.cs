@@ -118,43 +118,35 @@ public class TestArgumentParse
             Assert.Pass();
         }
     }
+}
 
-    private class TestArgumentTemplate : Paramaters
+public class UnsupportedType
+{
+
+}
+
+public partial class TestArgumentTemplate : Paramaters
+{
+    public Argument argument_int =
+        new("-int", typeof(int), 1);
+
+    public Argument argument_bool =
+        new("-bool", typeof(bool), true);
+
+    public Argument argument_float =
+        new("-float", typeof(float), 1.0f);
+
+    public Argument argument_double =
+        new("-double", typeof(double), 1.0d);
+
+    public Argument argument_string =
+        new("-string", typeof(string), "str");
+
+    public Argument argument_unsupported =
+        new("-unsupported", typeof(UnsupportedType), new UnsupportedType());
+
+    public TestArgumentTemplate()
     {
-        public Argument argument_int =
-            new("-int", typeof(int), 1);
-
-        public Argument argument_bool =
-            new("-bool", typeof(bool), true);
-
-        public Argument argument_float =
-            new("-float", typeof(float), 1.0f);
-
-        public Argument argument_double =
-            new("-double", typeof(double), 1.0d);
-
-        public Argument argument_string =
-            new("-string", typeof(string), "str");
-
-        public Argument argument_unsupported =
-            new("-unsupported", typeof(UnsupportedType), new UnsupportedType());
-
-        public TestArgumentTemplate()
-        {
-            Children = new()
-            {
-                { argument_int, "int" },
-                { argument_bool, "bool" },
-                { argument_float, "float" },
-                { argument_double, "double" },
-                { argument_string, "string" },
-                { argument_unsupported, "unsupported" },
-            };
-        }
-    }
-
-    private class UnsupportedType
-    {
-
+        setupChildren();
     }
 }
