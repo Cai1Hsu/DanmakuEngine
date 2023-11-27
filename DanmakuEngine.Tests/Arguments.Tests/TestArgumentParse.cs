@@ -136,16 +136,21 @@ public class TestArgumentParse
         public Argument argument_string =
             new("-string", typeof(string), "str");
 
-        // public Argument argument_path =
-        //     new("-directory", typeof(DirectoryInfo), "illegal path", arg =>
-        //     {
-        //         if (!arg.GetValue<DirectoryInfo>().Exists)
-        //             throw new DirectoryNotFoundException();
-        //     },
-        //     path => new DirectoryInfo(path.Trim('\"')));
-
         public Argument argument_unsupported =
             new("-unsupported", typeof(UnsupportedType), new UnsupportedType());
+
+        public TestArgumentTemplate()
+        {
+            Children = new()
+            {
+                { argument_int, "int" },
+                { argument_bool, "bool" },
+                { argument_float, "float" },
+                { argument_double, "double" },
+                { argument_string, "string" },
+                { argument_unsupported, "unsupported" },
+            };
+        }
     }
 
     private class UnsupportedType
