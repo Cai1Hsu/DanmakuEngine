@@ -9,7 +9,7 @@ namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class MainScreen : Screen
 {
-    protected List<TransformSequence> transformations = [];
+    protected List<TransformSequence> transformations = new();
 
     // This method is called when the screen(or average object) is loading
     public override void Load()
