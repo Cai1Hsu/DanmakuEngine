@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DanmakuEngine.SourceGeneration", "DanmakuEngine.SourceGeneration.csproj", "{0110FCEE-8B38-4AF2-831E-F54743370A3A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0110FCEE-8B38-4AF2-831E-F54743370A3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0110FCEE-8B38-4AF2-831E-F54743370A3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0110FCEE-8B38-4AF2-831E-F54743370A3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0110FCEE-8B38-4AF2-831E-F54743370A3A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {385BE4B5-93C1-4D33-B29E-3A8014E07B15}
+	EndGlobalSection
+EndGlobal
