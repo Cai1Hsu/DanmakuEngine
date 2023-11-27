@@ -104,7 +104,7 @@ public class MainScreen : Screen
 
         Console.SetCursorPosition(0, 10);
         for (int i = 1; i <= 26; i++)
-        { 
+        {
             Console.Write("\u001b[50C");
 
             if (i == line)
