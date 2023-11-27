@@ -117,7 +117,6 @@ using DanmakuEngine.Arguments;
             if (!typeName.Name.Contains("Argument"))
                 return;
 
-
             var description = (string)m.GetAttributes()
                 .FirstOrDefault(a => a.AttributeClass.Name == "DescriptionAttribute")
                 ?.ConstructorArguments[0].Value;

@@ -92,6 +92,7 @@ public partial class GameHost : Time, IDisposable
 
         DependencyContainer.AutoInject(Logger.GetLogger());
     }
+
     public virtual void SetUpSdl()
     {
         _sdl = Sdl.GetApi();
