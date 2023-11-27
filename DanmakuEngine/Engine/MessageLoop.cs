@@ -28,13 +28,13 @@ public unsafe partial class GameHost
         sw.Reset();
         sw.Start();
 
-        HandleMessages();
+        RunMainLoop();
 
         sw.Stop();
         PerformExit();
     }
 
-    public virtual void HandleMessages()
+    public virtual void RunMainLoop()
     {
         while (isRunning)
         {
