@@ -2,7 +2,7 @@ using DanmakuEngine.Bindables;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace DanmakuEngine.Tests.Bindables;
+namespace DanmakuEngine.Tests.Bindables.Tests;
 
 public class TestBindables
 {
