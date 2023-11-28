@@ -413,7 +413,13 @@ public unsafe partial class GameHost
         // fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
 
         if (ConfigManager.HasConsole && ConfigManager.DebugMode)
-            Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+        {
+            // Prevent IO blocking
+            Task.Run(() =>
+            {
+                Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+            });
+        }
 
         ActualFPS = count_frame / count_time;
 
