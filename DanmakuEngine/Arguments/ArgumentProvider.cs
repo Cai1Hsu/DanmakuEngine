@@ -36,6 +36,12 @@ public class ArgumentProvider : IDisposable
         throw new InvalidOperationException($"Target argument does not exist: {key}");
     }
 
+    public object GetDefault(string key)
+        => _argParser.GetDefault(key);
+
+    public T GetDefault<T>(string key)
+        => (T)GetDefault(key);
+
     public void Dispose()
     {
         Dispose(true);
