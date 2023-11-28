@@ -84,6 +84,7 @@ public partial class GameHost : Time, IDisposable
         using var argParser = new ArgumentParser(new ParamTemplate());
         using var argProvider = argParser.CreateArgumentProvider();
 
+        ConfigManager.DynamicLoadDefaultValues();
         ConfigManager.LoadFromArguments(argProvider);
 
         doFrontToBackPass = ConfigManager.DebugMode;
@@ -237,7 +238,7 @@ public unsafe partial class GameHost
             size.X, size.Y,
             (uint)windowFlag);
 
-        Logger.Debug($"Display mode: {ConfigManager.RefreshRate}Hz");
+        Logger.Debug($"Display mode: {ConfigManager.RefreshRate}Hz (This only applies to fullscreen mode)");
 
         DisplayMode deisplayMode = new DisplayMode(null, size.X, size.Y, ConfigManager.RefreshRate, null);
 
