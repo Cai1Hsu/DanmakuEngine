@@ -12,7 +12,7 @@ public abstract partial class MultiBuffer<T>
     protected virtual int bufferCount
         => throw new NotImplementedException(exception);
 
-    protected virtual Usage<T>[] buffers
+    protected virtual UsageValue<T>[] buffers
         => throw new NotImplementedException(exception);
 
     /// <summary>
@@ -43,21 +43,21 @@ public abstract partial class MultiBuffer<T>
 
         for (int i = 0; i < bufferCount; i++)
         {
-            buffers[i] = new Usage<T>(i, finishUsage);
+            buffers[i] = new UsageValue<T>(i, finishUsage);
         }
     }
 
-    public Usage<T> GetForWrite()
+    public UsageValue<T> GetForWrite()
     {
         // Only one write should be allowed at once
         Debug.Assert(buffers.All(b => b.UsingType != UsingType.Writing));
 
-        Usage<T> buffer = getNextWriteBuffer();
+        UsageValue<T> buffer = getNextWriteBuffer();
 
         return buffer;
     }
 
-    public Usage<T>? GetForRead()
+    public UsageValue<T>? GetForRead()
     {
         // Only one read should be allowed at once
         Debug.Assert(buffers.All(b => b.UsingType != UsingType.Reading));
@@ -77,7 +77,7 @@ public abstract partial class MultiBuffer<T>
         return GetForRead();
     }
 
-    private Usage<T>? getPendingReadBuffer()
+    private UsageValue<T>? getPendingReadBuffer()
     {
         // Avoid locking to see if there's a pending write.
         int pendingWrite = Interlocked.Exchange(ref pendingCompletedWriteIndex, -1);
@@ -98,7 +98,7 @@ public abstract partial class MultiBuffer<T>
         }
     }
 
-    private Usage<T> getNextWriteBuffer()
+    private UsageValue<T> getNextWriteBuffer()
     {
         lock (buffers)
         {
@@ -116,7 +116,7 @@ public abstract partial class MultiBuffer<T>
 
                 var buffer = buffers[i];
 
-                Debug.Assert(buffer.UsingType == UsingType.Writing);
+                Debug.Assert(buffer.UsingType == UsingType.Avaliable);
                 buffer.UsingType = UsingType.Writing;
 
                 return buffer;
@@ -126,7 +126,7 @@ public abstract partial class MultiBuffer<T>
         throw new InvalidOperationException("No buffer could be obtained. This should never ever happen.");
     }
 
-    private void finishUsage(Usage<T> obj)
+    private void finishUsage(UsageValue<T> obj)
     {
         // This implementation is intentionally written this way to avoid requiring locking overhead.
         bool wasWrite = obj.UsingType == UsingType.Writing;

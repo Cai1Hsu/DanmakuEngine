@@ -1,14 +1,16 @@
 namespace DanmakuEngine.Allocations;
 
-public class Usage<T> : IDisposable
+public class UsageValue<T> : IDisposable
 {
+    public T? Value;
+
     public readonly int Index;
 
     public UsingType UsingType = UsingType.Avaliable;
 
-    private Action<Usage<T>> OnFinish;
+    private Action<UsageValue<T>> OnFinish;
 
-    public Usage(int index, Action<Usage<T>> onFinish = null!)
+    public UsageValue(int index, Action<UsageValue<T>> onFinish = null!)
     {
         this.Index = index;
         this.OnFinish = onFinish;
