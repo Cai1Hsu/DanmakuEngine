@@ -11,18 +11,18 @@ internal class Program
     {
         var game = new TH08Game();
 
-        #if HEADLESS
+#if HEADLESS
             Logger.Debug("Running in headless mode.");
 
             using (var host = new HeadlessGameHost(() => true))
             {
                 host.Run(game);
             }
-        #else
-            using (var host = DesktopGameHost.GetSuitableHost())
-            {
-                host.Run(game);
-            }
-        #endif
+#else
+        using (var host = DesktopGameHost.GetSuitableHost())
+        {
+            host.Run(game);
+        }
+#endif
     }
 }

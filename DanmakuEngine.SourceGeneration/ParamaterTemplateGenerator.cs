@@ -73,7 +73,7 @@ using DanmakuEngine.Arguments;
             codeBuilder.AppendLine($"            Children = new()");
             codeBuilder.AppendLine($"            {{");
 
-            string indent = GeneratorHelper.GetIndent(4, 3);
+            string indent = GeneratorHelper.GetIndent(4, 4);
 
             foreach (var m in members)
             {

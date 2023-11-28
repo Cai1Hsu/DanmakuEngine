@@ -4,7 +4,7 @@ namespace DanmakuEngine.Transfomation;
 
 public class TransformSequence : ITransformable
 {
-    private readonly List<ITransformable> transformers = [];
+    private readonly List<ITransformable> transformers = new();
 
     private int _index = 0;
 
