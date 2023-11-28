@@ -212,7 +212,12 @@ public partial class Logger : IInjectable, IAutoloadable
         _instence = new Logger();
 
         log_directory = Environment.CurrentDirectory;
-        log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH-mm}.log";
+
+        // Generate a 4 digit unique id
+        // This prevents the log file from being overwritten
+        var unique_id = Guid.NewGuid().ToString().Substring(0, 4);
+
+        log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH-mm}-{unique_id}.log";
 
         Logger.Debug($"Log file: {FullLogFile}");
     }
