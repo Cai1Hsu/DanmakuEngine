@@ -50,8 +50,6 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public void update()
     {
-        Clock.Update(Time.UpdateDelta);
-
         base.Update();
     }
 
