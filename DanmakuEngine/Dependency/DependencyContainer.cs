@@ -79,6 +79,16 @@ public class DependencyContainer
     public static void AutoInject(IInjectable obj)
         => obj.AutoInject();
 
+    public static DependencyContainer Reset()
+    {
+        lock (_instanceLock)
+        {
+            Instance = new DependencyContainer();
+        }
+
+        return Instance;
+    }
+
     static DependencyContainer()
     {
         Instance = new DependencyContainer();

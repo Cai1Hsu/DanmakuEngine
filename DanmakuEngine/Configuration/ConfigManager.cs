@@ -135,4 +135,11 @@ public partial class ConfigManager
             this.Flag = flag;
         }
     }
+
+    public bool Headless { get; private set; }
+
+    public ConfigManager(bool headless)
+    {
+        this.Headless = headless;
+    }
 }

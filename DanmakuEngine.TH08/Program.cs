@@ -16,8 +16,6 @@ internal class Program
         using var argProvider = argParser.CreateArgumentProvider();
 
 #if HEADLESS
-        Logger.Debug("Running in headless mode.");
-
         using var host = new HeadlessGameHost(() => true);
 #else
         using var host = DesktopGameHost.GetSuitableHost();

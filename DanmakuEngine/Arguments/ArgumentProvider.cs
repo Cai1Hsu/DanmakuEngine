@@ -58,4 +58,7 @@ public class ArgumentProvider : IDisposable
 
     public static ArgumentProvider CreateDefaultProvider(Paramaters template)
         => new ArgumentParser(template).CreateArgumentProvider();
+
+    public static ArgumentProvider CreateDefaultProvider(Paramaters template, string[] args)
+=> new ArgumentParser(template, args).CreateArgumentProvider();
 }

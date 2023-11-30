@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
 using DanmakuEngine.Arguments;
@@ -38,7 +39,7 @@ public partial class GameHost : Time, IDisposable
 
     public InputManager InputManager { get; private set; } = null!;
 
-    public DependencyContainer Dependencies { get; private set; } = DependencyContainer.Instance;
+    public DependencyContainer Dependencies { get; private set; } = null!;
 
     private ScreenStack screens = null!;
 
@@ -46,6 +47,9 @@ public partial class GameHost : Time, IDisposable
 
     public void Run(Game game, ArgumentProvider argProvider)
     {
+        if (this is HeadlessGameHost)
+            Logger.Debug("Running in headless mode.");
+
         SetUpDependency();
 
         this.Game = game;
@@ -77,6 +81,11 @@ public partial class GameHost : Time, IDisposable
 
     private void SetUpDependency()
     {
+        Dependencies = DependencyContainer.Reset();
+
+        Debug.Assert(DependencyContainer.Instance != null);
+        Debug.Assert(Dependencies != null);
+
         Dependencies.Cache(this);
 
         Dependencies.Cache((Time)this);
@@ -84,7 +93,7 @@ public partial class GameHost : Time, IDisposable
 
     private void LoadConfig()
     {
-        ConfigManager = new ConfigManager();
+        ConfigManager = new ConfigManager(this is HeadlessGameHost);
         Dependencies.Cache(ConfigManager);
 
         ConfigManager.DynamicLoadDefaultValues();

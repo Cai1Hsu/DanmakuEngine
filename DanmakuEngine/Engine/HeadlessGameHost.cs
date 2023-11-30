@@ -6,27 +6,29 @@ namespace DanmakuEngine.Engine;
 
 public class HeadlessGameHost : GameHost
 {
-    private Func<bool> Running { get; }
+    private Func<bool> Running { get; } = null!;
 
     private double refreshRate = 60;
 
     private double averageWaitTime => 1 / refreshRate;
 
-    public Action? OnUpdate;
+    public Action<HeadlessGameHost>? OnUpdate;
+
+    public Action? OnTimedout;
+
+    private Stopwatch timer = null!;
+
+    private double timedout = 0;
 
     /// <summary>
     /// Create an instance of HeadlessGameHost with a specified timeout
-    ///
-    /// NOTE: The timer starts when you create the instance instead of when you actually run the host.
     /// </summary>
-    /// <param name="Timeout">timeout in ms</param>
-    public HeadlessGameHost(double Timeout)
+    /// <param name="timeout">timeout in ms</param>
+    public HeadlessGameHost(double timeout)
     {
-        Stopwatch sw = new Stopwatch();
+        timer = new Stopwatch();
 
-        sw.Start();
-
-        Running = () => sw.ElapsedMilliseconds < Timeout;
+        this.timedout = timeout;
     }
 
     public HeadlessGameHost(Func<bool> running)
@@ -55,9 +57,14 @@ public class HeadlessGameHost : GameHost
     {
         // TODO: Reimplement this and GameHost.HandleMessages()
 
+        if (timer is not null)
+            timer.Start();
+
         long LastWaitTicks = HostTimer.ElapsedTicks;
 
-        while (isRunning && Running())
+        while (isRunning 
+            && (Running is null || Running.Invoke()) 
+            && (timer is null || timer.ElapsedMilliseconds < timedout))
         {
             long currentTicks = HostTimer.ElapsedTicks;
 
@@ -66,7 +73,7 @@ public class HeadlessGameHost : GameHost
 
             UpdateTime(RenderDelta);
 
-            OnUpdate?.Invoke();
+            OnUpdate?.Invoke(this);
             DoUpdate();
 
             lastUpdateTicks = currentTicks;
@@ -87,6 +94,14 @@ public class HeadlessGameHost : GameHost
             }
 
             LastWaitTicks = HostTimer.ElapsedTicks;
+        }
+
+        // The host exited with timed out
+        if (timer is not null && timer.IsRunning && timer.ElapsedMilliseconds >= timedout)
+        {
+            Logger.Error("[HeadlessGameHost] timed out");
+
+            OnTimedout?.Invoke();
         }
     }
 }
