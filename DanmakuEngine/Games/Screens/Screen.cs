@@ -61,6 +61,7 @@ public partial class Screen : CompositeDrawable, IInjectable
     public void start()
     {
         Clock.Reset();
+        Clock.Start();
 
         Start();
     }

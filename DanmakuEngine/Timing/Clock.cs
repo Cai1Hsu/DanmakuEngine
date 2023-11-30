@@ -33,7 +33,7 @@ public class Clock
     /// </summary>
     public double RenderDelta => IsPaused ? 0 : Time.RenderDelta * _playback;
 
-    public Clock(bool start = true)
+    public Clock(bool start = false)
     {
         Reset();
 
@@ -58,6 +58,13 @@ public class Clock
         _accomulatedTime = this.CurrentTime;
 
         _isPaused = true;
+    }
+
+    public void Start()
+    {
+        Reset();
+
+        _isPaused = false;
     }
 
     public void Resume()
