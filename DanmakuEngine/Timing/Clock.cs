@@ -6,7 +6,7 @@ public class Clock
     /// Represents the current time of the clock in ms. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? realElpsedTime / Playback : 0);
+    public double CurrentTime => _accomulatedTime + (IsPaused ? realElpsedTime * Playback : 0);
 
     private double realElpsedTime => Time.CurrentTime - _startTime;
 
@@ -26,12 +26,12 @@ public class Clock
     /// You may want to use this because the delta time is affected by the playback.
     /// This is helpful when you want to make a slow motion effect.
     /// </summary>
-    public double UpdateDelta => IsPaused ? 0 : Time.UpdateDelta / _playback;
+    public double UpdateDelta => IsPaused ? 0 : Time.UpdateDelta * _playback;
 
     /// <summary>
     /// see <see cref="UpdateDelta"/> for more info.
     /// </summary>
-    public double RenderDelta => IsPaused ? 0 : Time.RenderDelta / _playback;
+    public double RenderDelta => IsPaused ? 0 : Time.RenderDelta * _playback;
 
     public Clock(bool start = true)
     {
