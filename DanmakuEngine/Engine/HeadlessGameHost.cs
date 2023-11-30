@@ -14,6 +14,8 @@ public class HeadlessGameHost : GameHost
 
     public Action<HeadlessGameHost>? OnUpdate;
 
+    public Action<HeadlessGameHost>? OnLoad;
+
     public Action? OnTimedout;
 
     private Stopwatch timer = null!;
@@ -55,6 +57,8 @@ public class HeadlessGameHost : GameHost
 
     public override void RunMainLoop()
     {
+        OnLoad?.Invoke(this);
+
         // TODO: Reimplement this and GameHost.HandleMessages()
 
         if (timer is not null)
