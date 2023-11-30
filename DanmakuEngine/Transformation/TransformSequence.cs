@@ -10,7 +10,7 @@ public class TransformSequence : ITransformable
 
     public bool IsDone => !_loopForever && _currentLoop >= _loopCount;
 
-    private bool _begun = true;
+    private bool _begun = false;
 
     private int _loopCount = 1;
 
