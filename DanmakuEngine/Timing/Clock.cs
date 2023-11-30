@@ -6,7 +6,7 @@ public class Clock
     /// Represents the current time of the clock in ms. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? realElpsedTime * Playback : 0);
+    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : realElpsedTime * Playback);
 
     private double realElpsedTime => Time.CurrentTime - _startTime;
 
@@ -14,7 +14,7 @@ public class Clock
 
     private double _accomulatedTime = 0;
 
-    private bool _isPaused = false;
+    private bool _isPaused = true;
 
     public bool IsPaused => _isPaused;
 
@@ -37,7 +37,9 @@ public class Clock
     {
         Reset();
 
-        if (!start)
+        if (start)
+            Start();
+        else
             Pause();
     }
 
