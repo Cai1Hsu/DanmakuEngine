@@ -18,9 +18,11 @@ public class HeadlessGameHost : GameHost
 
     public Action? OnTimedout;
 
+    public bool ThrowOnTimedOut = false;
+
     private Stopwatch timer = null!;
 
-    private double timedout = 0;
+    private double timeout = 0;
 
     /// <summary>
     /// Create an instance of HeadlessGameHost with a specified timeout
@@ -30,7 +32,7 @@ public class HeadlessGameHost : GameHost
     {
         timer = new Stopwatch();
 
-        this.timedout = timeout;
+        this.timeout = timeout;
     }
 
     public HeadlessGameHost(Func<bool> running)
@@ -61,14 +63,13 @@ public class HeadlessGameHost : GameHost
 
         // TODO: Reimplement this and GameHost.HandleMessages()
 
-        if (timer is not null)
-            timer.Start();
+        timer?.Start();
 
         long LastWaitTicks = HostTimer.ElapsedTicks;
 
         while (isRunning
             && (Running is null || Running.Invoke())
-            && (timer is null || timer.ElapsedMilliseconds < timedout))
+            && (timer is null || timer.ElapsedMilliseconds < timeout))
         {
             long currentTicks = HostTimer.ElapsedTicks;
 
@@ -101,11 +102,14 @@ public class HeadlessGameHost : GameHost
         }
 
         // The host exited with timed out
-        if (timer is not null && timer.IsRunning && timer.ElapsedMilliseconds >= timedout)
+        if (timer is not null && timer.IsRunning && timer.ElapsedMilliseconds >= timeout)
         {
             Logger.Error("[HeadlessGameHost] timed out");
 
             OnTimedout?.Invoke();
+
+            if (ThrowOnTimedOut)
+                throw new Exception($"Reached time limit({timeout} ms) when running HeadlessGameHost");
         }
     }
 }
