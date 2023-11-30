@@ -50,7 +50,7 @@ public class Clock
 
     /// <summary>
     /// Pause everything related to the clock
-    /// For example, you can implement implement objects related to `Sakuya` with <see cref="Time"/>
+    /// For example, you can implement and update objects related to `Sakuya` with <see cref="Time"/>
     /// and everything elses with a managed Clock.
     /// </summary>
     public void Pause()
