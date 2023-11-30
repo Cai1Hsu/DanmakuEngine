@@ -1,13 +1,9 @@
-using DanmakuEngine.Timing;
-
 namespace DanmakuEngine.Scheduling;
 
 public class Scheduler
 {
     private readonly Queue<ScheduledTask> tasks = new();
     private readonly object taskLock = new();
-
-    private Clock Clock = new Clock();
 
     public void ScheduleTask(ScheduledTask task)
     {
@@ -19,8 +15,6 @@ public class Scheduler
 
     public void update()
     {
-        Clock.Update(Time.UpdateDelta);
-
         lock (taskLock)
         {
             while (tasks.Count > 0)
@@ -28,7 +22,11 @@ public class Scheduler
                 var task = tasks.Dequeue();
 
                 if (task.ShouldRun)
+                {
+                    using var t = task;
+
                     task.Run();
+                }
             }
         }
 

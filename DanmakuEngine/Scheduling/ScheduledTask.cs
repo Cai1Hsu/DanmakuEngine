@@ -6,7 +6,17 @@ public class ScheduledTask : IDisposable
 
     private bool IsDisposed = false;
 
-    public virtual bool ShouldRun => true;
+    public virtual bool ShouldRun
+        => _shouldRun is null || _shouldRun.Invoke();
+
+    private readonly Func<bool>? _shouldRun;
+
+    public ScheduledTask(Action action, Func<bool> shouldRun)
+    {
+        this.action = action;
+
+        this._shouldRun = shouldRun;
+    }
 
     public ScheduledTask(Action action)
     {
