@@ -20,7 +20,7 @@ internal class Program
 #else
         using var host = DesktopGameHost.GetSuitableHost();
 #endif
-        
+
         host.Run(game, argProvider);
     }
 }

@@ -9,6 +9,7 @@ namespace DanmakuEngine.Tests.Timing;
 public class TestTime
 {
     private ArgumentProvider defaultProvider;
+
     [SetUp]
     public void SetUp()
     {

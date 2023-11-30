@@ -62,8 +62,8 @@ public class HeadlessGameHost : GameHost
 
         long LastWaitTicks = HostTimer.ElapsedTicks;
 
-        while (isRunning 
-            && (Running is null || Running.Invoke()) 
+        while (isRunning
+            && (Running is null || Running.Invoke())
             && (timer is null || timer.ElapsedMilliseconds < timedout))
         {
             long currentTicks = HostTimer.ElapsedTicks;

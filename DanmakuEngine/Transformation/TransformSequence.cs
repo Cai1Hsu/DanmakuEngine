@@ -21,7 +21,7 @@ public class TransformSequence : ITransformable
     public TransformSequence()
     {
     }
-
+    
     public TransformSequence(ITransformable transformable)
     {
         this.transformers.Add(transformable);
