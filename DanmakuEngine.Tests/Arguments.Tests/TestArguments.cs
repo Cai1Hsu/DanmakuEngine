@@ -1,7 +1,7 @@
 using DanmakuEngine.Arguments;
 using NUnit.Framework;
 
-namespace DanmakuEngine.Tests.Arguments.Tests;
+namespace DanmakuEngine.Tests.Arguments;
 
 public class TestArguments
 {
