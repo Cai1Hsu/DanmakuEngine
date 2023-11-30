@@ -312,12 +312,15 @@ public unsafe partial class GameHost
         Root.Add(screens);
 
         Dependencies.Cache(screens);
-        DependencyContainer.AutoInject(Game);
 
         Root.load();
 
         RegisterEvents();
 
+        // throw new NotImplementedException();
+
+        // TODO: Do this in the update loop
+        // The first screen blocked the update loop
         Game.begin();
     }
 
@@ -403,23 +406,30 @@ public unsafe partial class GameHost
 
     protected void UpdateTime(double delta)
     {
+        CurrentTime += delta;
+
         count_time += delta;
         count_frame++;
+
+        fps_debug_time += delta;
+
+        if (fps_debug_time > UpdateFrequency)
+        {
+            if (ConfigManager.HasConsole && ConfigManager.DebugMode)
+            {
+                // Prevent IO blocking
+                Task.Run(() =>
+                {
+                    Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+                }).ContinueWith(_ => fps_debug_time = 0, TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
 
         if (count_time < 1)
             return;
 
         // fpsText.Mutate(x => x.Clear(Color.Transparent));
         // fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
-
-        if (ConfigManager.HasConsole && ConfigManager.DebugMode)
-        {
-            // Prevent IO blocking
-            Task.Run(() =>
-            {
-                Logger.Write($"FPS: {ActualFPS:F2}\r", true);
-            });
-        }
 
         ActualFPS = count_frame / count_time;
 
@@ -429,7 +439,7 @@ public unsafe partial class GameHost
 
     public void PerformExit()
     {
-        sw.Stop();
+        HostTimer.Stop();
 
         // This helps HeadlessGameHost to stop
         if (_sdl != null)

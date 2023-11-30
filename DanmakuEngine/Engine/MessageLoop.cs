@@ -16,21 +16,26 @@ public unsafe partial class GameHost
 
     protected bool isRunning = true;
 
-    protected readonly Stopwatch sw = new();
+    protected readonly Stopwatch HostTimer = new();
 
     protected long lastUpdateTicks = 0;
     protected long lastRenderTicks = 0;
 
     public void RunUntilExit()
     {
-        DoLoad();
+        ResetTime();
 
-        sw.Reset();
-        sw.Start();
+        HostTimer.Reset();
+        HostTimer.Start();
+
+        // We do it here 
+        // because the load process is also a part of the Update Loop
+        // The only difference is that it only executes once at the beginning
+        DoLoad();
 
         RunMainLoop();
 
-        sw.Stop();
+        HostTimer.Stop();
         PerformExit();
     }
 
@@ -38,62 +43,12 @@ public unsafe partial class GameHost
     {
         while (isRunning)
         {
-            long currentTicks = sw.ElapsedTicks;
+            HandleMessages();
+
+            long currentTicks = HostTimer.ElapsedTicks;
 
             UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
             RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
-
-            Event e = new();
-            while (_sdl.PollEvent(ref e) != 0)
-            {
-                switch ((EventType)e.Type)
-                {
-                    case EventType.Firstevent:
-                        // This is not reliable, so we ignore it
-                        break;
-
-                    case EventType.AppTerminating:
-                    case EventType.Quit:
-                        isRunning = false;
-                        break;
-
-                    case EventType.Keydown:
-                        KeyDown?.Invoke(e.Key);
-                        break;
-
-                    case EventType.Keyup:
-                        KeyUp?.Invoke(e.Key);
-                        break;
-
-                    case EventType.Mousebuttondown:
-                        MouseButtonDown?.Invoke(e.Button);
-                        break;
-
-                    case EventType.Mousebuttonup:
-                        MouseButtonUp?.Invoke(e.Button);
-                        break;
-
-                    case EventType.Mousemotion:
-                        MouseMove?.Invoke(e.Motion);
-                        break;
-
-                    case EventType.Mousewheel:
-                        MouseScroll?.Invoke(e.Wheel);
-                        break;
-
-                    case EventType.Windowevent:
-                        windowManager?.HandleWindowEvent(e.Window);
-                        break;
-
-                    case EventType.AppWillenterbackground:
-                    case EventType.AppWillenterforeground:
-                    case EventType.AppDidenterforeground:
-                    case EventType.AppDidenterbackground:
-                        windowManager?.HandleAppEvent(e.Type);
-                        break;
-
-                }
-            }
 
             UpdateTime(RenderDelta);
 
@@ -104,6 +59,60 @@ public unsafe partial class GameHost
             DoRender();
 
             lastRenderTicks = currentTicks;
+        }
+    }
+
+    private void HandleMessages()
+    {
+        Event e = new();
+        while (_sdl.PollEvent(ref e) != 0)
+        {
+            switch ((EventType)e.Type)
+            {
+                case EventType.Firstevent:
+                    // This is not reliable, so we ignore it
+                    break;
+
+                case EventType.AppTerminating:
+                case EventType.Quit:
+                    isRunning = false;
+                    break;
+
+                case EventType.Keydown:
+                    KeyDown?.Invoke(e.Key);
+                    break;
+
+                case EventType.Keyup:
+                    KeyUp?.Invoke(e.Key);
+                    break;
+
+                case EventType.Mousebuttondown:
+                    MouseButtonDown?.Invoke(e.Button);
+                    break;
+
+                case EventType.Mousebuttonup:
+                    MouseButtonUp?.Invoke(e.Button);
+                    break;
+
+                case EventType.Mousemotion:
+                    MouseMove?.Invoke(e.Motion);
+                    break;
+
+                case EventType.Mousewheel:
+                    MouseScroll?.Invoke(e.Wheel);
+                    break;
+
+                case EventType.Windowevent:
+                    windowManager?.HandleWindowEvent(e.Window);
+                    break;
+
+                case EventType.AppWillenterbackground:
+                case EventType.AppWillenterforeground:
+                case EventType.AppDidenterforeground:
+                case EventType.AppDidenterbackground:
+                    windowManager?.HandleAppEvent(e.Type);
+                    break;
+            }
         }
     }
 
