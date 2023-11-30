@@ -42,13 +42,19 @@ public partial class GameHost : Time, IDisposable
 
     private ScreenStack screens = null!;
 
-    public void Run(Game game)
+    private ArgumentProvider argProvider = null!;
+
+    public void Run(Game game, ArgumentProvider argProvider)
     {
         SetUpDependency();
 
         this.Game = game;
-
         Dependencies.Cache(Game);
+
+        ArgumentNullException.ThrowIfNull(argProvider);
+
+        this.argProvider = argProvider;
+        Dependencies.Cache(argProvider);
 
         SetUpConsole();
 
@@ -80,9 +86,6 @@ public partial class GameHost : Time, IDisposable
     {
         ConfigManager = new ConfigManager();
         Dependencies.Cache(ConfigManager);
-
-        using var argParser = new ArgumentParser(new ParamTemplate());
-        using var argProvider = argParser.CreateArgumentProvider();
 
         ConfigManager.DynamicLoadDefaultValues();
         ConfigManager.LoadFromArguments(argProvider);

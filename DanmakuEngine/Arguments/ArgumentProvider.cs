@@ -55,4 +55,7 @@ public class ArgumentProvider : IDisposable
 
         ArgumentMap = null!;
     }
+
+    public static ArgumentProvider CreateDefaultProvider(Paramaters template)
+        => new ArgumentParser(template).CreateArgumentProvider();
 }
