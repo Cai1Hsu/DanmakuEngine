@@ -36,7 +36,6 @@ public class TestTime
         host.Run(testGame, defaultProvider);
     }
 
-
     [Test]
     public void TestTimeReset()
     {
