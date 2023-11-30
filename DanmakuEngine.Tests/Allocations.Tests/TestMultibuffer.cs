@@ -3,7 +3,7 @@
 using DanmakuEngine.Allocations;
 using NUnit.Framework;
 
-namespace DanmakuEngine.Test.Allocations.Tests;
+namespace DanmakuEngine.Tests.Allocations.Tests;
 
 public class TestMultiBuffer
 {
