@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Engine;
 
@@ -10,6 +11,23 @@ public class HeadlessGameHost : GameHost
     private double refreshRate = 60;
 
     private double averageWaitTime => 1 / refreshRate;
+
+    public Action? OnUpdate;
+
+    /// <summary>
+    /// Create an instance of HeadlessGameHost with a specified timeout
+    ///
+    /// NOTE: The timer starts when you create the instance instead of when you actually run the host.
+    /// </summary>
+    /// <param name="Timeout">timeout in ms</param>
+    public HeadlessGameHost(double Timeout)
+    {
+        Stopwatch sw = new Stopwatch();
+
+        sw.Start();
+
+        Running = () => sw.ElapsedMilliseconds < Timeout;
+    }
 
     public HeadlessGameHost(Func<bool> running)
     {
@@ -37,17 +55,18 @@ public class HeadlessGameHost : GameHost
     {
         // TODO: Reimplement this and GameHost.HandleMessages()
 
-        long LastWaitTicks = sw.ElapsedTicks;
+        long LastWaitTicks = HostTimer.ElapsedTicks;
 
         while (isRunning && Running())
         {
-            long currentTicks = sw.ElapsedTicks;
+            long currentTicks = HostTimer.ElapsedTicks;
 
             UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
             RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
 
             UpdateTime(RenderDelta);
 
+            OnUpdate?.Invoke();
             DoUpdate();
 
             lastUpdateTicks = currentTicks;
@@ -64,10 +83,10 @@ public class HeadlessGameHost : GameHost
             var waitTime = averageWaitTime - UpdateDelta;
             if (waitTime > 1E-3)
             {
-                SpinWait.SpinUntil(() => (sw.ElapsedTicks - LastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
+                SpinWait.SpinUntil(() => (HostTimer.ElapsedTicks - LastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
             }
 
-            LastWaitTicks = sw.ElapsedTicks;
+            LastWaitTicks = HostTimer.ElapsedTicks;
         }
     }
 }
