@@ -9,7 +9,7 @@ public unsafe partial class GameHost
     public WindowManager windowManager = null!;
     public void RequestClose()
     {
-        Logger.Info("Requesting close");
+        Logger.Debug("Requesting close");
 
         isRunning = false;
     }

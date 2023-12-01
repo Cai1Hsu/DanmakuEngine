@@ -47,9 +47,6 @@ public partial class GameHost : Time, IDisposable
 
     public void Run(Game game, ArgumentProvider argProvider)
     {
-        if (this is HeadlessGameHost)
-            Logger.Debug("Running in headless mode.");
-
         SetUpDependency();
 
         this.Game = game;
@@ -104,6 +101,10 @@ public partial class GameHost : Time, IDisposable
         UpdateFrequency = ConfigManager.FpsUpdateFrequency;
 
         DependencyContainer.AutoInject(Logger.GetLogger());
+
+        // Logger is loaded with debug flag here
+        if (this is HeadlessGameHost)
+            Logger.Debug("Running in headless mode.");
     }
 
     public virtual void SetUpSdl()
