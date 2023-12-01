@@ -6,9 +6,25 @@ public class Clock
     /// Represents the current time of the clock in ms. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : realElpsedTime * Playback);
+    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElpsedTime * Playback);
 
-    private double realElpsedTime => Time.CurrentTime - _startTime;
+    private double realElapsedTime => Time.CurrentTime - _startTime;
+
+    private double currentPeriodElpsedTime
+    {
+        get
+        {
+            if (_theworld)
+            {
+                if (!isTheWorldFinished())
+                    return 0;
+
+                finishTheWorld();
+            }
+
+            return realElapsedTime;
+        }
+    }
 
     private double _startTime;
 
@@ -16,7 +32,16 @@ public class Clock
 
     private bool _isPaused = true;
 
-    public bool IsPaused => _isPaused;
+    public bool IsPaused
+    {
+        get
+        {
+            if (_theworld && isTheWorldFinished())
+                finishTheWorld();
+
+            return _isPaused;
+        }
+    }
 
     private double _playback = 1.00;
 
@@ -26,12 +51,30 @@ public class Clock
     /// You may want to use this because the delta time is affected by the playback.
     /// This is helpful when you want to make a slow motion effect.
     /// </summary>
-    public double UpdateDelta => IsPaused ? 0 : Time.UpdateDelta * _playback;
+    public double UpdateDelta
+    {
+        get
+        {
+            if (_theworld && isTheWorldFinished())
+                finishTheWorld();
+
+            return IsPaused ? 0 : Time.UpdateDelta * _playback;
+        }
+    }
 
     /// <summary>
     /// see <see cref="UpdateDelta"/> for more info.
     /// </summary>
-    public double RenderDelta => IsPaused ? 0 : Time.RenderDelta * _playback;
+    public double RenderDelta
+    {
+        get
+        {
+            if (_theworld && isTheWorldFinished())
+                finishTheWorld();
+
+            return IsPaused ? 0 : Time.RenderDelta * _playback;
+        }
+    }
 
     public Clock(bool start = false)
     {
@@ -60,6 +103,8 @@ public class Clock
         _accomulatedTime = this.CurrentTime;
 
         _isPaused = true;
+
+        _theworld = false;
     }
 
     public void Start()
@@ -74,6 +119,9 @@ public class Clock
         _startTime = Time.CurrentTime;
 
         _isPaused = false;
+
+        // reset theworld
+        _theworld = false;
     }
 
     public void ResetPlayback()
@@ -109,4 +157,86 @@ public class Clock
 
         _startTime = Time.CurrentTime;
     }
+
+    #region StepIn/StepOut
+
+    /// <summary>
+    /// Step in the clock by a specific time.
+    /// </summary>
+    /// <param name="seconds"> The time to step in in seconds. </param>
+    public void StepIn(double seconds)
+        => _accomulatedTime += seconds;
+
+    /// <summary>
+    /// Step out the clock by a specific time.
+    /// This will throw an exception if the result is negative.
+    /// </summary>
+    /// <param name="seconds"> The time to step out in seconds. </param> 
+    /// <exception cref="ArgumentException"> If the result is negative. </exception> 
+    public void StepOut(double seconds)
+    {
+        if (_accomulatedTime < seconds)
+        {
+            // let's try accomulate time
+            // and see if it's enough to step out
+            _accomulatedTime = Time.CurrentTime;
+            _startTime = Time.CurrentTime;
+
+            if (_accomulatedTime < seconds)
+                throw new ArgumentException($"Cannot step out more than the accomulated time, accomulated time: {_accomulatedTime}, step out time: {seconds}.");
+        }
+
+
+        _accomulatedTime -= seconds;
+    }
+
+    #endregion
+
+    #region TheWorld
+
+    private double _theworldStartTime = 0;
+    private double _theworldTime = 0;
+    private bool _theworld = false;
+
+    /// <summary>
+    /// Pause the clock for a specific time.
+    /// </summary>
+    /// <param name="time">time in seconds</param>
+    /// <returns>True if the clock was paused, false otherwise</returns>
+    public bool TheWorld(double seconds)
+    {
+        // TODO:Handle paused cases
+        if (this.IsPaused)
+            return false;
+
+        _theworldStartTime = Time.CurrentTime;
+        _theworldTime = seconds;
+
+        Pause();
+
+        _theworld = true;
+
+        return true;
+    }
+
+    private void finishTheWorld()
+    {
+        _theworld = false;
+
+        Resume();
+
+        _startTime = Time.CurrentTime;
+
+        // accomulate the extra time
+        _accomulatedTime += (Time.CurrentTime - _theworldStartTime) - _theworldTime;
+    }
+
+    private bool isTheWorldFinished()
+    {
+        if (!_theworld)
+            return false;
+
+        return Time.CurrentTime - _theworldStartTime >= _theworldTime;
+    }
+    #endregion
 }
