@@ -90,6 +90,8 @@ public class Clock
     {
         _startTime = Time.CurrentTime;
 
+        _theworld = false;
+
         _accomulatedTime = 0;
     }
 
