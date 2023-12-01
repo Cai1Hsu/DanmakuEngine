@@ -41,7 +41,7 @@ public partial class GameHost : Time, IDisposable
 
     public DependencyContainer Dependencies { get; private set; } = null!;
 
-    private ScreenStack screens = null!;
+    protected ScreenStack screens = null!;
 
     private ArgumentProvider argProvider = null!;
 
