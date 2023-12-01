@@ -20,6 +20,8 @@ public class HeadlessGameHost : GameHost
 
     public bool ThrowOnTimedOut = true;
 
+    public bool IgnoreTimedout = false;
+
     private Stopwatch timer = null!;
 
     private double timeout = 0;
@@ -112,7 +114,8 @@ public class HeadlessGameHost : GameHost
         // The host exited with timed out
         if (timer is not null && timer.IsRunning && timer.ElapsedMilliseconds >= timeout)
         {
-            Logger.Error("[HeadlessGameHost] timed out");
+            if (!IgnoreTimedout)
+                Logger.Error("[HeadlessGameHost] timed out");
 
             OnTimedout?.Invoke();
 

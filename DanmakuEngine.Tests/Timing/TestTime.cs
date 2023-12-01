@@ -77,7 +77,9 @@ public class TestTime
 
         using var host = new HeadlessGameHost(100)
         {
-            ThrowOnTimedOut = false
+            // Fix error output in CI
+            ThrowOnTimedOut = false,
+            IgnoreTimedout = true
         };
 
         host.OnUpdate += h =>
