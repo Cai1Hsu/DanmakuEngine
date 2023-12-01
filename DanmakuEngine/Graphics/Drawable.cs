@@ -77,7 +77,7 @@ public class Drawable : IDisposable
         return false;
     }
 
-    private void start()
+    protected virtual void start()
     {
         if (LoadState != LoadState.Ready)
             return;

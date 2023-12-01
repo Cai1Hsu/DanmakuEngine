@@ -17,7 +17,7 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public UserKeyboardHandler keyboardHandler = null!;
 
-    public Clock Clock { get; } = new();
+    public Clock ScreenClock { get; } = new();
 
     public Screen() : base(null!)
     {
@@ -58,12 +58,12 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     }
 
-    public void start()
+    protected override void start()
     {
-        Clock.Reset();
-        Clock.Start();
+        ScreenClock.Reset();
+        ScreenClock.Start();
 
-        Start();
+        base.start();
     }
 
     public override void Start()
