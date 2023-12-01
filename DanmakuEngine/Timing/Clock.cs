@@ -98,12 +98,15 @@ public class Clock
                 return;
         }
 
+        // accomulate time before _playback was changed.
+        // it changes CurrentTime calculation
+        _accomulatedTime += this.CurrentTime;
+
         _playback = playback;
 
         if (IsPaused)
             return;
 
-        _accomulatedTime = this.CurrentTime;
         _startTime = Time.CurrentTime;
     }
 }
