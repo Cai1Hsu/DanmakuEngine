@@ -19,9 +19,19 @@ public class Time
 
     public double ActualFPS { get; protected set; }
 
+    /// <summary>
+    /// Current time of the game main loop in seconds
+    /// </summary>
     public static double CurrentTime { get; protected set; }
 
+    /// <summary>
+    /// Render delta of the last frame in seconds
+    /// </summary>
     public static double RenderDelta { get; protected set; } = 1 / 60;
+
+    /// <summary>
+    /// Update delta of the last frame in seconds
+    /// </summary>
     public static double UpdateDelta { get; protected set; } = 1 / 60;
 
     public void ResetTime()

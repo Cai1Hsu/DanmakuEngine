@@ -46,7 +46,7 @@ public class TestTime
 
         host1.OnUpdate += h =>
         {
-            if (Time.CurrentTime > 2000)
+            if (Time.CurrentTime > 0.5)
                 h.RequestClose();
         };
 
@@ -58,7 +58,7 @@ public class TestTime
 
         host2.OnUpdate += h =>
         {
-            Assert.That(Time.CurrentTime, Is.LessThan(2000));
+            Assert.That(Time.CurrentTime, Is.LessThan(0.5));
 
             h.RequestClose();
         };
