@@ -60,13 +60,17 @@ public class TestClock
         {
             count_frame += 1;
 
+            if (count_frame == 1)
+            {
+                current_time = clock.CurrentTime;
+
+                clock.Pause();
+            }
+
+            Assert.That(clock.CurrentTime, Is.EqualTo(current_time));
+
             if (count_frame > 60)
                 h.RequestClose();
-
-            if (current_time == 0)
-                current_time = clock.CurrentTime;
-            else
-                Assert.That(clock.CurrentTime, Is.EqualTo(current_time));
         };
 
         host.OnLoad += _ => clock.Start();
@@ -95,7 +99,7 @@ public class TestClock
                 if (current_time == 0)
                     current_time = clock.CurrentTime;
                 else
-                    Assert.That(clock.CurrentTime, Is.EqualTo(current_time));
+                    Assert.That(clock.CurrentTime, Is.LessThan(current_time));
             }
             else if (count_frame < 120)
             {
@@ -111,7 +115,12 @@ public class TestClock
             }
         };
 
-        host.OnLoad += _ => clock.Start();
+        host.OnLoad += _ =>
+        {
+            clock.Start();
+
+            clock.Pause();
+        };
 
         host.Run(game, defaultProvider);
     }
@@ -127,8 +136,8 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta * 2).Within(0.002));
-            Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime * 2).Within(0.002));
+            Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta * 2).Within(0.001));
+            Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime * 2).Within(0.001));
 
             h.RequestClose();
         };
@@ -169,9 +178,9 @@ public class TestClock
             else if (count_frame == 60)
             {
                 // half of the second part and the first part
-                var correct_clock_time = (Time.CurrentTime - current_time) / 2 + current_time;
+                var correct_clock_time = (Time.CurrentTime - current_time) * 2 + current_time;
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(correct_clock_time).Within(0.002));
+                Assert.That(clock.CurrentTime, Is.EqualTo(correct_clock_time).Within(0.001));
 
                 h.RequestClose();
             }
