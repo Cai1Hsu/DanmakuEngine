@@ -17,6 +17,42 @@ public class TestClock
     }
 
     [Test]
+    public void TestClockConsitentWithTime()
+    {
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new HeadlessGameHost(5000);
+
+        host.OnUpdate += h =>
+        {
+            Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime));
+
+            Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
+            Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
+
+            if (Time.CurrentTime > 0.1)
+            {
+                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime));
+
+                Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
+                Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
+
+                h.RequestClose();
+            }
+        };
+
+        host.OnLoad += _ =>
+        {
+            clock.Start();
+            clock.Reset();
+        };
+
+        host.Run(game, defaultProvider);
+    }
+
+    [Test]
     public void TestUpdateClock()
     {
         Clock clock = new();
@@ -235,6 +271,137 @@ public class TestClock
             Assert.That(clock.CurrentTime, Is.EqualTo(0));
 
             h.RequestClose();
+        };
+
+        host.OnLoad += _ => clock.Start();
+
+        host.Run(game, defaultProvider);
+    }
+
+    [Test]
+    public void TestStepIn()
+    {
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new HeadlessGameHost(5000);
+
+        host.OnUpdate += h =>
+        {
+            var current_time = clock.CurrentTime;
+
+            clock.StepIn(1);
+
+            Assert.That(clock.CurrentTime, Is.EqualTo(current_time + 1));
+
+            h.RequestClose();
+        };
+
+        host.OnLoad += _ => clock.Start();
+
+        host.Run(game, defaultProvider);
+    }
+
+    [Test]
+    public void TestStepOut()
+    {
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new HeadlessGameHost(5000);
+
+        host.OnUpdate += h =>
+        {
+            if (Time.CurrentTime > 0.5)
+            {
+                var current_time = clock.CurrentTime;
+
+                clock.StepOut(0.1);
+
+                Assert.That(clock.CurrentTime, Is.EqualTo(current_time - 0.1));
+
+                h.RequestClose();
+            }
+        };
+
+        host.OnLoad += _ => clock.Start();
+
+        host.Run(game, defaultProvider);
+    }
+
+    // [Test]
+    // public void TestTheWorldManyTimes()
+    // {
+    //     for (int i = 0; i < 100; i++)
+    //     {
+    //         TestTheWorld();
+    //     }
+    // }
+
+    [Test]
+    public void TestTheWorld()
+    {
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new HeadlessGameHost(5000)
+        {
+            BypassWaitForSync = true
+        };
+
+        bool checkpoint1 = true;
+        double checkpoint1_time = -1;
+
+        bool checkpoint2 = true;
+
+        bool checkpoint3 = true;
+
+        host.OnUpdate += h =>
+        {
+            if (!checkpoint1 && !checkpoint2 && checkpoint3 && Time.CurrentTime > 0.7)
+            {
+                checkpoint3 = false;
+
+                Assert.That(clock.IsPaused, Is.False);
+
+                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime - 0.5).Within(0.0001));
+
+                Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
+                Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
+
+                h.RequestClose();
+            }
+
+            if (!checkpoint1 && checkpoint2 && Time.CurrentTime < 0.2)
+            {
+                checkpoint2 = false;
+
+                Assert.That(clock.IsPaused, Is.True);
+
+                Assert.That(clock.CurrentTime, Is.EqualTo(checkpoint1_time));
+
+                Assert.That(clock.UpdateDelta, Is.EqualTo(0));
+                Assert.That(clock.RenderDelta, Is.EqualTo(0));
+            }
+
+            if (checkpoint1)
+            {
+                checkpoint1 = false;
+
+                checkpoint1_time = clock.CurrentTime;
+
+                clock.TheWorld(0.5);
+
+                Assert.That(clock.IsPaused, Is.True);
+
+                Assert.That(clock.CurrentTime, Is.EqualTo(checkpoint1_time));
+
+                Assert.That(clock.UpdateDelta, Is.EqualTo(0));
+                Assert.That(clock.RenderDelta, Is.EqualTo(0));
+            }
         };
 
         host.OnLoad += _ => clock.Start();
