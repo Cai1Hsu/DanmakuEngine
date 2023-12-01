@@ -18,7 +18,7 @@ public class HeadlessGameHost : GameHost
 
     public Action? OnTimedout;
 
-    public bool ThrowOnTimedOut = false;
+    public bool ThrowOnTimedOut = true;
 
     private Stopwatch timer = null!;
 
