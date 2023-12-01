@@ -188,7 +188,6 @@ public class Clock
                 throw new ArgumentException($"Cannot step out more than the accomulated time, accomulated time: {_accomulatedTime}, step out time: {seconds}.");
         }
 
-
         _accomulatedTime -= seconds;
     }
 
