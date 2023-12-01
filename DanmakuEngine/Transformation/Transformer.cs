@@ -10,7 +10,21 @@ public class Transformer : ITransformable
 
     public double CurrentTime { get; private set; }
 
-    public double time => CurrentTime / Duration;
+    public double time
+    {
+        get
+        {
+            var t = CurrentTime / Duration;
+
+            if (t > 1 && !AllowOverflow)
+                t = 1;
+
+            if (t < -1 && !AllowOverflow)
+                t = -1;
+
+            return t;
+        }
+    }
 
     public ITransformFunction? Function { get; private set; }
 
@@ -19,6 +33,8 @@ public class Transformer : ITransformable
     public Action<double> OnUpdate = null!;
 
     public Action OnDone = null!;
+
+    public bool AllowOverflow = false;
 
     private bool done = false;
 
