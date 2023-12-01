@@ -16,7 +16,7 @@ public class MainScreen : Screen
     {
         keyboardHandler = new MainMenuKeyBoardHandler()
         {
-            secretCodeHandler = new(Clock),
+            secretCodeHandler = new(ScreenClock),
         };
 
         transformations.AddRange(new TransformSequence[]
@@ -178,6 +178,6 @@ public class MainScreen : Screen
     public override void Update()
     {
         foreach (var transformation in transformations)
-            transformation.Update(Time.UpdateDelta * 1000);
+            transformation.Update(ScreenClock.UpdateDelta * 1000);
     }
 }
