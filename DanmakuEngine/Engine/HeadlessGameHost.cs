@@ -22,6 +22,11 @@ public class HeadlessGameHost : GameHost
 
     public bool IgnoreTimedout = false;
 
+    /// <summary>
+    /// Bypass the wait for sync, if you want high refresh rate
+    /// </summary>
+    public bool BypassWaitForSync = false;
+
     private Stopwatch timer = null!;
 
     private double timeout = 0;
@@ -98,14 +103,17 @@ public class HeadlessGameHost : GameHost
 
             lastRenderTicks = currentTicks;
 
-            // Wait for sync
-            // This is a very simple sync method, only to prevent the CPU from running at 100%
-
-            // Only do this when the wait time is greater than 1ms
-            var waitTime = averageWaitTime - UpdateDelta;
-            if (waitTime > 1E-3)
+            if (!BypassWaitForSync)
             {
-                SpinWait.SpinUntil(() => (HostTimer.ElapsedTicks - LastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
+                // Wait for sync
+                // This is a very simple sync method, only to prevent the CPU from running at 100%
+
+                // Only do this when the wait time is greater than 1ms
+                var waitTime = averageWaitTime - UpdateDelta;
+                if (waitTime > 1E-3)
+                {
+                    SpinWait.SpinUntil(() => (HostTimer.ElapsedTicks - LastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
+                }
             }
 
             LastWaitTicks = HostTimer.ElapsedTicks;
