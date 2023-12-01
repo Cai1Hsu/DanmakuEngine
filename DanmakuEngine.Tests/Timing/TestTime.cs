@@ -67,4 +67,26 @@ public class TestTime
 
         host2.Run(testGame, defaultProvider);
     }
+
+    [Test]
+    public void TestHeadlessGameHostUpdateFrames()
+    {
+        var testGame = new TestGame();
+
+        int count_frame = 0;
+
+        using var host = new HeadlessGameHost(100)
+        {
+            ThrowOnTimedOut = false
+        };
+
+        host.OnUpdate += h =>
+        {
+            count_frame++;
+        };
+
+        host.Run(testGame, defaultProvider);
+
+        Assert.That(count_frame, Is.GreaterThan(1));
+    }
 }
