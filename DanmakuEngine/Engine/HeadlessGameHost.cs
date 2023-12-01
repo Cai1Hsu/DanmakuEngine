@@ -61,6 +61,8 @@ public class HeadlessGameHost : GameHost
     {
         OnLoad?.Invoke(this);
 
+        bool empty_screens = screens.Empty();
+
         // TODO: Reimplement this and GameHost.HandleMessages()
 
         timer?.Start();
@@ -79,7 +81,13 @@ public class HeadlessGameHost : GameHost
             UpdateTime(UpdateDelta);
 
             OnUpdate?.Invoke(this);
+
+            var isrunning = isRunning;
+
             DoUpdate();
+
+            // This is a hack to prevent Headless gamehost from exiting fast for empty screen stack
+            isRunning = empty_screens ? isrunning : isRunning;
 
             lastUpdateTicks = currentTicks;
 
