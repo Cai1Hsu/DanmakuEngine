@@ -341,7 +341,9 @@ public class TestClock
     // }
 
     [Test]
-    public void TestTheWorld()
+    [TestCase(true)]
+    [TestCase(false)]
+    public void TestTheWorld(bool sync)
     {
         Clock clock = new();
 
@@ -349,7 +351,7 @@ public class TestClock
 
         using var host = new HeadlessGameHost(5000)
         {
-            BypassWaitForSync = true
+            BypassWaitForSync = sync
         };
 
         bool checkpoint1 = true;
@@ -367,7 +369,7 @@ public class TestClock
 
                 Assert.That(clock.IsPaused, Is.False);
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime - 0.5).Within(0.0001));
+                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime - 0.5).Within(1E-10));
 
                 Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
                 Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
@@ -387,7 +389,7 @@ public class TestClock
                 Assert.That(clock.RenderDelta, Is.EqualTo(0));
             }
 
-            if (checkpoint1)
+            if (checkpoint1 && Time.CurrentTime > 0.05)
             {
                 checkpoint1 = false;
 
