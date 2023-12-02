@@ -33,14 +33,7 @@ public class TestClock
             Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
 
             if (Time.CurrentTime > 0.1)
-            {
-                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime));
-
-                Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
-                Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
-
                 h.RequestClose();
-            }
         };
 
         host.OnLoad += _ =>
