@@ -22,7 +22,16 @@ public partial class Logger : IInjectable, IAutoloadable
 
     private const string game = @"DanmakuEngine";
 
+    private LogLevel printLevel = LogLevel.Verbose;
+
     public static Logger GetLogger() => _instence;
+
+    public static void SetPrintLevel(LogLevel logLevel)
+    {
+        _instence.printLevel = logLevel;
+
+        Logger.Debug($"Print level updated, current: {_instence.printLevel}");
+    }
 
     public static void SetLogDirectory(string directory)
     {
@@ -115,6 +124,9 @@ public partial class Logger : IInjectable, IAutoloadable
     private static void PrintLog(Log log)
     {
         if (!ConfigManager.HasConsole)
+            return;
+
+        if (log.level < _instence.printLevel)
             return;
 
         lock (_synccolor)
@@ -220,6 +232,15 @@ public partial class Logger : IInjectable, IAutoloadable
         log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH-mm}-{unique_id}.log";
 
         Logger.Debug($"Log file: {FullLogFile}");
+
+        var ci_env = Environment.GetEnvironmentVariable("IS_CI_ENVIRONMENT");
+
+        if (ci_env is not null 
+            && bool.TryParse(ci_env, out var is_ci_env) && is_ci_env)
+        {
+            // Disable console output in CI environment
+            SetPrintLevel(LogLevel.Silent);
+        }
     }
 }
 
@@ -244,9 +265,10 @@ public readonly struct Log
 // Converter
 public enum LogLevel
 {
-    Error,
-    Warning,
-    Debug,
-    Verbose,
-    Info
+    Silent = 0x7fffffff,
+    Error = 5,
+    Warning = 4,
+    Debug = 3,
+    Verbose = 2,
+    Info = 1,
 }
