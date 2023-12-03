@@ -3,7 +3,7 @@ namespace DanmakuEngine.Timing;
 public class Clock
 {
     /// <summary>
-    /// Represents the current time of the clock in ms. 
+    /// Represents the current time of the clock in seconds. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
     public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElpsedTime * Playback);
@@ -50,6 +50,8 @@ public class Clock
     /// <summary>
     /// You may want to use this because the delta time is affected by the playback.
     /// This is helpful when you want to make a slow motion effect.
+    /// 
+    /// In seconds.
     /// </summary>
     public double UpdateDelta
     {
@@ -64,6 +66,8 @@ public class Clock
 
     /// <summary>
     /// see <see cref="UpdateDelta"/> for more info.
+    /// 
+    /// In seconds.
     /// </summary>
     public double RenderDelta
     {
