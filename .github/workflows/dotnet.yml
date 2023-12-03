@@ -11,6 +11,8 @@ on:
 
 jobs:
   build:
+    env:
+      IS_CI_ENVIRONMENT: true
 
     runs-on: ubuntu-latest
 
