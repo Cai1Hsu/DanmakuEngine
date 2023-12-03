@@ -15,6 +15,12 @@ public class Scheduler : IUpdatable
         }
     }
 
+    public void ScheduleTask(Action action, Func<bool> shouldRun)
+        => ScheduleTask(new ScheduledTask(action, shouldRun));
+
+    public void ScheduleTask(Action action)
+        => ScheduleTask(new ScheduledTask(action));
+
     public void load()
         => Load();
 
