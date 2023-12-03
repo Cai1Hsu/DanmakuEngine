@@ -19,6 +19,8 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public Clock ScreenClock { get; } = new();
 
+    protected List<IUpdatable> InternalChildren { get; set; } = null!;
+
     public Screen() : base(null!)
     {
         this.AutoInject();
@@ -51,8 +53,15 @@ public partial class Screen : CompositeDrawable, IInjectable
     public void update()
     {
         base.Update();
+
+        if (InternalChildren is not null)
+        {
+            foreach (var ichild in InternalChildren)
+                ichild.update();
+        }
     }
 
+    // this is called in Drawable.update()
     public override void Update()
     {
 
@@ -64,6 +73,12 @@ public partial class Screen : CompositeDrawable, IInjectable
         ScreenClock.Start();
 
         base.start();
+
+        if (InternalChildren is not null)
+        {
+            foreach (var ichild in InternalChildren)
+                ichild.start();
+        }
     }
 
     public override void Start()
@@ -76,6 +91,12 @@ public partial class Screen : CompositeDrawable, IInjectable
         DependencyContainer.AutoInject(this);
 
         base.load();
+
+        if (InternalChildren is not null)
+        {
+            foreach (var ichild in InternalChildren)
+                ichild.load();
+        }
     }
 
     public override void Load()
