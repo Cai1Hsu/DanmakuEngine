@@ -10,7 +10,7 @@ public class TransformSequence : ITransformable
 
     public bool IsDone => !_loopForever && _currentLoop >= _loopCount;
 
-    private bool _begun = false;
+    private bool _begun = true;
 
     private int _loopCount = 1;
 
@@ -47,6 +47,17 @@ public class TransformSequence : ITransformable
             transformers[_index].Reset();
             _index++;
 
+            while (_index < transformers.Count
+                // Some transformers may finish immediately
+                // so we need to check if it's done
+                // and if it's done, we need to reset it
+                // and skip it
+                && transformers[_index].IsDone)
+            {
+                transformers[_index].Reset();
+                _index++;
+            }
+
             if (_index >= transformers.Count)
             {
                 if (!_loopForever && _currentLoop < _loopCount)
@@ -63,6 +74,13 @@ public class TransformSequence : ITransformable
     {
         foreach (var transformer in transformers)
             transformer.Dispose();
+    }
+
+    public TransformSequence BeginLater()
+    {
+        _begun = false;
+
+        return this;
     }
 
     public void Pause()
@@ -92,14 +110,13 @@ public class TransformSequence : ITransformable
     }
 
     public TransformSequence Then()
-        => Delay(0);
+        => this;
 
     public TransformSequence Delay(double duration)
-    {
-        transformers.Add(new Transformer(duration, null!, null!));
+        => Add(new Delayer(duration));
 
-        return this;
-    }
+    public TransformSequence DelayUntil(Func<bool> condition)
+        => Add(new UntilDelayer(condition));
 
     public TransformSequence Loop(int Count)
     {
@@ -121,5 +138,59 @@ public class TransformSequence : ITransformable
 
         foreach (var transformer in transformers)
             transformer.Reset();
+    }
+
+    private class UntilDelayer : ITransformable
+    {
+        private readonly Func<bool> _condition;
+
+        public bool IsDone => _condition();
+
+        public UntilDelayer(Func<bool> condition)
+        {
+            _condition = condition;
+        }
+
+        public void Update(double _)
+        {
+        }
+
+        public void Reset()
+        {
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
+    }
+
+    private class Delayer : ITransformable
+    {
+        private readonly double _duration;
+
+        private double _currentTime = 0;
+
+        public bool IsDone => _currentTime >= _duration;
+
+        public Delayer(double duration)
+        {
+            _duration = duration;
+        }
+
+        public void Update(double deltaTime)
+        {
+            _currentTime += deltaTime;
+        }
+
+        public void Reset()
+        {
+            _currentTime = 0;
+        }
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+        }
     }
 }

@@ -109,6 +109,9 @@ public class Transformer : ITransformable
     public TransformSequence Delay(double duration)
         => new TransformSequence(this).Delay(duration);
 
+    public TransformSequence DelayUntil(Func<bool> condition)
+        => new TransformSequence(this).DelayUntil(condition);
+
     public TransformSequence Loop(int count)
         => new TransformSequence(this).Loop(count);
 
