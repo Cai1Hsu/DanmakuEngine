@@ -17,6 +17,11 @@ public partial class Screen : CompositeDrawable, IInjectable
 
     public UserKeyboardHandler keyboardHandler = null!;
 
+    /// <summary>
+    /// The clock for the screen
+    /// it provides standard time for the screen
+    /// be careful when pause the clock or change the rate as it may cause unexpected behavior
+    /// </summary>
     public Clock ScreenClock { get; } = new();
 
     protected List<IUpdatable> InternalChildren { get; set; } = null!;

@@ -11,6 +11,8 @@ public class MainScreen : Screen
 {
     protected List<TransformSequence> transformations = new();
 
+    private Clock clock = new();
+
     // This method is called when the screen(or average object) is loading
     public override void Load()
     {
@@ -163,6 +165,8 @@ public class MainScreen : Screen
         Logger.Info("Keyboard is handled in this screen.");
         Logger.Info("You can exit the game by pressing ESC.");
 
+        clock.Start();
+
         Console.Clear();
         Console.ResetColor();
         foreach (var transformation in transformations)
@@ -178,6 +182,6 @@ public class MainScreen : Screen
     public override void Update()
     {
         foreach (var transformation in transformations)
-            transformation.Update(ScreenClock.UpdateDelta * 1000);
+            transformation.Update(clock.UpdateDelta * 1000);
     }
 }
