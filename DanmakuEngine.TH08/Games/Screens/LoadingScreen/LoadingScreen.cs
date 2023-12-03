@@ -39,16 +39,17 @@ public class LoadingScreen : Screen
         // you should load your resources here
         // and do it in a async way
 
-        scheduler.ScheduleTask(new ScheduledTask(() =>
+        scheduler.ScheduleTask(() =>
         {
             // if finished, switch to main screen
             ScreenStack.Switch(new MainScreen());
-        }, () =>
+        },
+        () =>
         {
             // check that if our loading is finished
             // here we just check if the time is greater than 2s
             return ScreenClock.CurrentTime > 2;
-        }));
+        });
     }
 
     // This method is called every frame, the first call is after `Start` method
