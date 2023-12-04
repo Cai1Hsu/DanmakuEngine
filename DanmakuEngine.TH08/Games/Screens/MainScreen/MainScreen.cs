@@ -11,7 +11,7 @@ public partial class MainScreen : Screen
 {
     protected List<TransformSequence> transformations = new();
 
-    private Clock clock = new();
+    private readonly Clock clock = new();
 
     // This method is called when the screen(or average object) is loading
     public override void Load()
