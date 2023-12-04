@@ -101,7 +101,7 @@ public class Drawable : IDisposable
 
     }
 
-    public void load()
+    public virtual void load()
     {
         if (LoadState != LoadState.NotLoaded)
             return;
