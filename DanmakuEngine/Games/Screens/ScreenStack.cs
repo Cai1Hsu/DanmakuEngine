@@ -91,7 +91,7 @@ public class ScreenStack : CompositeDrawable
         if (peek is null)
             return true;
 
-        if (peek.UpdateSubTree())
+        if (peek.updateSubTree())
             return true;
 
         return false;

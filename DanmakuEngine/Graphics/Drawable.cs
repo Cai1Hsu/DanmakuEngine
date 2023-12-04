@@ -53,7 +53,11 @@ public class Drawable : IDisposable
             return true;
 
         if (LoadState == LoadState.NotLoaded)
+        {
+            load();
+
             return true;
+        }
 
         if (LoadState == LoadState.Ready)
             start();
@@ -70,7 +74,7 @@ public class Drawable : IDisposable
 
         // scheuler update
 
-        Update();
+        update();
 
         OnUpdate?.Invoke(this);
 
@@ -94,6 +98,11 @@ public class Drawable : IDisposable
     public virtual void Start()
     {
 
+    }
+
+    public virtual void update()
+    {
+        Update();
     }
 
     public virtual void Update()

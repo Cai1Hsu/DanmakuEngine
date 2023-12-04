@@ -49,8 +49,6 @@ public partial class Screen : CompositeDrawable
         if (base.UpdateSubTree())
             return true;
 
-        update();
-
         // TODO: update children
 
         return UpdateSubTree();
@@ -62,9 +60,9 @@ public partial class Screen : CompositeDrawable
         return false;
     }
 
-    public void update()
+    public override void update()
     {
-        base.Update();
+        base.update();
 
         if (InternalChildren is not null)
         {
