@@ -7,7 +7,7 @@ using DanmakuEngine.Transfomation.Functions;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
-public class MainScreen : Screen
+public partial class MainScreen : Screen
 {
     protected List<TransformSequence> transformations = new();
 

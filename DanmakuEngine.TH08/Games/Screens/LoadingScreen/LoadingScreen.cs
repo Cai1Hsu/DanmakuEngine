@@ -4,7 +4,7 @@ using DanmakuEngine.Scheduling;
 
 namespace DanmakuEngine.Games.Screens.Welcome;
 
-public class LoadingScreen : Screen
+public partial class LoadingScreen : Screen
 {
     private Scheduler scheduler = null!;
 

@@ -3,7 +3,7 @@ using DanmakuEngine.Games.Screens.Welcome;
 
 namespace DanmakuEngine.TH08.Games;
 
-public class TH08Game : Game
+public partial class TH08Game : Game
 {
     public override string Name => @"TH08";
 
