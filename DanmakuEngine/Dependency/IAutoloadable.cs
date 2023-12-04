@@ -1,6 +1,6 @@
 namespace DanmakuEngine.Dependency;
 
-public interface IAutoloadable : IInjectable
+public interface IAutoloadable
 {
     /// <summary>
     /// This method is called when auto injection to your class finished.
