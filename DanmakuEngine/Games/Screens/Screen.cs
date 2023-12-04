@@ -44,8 +44,6 @@ public partial class Screen : CompositeDrawable
 
     public bool updateSubTree()
     {
-        // FIXME: this doesn't work properly
-        // it always return true
         if (base.UpdateSubTree())
             return true;
 
