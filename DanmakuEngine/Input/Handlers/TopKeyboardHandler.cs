@@ -14,8 +14,6 @@ public partial class TopKeyboardHandler : IInputHandler
 
     public TopKeyboardHandler()
     {
-        // check that if we inject the screen stack successfully
-        Debug.Assert(screens != null);
     }
 
     public void KeyDown(KeyboardEvent e)
@@ -40,6 +38,9 @@ public partial class TopKeyboardHandler : IInputHandler
 
     public void Register(GameHost host)
     {
+        // check that if we inject the screen stack successfully
+        Debug.Assert(screens != null);
+
         host.KeyDown += KeyDown;
         host.KeyUp += KeyUp;
     }

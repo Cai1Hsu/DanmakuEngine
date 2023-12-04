@@ -6,17 +6,14 @@ namespace DanmakuEngine.Input;
 
 public class InputManager
 {
-    public List<IInputHandler> Handlers { get; private set; } = null!;
+    public IInputHandler[] Handlers { get; private set; }
 
     public InputManager()
     {
-        Handlers = new List<IInputHandler>()
+        Handlers = new[]
         {
             new TopKeyboardHandler(),
         };
-
-        foreach (var h in Handlers)
-            h.AutoInject();
     }
 
     public void RegisterHandlers(GameHost host)
@@ -24,6 +21,8 @@ public class InputManager
         foreach (var h in Handlers)
         {
             Logger.Debug($"Registering {h.GetType()}");
+
+            h.AutoInject();
 
             h.Register(host);
         }
