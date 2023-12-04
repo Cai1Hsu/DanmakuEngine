@@ -235,7 +235,7 @@ public partial class Logger : IInjectable, IAutoloadable
 
         var ci_env = Environment.GetEnvironmentVariable("IS_CI_ENVIRONMENT");
 
-        if (ci_env is not null 
+        if (ci_env is not null
             && bool.TryParse(ci_env, out var is_ci_env) && is_ci_env)
         {
             // Disable console output in CI environment

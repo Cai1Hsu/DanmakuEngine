@@ -15,7 +15,7 @@ namespace DanmakuEngine.SourceGeneration
         private const string iinjectable_interface = @"IInjectable";
 
         private const string inject_attribute = @"InjectAttribute";
-        
+
         public void Initialize(GeneratorInitializationContext context)
         {
         }
@@ -157,7 +157,7 @@ using DanmakuEngine.Dependency;
                 else if (member is INamedTypeSymbol classSymbol)
                 {
                     var membersToInject = classSymbol.GetMembers()
-                        .Where(m => (m is IFieldSymbol || m is IPropertySymbol) 
+                        .Where(m => (m is IFieldSymbol || m is IPropertySymbol)
                             && m.GetAttributes().Any(a => a.AttributeClass!.Name == inject_attribute))
                         .ToList();
 
