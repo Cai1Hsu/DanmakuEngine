@@ -166,9 +166,7 @@ using DanmakuEngine.Dependency;
                     // we don't want to inject interfaces
                     var isInterface = classSymbol.TypeKind == TypeKind.Interface;
 
-                    var isAbstract = classSymbol.IsAbstract;
-
-                    if ((hasIInjectableInterface && !isInterface) || (membersToInject.Any() && !isAbstract))
+                    if ((hasIInjectableInterface && !isInterface) || membersToInject.Any())
                     {
                         var code = HandleClass(classSymbol, membersToInject);
                         context.AddSource($"{classSymbol.Name}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
