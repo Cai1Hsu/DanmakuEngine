@@ -117,4 +117,11 @@ public class Transformer : ITransformable
 
     public TransformSequence LoopForever()
         => new TransformSequence(this).LoopForever();
+
+    public double CurrentExtraTime => IsDone ? CurrentTime - Duration
+        : throw new InvalidOperationException($"The transform is not done yet, CurrentTime: {CurrentTime}, Duration: {Duration}");
+
+    public double TotalDuration => Duration;
+
+    public bool IsCurrentDone => IsDone;
 }

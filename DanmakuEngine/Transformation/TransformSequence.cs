@@ -18,18 +18,26 @@ public class TransformSequence : ITransformable
 
     private bool _loopForever = false;
 
+    public double CurrentExtraTime => transformers[_index].CurrentExtraTime;
+
+    public double TotalDuration => _totalDuration;
+
+    public bool IsCurrentDone => transformers[_index].IsCurrentDone;
+
+    private double _totalDuration = 0;
+
     public TransformSequence()
     {
     }
 
     public TransformSequence(ITransformable transformable)
     {
-        this.transformers.Add(transformable);
+        Add(transformable);
     }
 
     public TransformSequence(params ITransformable[] transformables)
     {
-        this.transformers.AddRange(transformables);
+        Add(transformables);
     }
 
     public void Update(double deltaTime)
@@ -44,29 +52,80 @@ public class TransformSequence : ITransformable
 
         if (transformers[_index].IsDone)
         {
+            var extraTime = IsCurrentDone ? transformers[_index].CurrentExtraTime : 0;
+
             transformers[_index].Reset();
             _index++;
 
-            while (_index < transformers.Count
-                // Some transformers may finish immediately
-                // so we need to check if it's done
-                // and if it's done, we need to reset it
-                // and skip it
-                && transformers[_index].IsDone)
+            CheckAndRunNextLoop();
+
+            // The top transformer may be a infinite transform sequence
+            // and its current transformer may not be done
+            if (!IsCurrentDone)
+                return;
+
+            while (HandleImmediateTransform()
+                // see the comment below and CurrentExtraTime in `ITransformable`
+                || HandleTransformationFinishesWithinExtraTime())
             {
                 transformers[_index].Reset();
                 _index++;
+
+                CheckAndRunNextLoop();
             }
 
-            if (_index >= transformers.Count)
+            // This is needed because we may not(or always not) finish the transform at the exact time
+            // Generally, we will finish the transform a little bit later
+            // this allow us to make our transform sequence more accurate
+            // we dont need to care about whether the transform is a transformer or a transform sequence
+            // as transfrom sequence fixes this problem recursively
+            transformers[_index].Update(extraTime);
+
+            void CheckAndRunNextLoop()
             {
-                if (!_loopForever && _currentLoop < _loopCount)
-                    _currentLoop++;
+                if (_index >= transformers.Count)
+                {
+                    if (!_loopForever && _currentLoop < _loopCount)
+                        _currentLoop++;
 
-                _index = 0;
+                    _index = 0;
+                }
             }
 
-            return;
+            bool HandleImmediateTransform()
+            {
+                if (_index < transformers.Count
+                    // Some transformers may finish immediately
+                    // so we need to check if it's done
+                    // and if it's done, we need to reset it
+                    // and skip it
+                    && transformers[_index].IsDone)
+                {
+                    // just finish the transform
+                    transformers[_index].FinishInstantly();
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            bool HandleTransformationFinishesWithinExtraTime()
+            {
+                if (_index >= transformers.Count)
+                    return false;
+
+                if (extraTime <= transformers[_index].TotalDuration)
+                    return false;
+
+                // just finish the transform
+                transformers[_index].FinishInstantly();
+
+                // calculate the left extra time
+                extraTime -= transformers[_index].TotalDuration;
+
+                return true;
+            }
         }
     }
 
@@ -99,12 +158,17 @@ public class TransformSequence : ITransformable
     {
         transformers.AddRange(transformables);
 
+        foreach (var t in transformables)
+            _totalDuration += t.TotalDuration;
+
         return this;
     }
 
     public TransformSequence Add(ITransformable transformable)
     {
         transformers.Add(transformable);
+
+        _totalDuration += transformable.TotalDuration;
 
         return this;
     }
@@ -172,6 +236,10 @@ public class TransformSequence : ITransformable
         private double _currentTime = 0;
 
         public bool IsDone => _currentTime >= _duration;
+
+        public double CurrentExtraTime => IsDone ? _currentTime - _duration : throw new InvalidOperationException("The transform is not done yet");
+
+        public double TotalDuration => _duration;
 
         public Delayer(double duration)
         {
