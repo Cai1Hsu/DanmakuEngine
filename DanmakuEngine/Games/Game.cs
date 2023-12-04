@@ -3,7 +3,7 @@ using DanmakuEngine.Games.Screens;
 
 namespace DanmakuEngine.Games;
 
-public partial class Game : IInjectable
+public partial class Game
 {
     public virtual string Name => @"Danmaku!";
 
@@ -15,7 +15,8 @@ public partial class Game : IInjectable
     /// </summary>
     public void begin()
     {
-        AutoInject();
+        if (this is IInjectable injectable)
+            injectable.AutoInject();
 
         this.Begin();
     }
