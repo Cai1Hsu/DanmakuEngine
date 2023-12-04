@@ -55,7 +55,7 @@ public partial class Logger : IInjectable, IAutoloadable
         Log(message, LogLevel.Debug);
     }
 
-    public static void Warning(string message) => Log(message, LogLevel.Warning);
+    public static void Warn(string message) => Log(message, LogLevel.Warning);
 
     public static void Error(string message) => Log(message, LogLevel.Error);
 
