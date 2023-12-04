@@ -8,7 +8,6 @@ namespace DanmakuEngine.Games.Screens;
 
 public partial class Screen : CompositeDrawable
 {
-    [Inject]
     private ScreenStack _parent = null!;
 
     public override ScreenStack Parent => _parent;
@@ -39,9 +38,8 @@ public partial class Screen : CompositeDrawable
         if (this is IInjectable injectable)
             injectable.AutoInject();
 
-        this.load();
-
-        Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
+        // in Drawable.load which is called in the update loop
+        // this.load();
     }
 
     public bool updateSubTree()
@@ -100,9 +98,14 @@ public partial class Screen : CompositeDrawable
 
     }
 
-    public new void load()
+    public override void load()
     {
-        DependencyContainer.AutoInject(this);
+        // we make the Screen base class injectable
+        if (this is IInjectable injectable)
+            injectable.AutoInject();
+
+        // we dont have to assert as early as in the constructor
+        Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
 
         base.load();
 

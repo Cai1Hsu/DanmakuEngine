@@ -25,6 +25,8 @@ public class ScreenStack : CompositeDrawable
 
         Screen last = null!;
 
+        screen.SetParent(this);
+
         lock (_lock)
         {
             last =
@@ -42,6 +44,8 @@ public class ScreenStack : CompositeDrawable
     /// <param name="screen">Screen to push</param>
     public void Push(Screen screen)
     {
+        screen.SetParent(this);
+
         lock (_lock)
         {
             screens.Push(screen);
@@ -82,10 +86,12 @@ public class ScreenStack : CompositeDrawable
 
     public override bool UpdateSubTree()
     {
-        if (Empty())
+        var peek = Peek();
+
+        if (peek is null)
             return true;
 
-        if (Peek()!.updateSubTree())
+        if (peek.UpdateSubTree())
             return true;
 
         return false;
