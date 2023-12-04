@@ -52,7 +52,9 @@ public class TransformSequence : ITransformable
 
         if (transformers[_index].IsDone)
         {
-            var extraTime = IsCurrentDone ? transformers[_index].CurrentExtraTime : 0;
+            var doAdjust = IsCurrentDone;
+
+            var extraTime = doAdjust ? transformers[_index].CurrentExtraTime : 0;
 
             transformers[_index].Reset();
             _index++;
@@ -61,7 +63,7 @@ public class TransformSequence : ITransformable
 
             // The top transformer may be a infinite transform sequence
             // and its current transformer may not be done
-            if (!IsCurrentDone)
+            if (!doAdjust)
                 return;
 
             while (HandleImmediateTransform()
