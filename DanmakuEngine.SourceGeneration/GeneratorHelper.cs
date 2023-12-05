@@ -35,4 +35,22 @@ public static class GeneratorHelper
 
         return $"{nsName}.{className}";
     }
+
+    public static IEnumerable<INamedTypeSymbol> GetAllSubClasses(this INamespaceSymbol ns)
+    {
+        foreach (var member in ns.GetMembers())
+        {
+            if (member is INamespaceSymbol nestedNs)
+            {
+                foreach (var c in GetAllSubClasses(nestedNs))
+                {
+                    yield return c;
+                }
+            }
+            else if (member is INamedTypeSymbol classSymbol)
+            {
+                yield return classSymbol;
+            }
+        }
+    }
 }
