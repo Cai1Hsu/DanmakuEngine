@@ -6,11 +6,11 @@ public class Clock
     /// Represents the current time of the clock in seconds. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElpsedTime * Playback);
+    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime * Playback);
 
     private double realElapsedTime => Time.CurrentTime - _startTime;
 
-    private double currentPeriodElpsedTime
+    private double currentPeriodElapsedTime
     {
         get
         {
