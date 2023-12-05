@@ -57,7 +57,6 @@ using DanmakuEngine.Arguments;
 
             string nsName = classSymbol.ContainingNamespace.ToDisplayString();
             string className = classSymbol.Name;
-            string accessibility = GeneratorHelper.AccessibilityToString(classSymbol.DeclaredAccessibility);
 
             string nsDeclaration = $"namespace {nsName}";
 
@@ -65,7 +64,7 @@ using DanmakuEngine.Arguments;
             codeBuilder.AppendLine(usings);
             codeBuilder.AppendLine($"{nsDeclaration}");
             codeBuilder.AppendLine($"{{");
-            codeBuilder.AppendLine($"    {accessibility} partial class {className} : Paramaters");
+            codeBuilder.AppendLine($"    partial class {className} : Paramaters");
             codeBuilder.AppendLine($"    {{");
             codeBuilder.AppendLine($"        {generated_method}");
             codeBuilder.AppendLine($"        {{");

@@ -46,7 +46,6 @@ using DanmakuEngine.Dependency;
 
             string nsName = classSymbol.ContainingNamespace.ToDisplayString();
             string className = classSymbol.Name;
-            string accessibility = GeneratorHelper.AccessibilityToString(classSymbol.DeclaredAccessibility);
 
             string nsDeclaration = $"namespace {nsName}";
 
@@ -69,7 +68,7 @@ using DanmakuEngine.Dependency;
             codeBuilder.AppendLine(usings);
             codeBuilder.AppendLine($"{nsDeclaration}");
             codeBuilder.AppendLine($"{{");
-            codeBuilder.AppendLine($"    {accessibility} {abstract_modifier} {static_modifier} partial class {className} : IInjectable");
+            codeBuilder.AppendLine($"    " + $"{abstract_modifier} {static_modifier} partial class {className} : IInjectable".TrimStart());
             codeBuilder.AppendLine($"    {{");
             codeBuilder.AppendLine($"        {injection_method}");
             codeBuilder.AppendLine($"        {{");
