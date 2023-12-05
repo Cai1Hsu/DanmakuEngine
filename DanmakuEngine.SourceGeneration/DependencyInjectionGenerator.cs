@@ -142,35 +142,27 @@ using DanmakuEngine.Dependency;
 
         public void Execute(GeneratorExecutionContext context)
         {
-            HandleNamespace(context.Compilation.Assembly.GlobalNamespace, context);
-        }
+            var topNamespace = context.Compilation.Assembly.GlobalNamespace;
 
-        private void HandleNamespace(INamespaceSymbol ns, GeneratorExecutionContext context)
-        {
-            foreach (var member in ns.GetMembers())
+            var classes = topNamespace.GetAllSubClasses();
+
+            foreach (var classSymbol in classes)
             {
-                if (member is INamespaceSymbol nestedNs)
-                {
-                    HandleNamespace(nestedNs, context);
-                }
-                else if (member is INamedTypeSymbol classSymbol)
-                {
-                    var membersToInject = classSymbol.GetMembers()
+                var membersToInject = classSymbol.GetMembers()
                         .Where(m => (m is IFieldSymbol || m is IPropertySymbol)
                             && m.GetAttributes().Any(a => a.AttributeClass!.Name == inject_attribute))
                         .ToList();
 
-                    var hasIInjectableInterface = classSymbol.AllInterfaces.Any(i => i.Name == iinjectable_interface);
+                var hasIInjectableInterface = classSymbol.AllInterfaces.Any(i => i.Name == iinjectable_interface);
 
-                    // we don't want to inject interfaces
-                    var isInterface = classSymbol.TypeKind == TypeKind.Interface;
+                // we don't want to inject interfaces
+                var isInterface = classSymbol.TypeKind == TypeKind.Interface;
 
-                    if ((hasIInjectableInterface && !isInterface) || membersToInject.Any())
-                    {
-                        var code = HandleClass(classSymbol, membersToInject);
+                if ((hasIInjectableInterface && !isInterface) || membersToInject.Any())
+                {
+                    var code = HandleClass(classSymbol, membersToInject);
 
-                        context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
-                    }
+                    context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
                 }
             }
         }

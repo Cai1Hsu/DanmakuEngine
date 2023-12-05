@@ -19,32 +19,24 @@ using DanmakuEngine.Arguments;
 
         public void Execute(GeneratorExecutionContext context)
         {
-            HandleNamespace(context.Compilation.Assembly.GlobalNamespace, context);
-        }
+            var topNamespace = context.Compilation.Assembly.GlobalNamespace;
+            var classes = topNamespace.GetAllSubClasses();
 
-        private void HandleNamespace(INamespaceSymbol ns, GeneratorExecutionContext context)
-        {
-            foreach (var member in ns.GetMembers())
+            foreach (var classSymbol in classes)
             {
-                if (member is INamespaceSymbol nestedNs)
-                {
-                    HandleNamespace(nestedNs, context);
-                }
-                else if (member is INamedTypeSymbol classSymbol)
-                {
-                    // ParamaterTemplates must be inherited from `Paramaters`
-                    var isParamaters = classSymbol.BaseType?.Name.Contains("Paramaters");
+                // ParamaterTemplates must be inherited from `Paramaters`
+                var isParamaters = classSymbol.BaseType?.Name.Contains("Paramaters");
 
-                    if (!isParamaters.GetValueOrDefault(false))
-                        continue;
+                if (!isParamaters.GetValueOrDefault(false))
+                    continue;
 
-                    // Judge members in `HandleMembers`
-                    var membersToInit = classSymbol.GetMembers().ToList();
+                // Judge members in `HandleMembers`
+                var membersToInit = classSymbol.GetMembers().ToList();
 
-                    var code = HandleClass(classSymbol, membersToInit);
+                var code = HandleClass(classSymbol, membersToInit);
 
-                    context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_InitlizeChildren.g.cs", SourceText.From(code, Encoding.UTF8));
-                }
+                context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_InitlizeChildren.g.cs", SourceText.From(code, Encoding.UTF8));
+
             }
         }
 
