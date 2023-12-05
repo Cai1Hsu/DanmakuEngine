@@ -56,6 +56,10 @@ public partial class ParamTemplate : Paramaters
     public Argument FpsUpdateFrequency =
         new("-frequency", typeof(double), 1.00);
 
+    [Description("Specify whether to run the game in headless mode")]
+    public Argument Headless =
+        new("-headless", typeof(bool), false);
+
     // For some arguments need non-static support.
     public ParamTemplate()
     {

@@ -15,11 +15,10 @@ internal class Program
         using var argParser = new ArgumentParser(new ParamTemplate());
         using var argProvider = argParser.CreateArgumentProvider();
 
-#if HEADLESS
-        using var host = new HeadlessGameHost(() => true);
-#else
-        using var host = DesktopGameHost.GetSuitableHost();
-#endif
+        var headless = argProvider.GetValue<bool>("-headless");
+
+        using GameHost host = headless ? new HeadlessGameHost(() => true)
+                                  : DesktopGameHost.GetSuitableHost();
 
         host.Run(game, argProvider);
     }
