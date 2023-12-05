@@ -24,6 +24,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using SixLabors.ImageSharp.Memory;
 using Color = SixLabors.ImageSharp.Color;
+using DanmakuEngine.Scheduling;
 
 namespace DanmakuEngine.Engine;
 
@@ -40,6 +41,10 @@ public partial class GameHost : Time, IDisposable
     public InputManager InputManager { get; private set; } = null!;
 
     public DependencyContainer Dependencies { get; private set; } = null!;
+
+    public Scheduler Scheduler => Root.Scheduler;
+
+    private readonly DrawableContainer Root = new DrawableContainer(null!);
 
     protected ScreenStack screens = null!;
 
@@ -318,8 +323,6 @@ public unsafe partial class GameHost
             };
         }
 
-        Root = new DrawableContainer(null!);
-
         screens = new(Root);
 
         Root.Add(screens);
@@ -330,14 +333,13 @@ public unsafe partial class GameHost
 
         RegisterEvents();
 
-        // throw new NotImplementedException();
-
-        // TODO: Do this in the update loop
-        // The first screen blocked the update loop
-        Game.begin();
+        Logger.Debug("Everything is ready, let's go!");
+        
+        // we should do this in the update loop
+        // otherwise first screen will block the update loop
+        Scheduler.ScheduleTask(Game.begin);
     }
 
-    private DrawableContainer Root = null!;
     protected void DoUpdate()
     {
         if (Root == null)
