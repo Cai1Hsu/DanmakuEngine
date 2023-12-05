@@ -6,8 +6,6 @@ namespace DanmakuEngine.Games.Screens.Welcome;
 
 public partial class LoadingScreen : Screen
 {
-    private Scheduler scheduler = null!;
-
     // All of the three methods below run in the `Update` loop
 
     // called by `load` in constructor for screen and manually called for other objects
@@ -16,11 +14,6 @@ public partial class LoadingScreen : Screen
     public override void Load()
     {
         keyboardHandler = null!;
-
-        InternalChildren =
-        [
-            scheduler = new Scheduler(),
-        ];
     }
 
     // This method is called the first frame when the screen(or average object) is completely loaded
@@ -39,7 +32,7 @@ public partial class LoadingScreen : Screen
         // you should load your resources here
         // and do it in a async way
 
-        scheduler.ScheduleTask(() =>
+        Scheduler.ScheduleTask(() =>
         {
             // if finished, switch to main screen
             ScreenStack.Switch(new MainScreen());
@@ -48,6 +41,9 @@ public partial class LoadingScreen : Screen
         {
             // check that if our loading is finished
             // here we just check if the time is greater than 2s
+
+            // If you want to schedule a task that will be executed after a certain delay,
+            // you can use `Scheduler.ScheduleTaskDelay` method
             return ScreenClock.CurrentTime > 2;
         });
     }

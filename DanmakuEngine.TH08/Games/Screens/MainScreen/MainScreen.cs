@@ -1,6 +1,9 @@
 using System.Text;
+using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
 using DanmakuEngine.Transfomation;
 using DanmakuEngine.Transfomation.Functions;
@@ -12,6 +15,9 @@ public partial class MainScreen : Screen
     protected List<TransformSequence> transformations = new();
 
     private readonly Clock clock = new();
+
+    [Inject]
+    private GameHost _host = null!;
 
     // This method is called when the screen(or average object) is loading
     public override void Load()
@@ -176,6 +182,14 @@ public partial class MainScreen : Screen
             else
                 transformation.Begin();
         }
+
+        Logger.Info("Scheduled to exit in 5 seconds.");
+        Scheduler.ScheduleTaskDelay(() =>
+        {
+            _host.RequestClose();
+
+            Logger.Info("exiting");
+        }, 5);
     }
 
     // This method is called every frame for the screen(and it's children object)
