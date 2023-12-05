@@ -56,6 +56,7 @@ public class TransformSequence : ITransformable
 
             var extraTime = doAdjust ? transformers[_index].CurrentExtraTime : 0;
 
+            // TODO: we should implement a `getNextTransfomation` method
             transformers[_index].Reset();
             _index++;
 
