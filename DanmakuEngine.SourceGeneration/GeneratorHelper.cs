@@ -1,18 +1,19 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using Microsoft.CodeAnalysis;
 
 namespace DanmakuEngine.SourceGeneration;
 
 public static class GeneratorHelper
 {
-    private static readonly Dictionary<Accessibility, string> accessbilityMap = new Dictionary<Accessibility, string>()
+    private static readonly ImmutableDictionary<Accessibility, string> accessbilityMap = new Dictionary<Accessibility, string>()
     {
         { Accessibility.NotApplicable, "" },
         { Accessibility.Public, "public" },
         { Accessibility.Private, "private" },
         { Accessibility.Internal, "internal" },
         { Accessibility.Protected, "protected" },
-    };
+    }.ToImmutableDictionary();
 
     public static string AccessibilityToString(Accessibility accessibility)
     {
