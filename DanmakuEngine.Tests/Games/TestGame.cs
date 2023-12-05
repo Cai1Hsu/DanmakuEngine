@@ -1,6 +1,6 @@
 using DanmakuEngine.Games;
 
-namespace DanmakuEngine.Tests.Timing;
+namespace DanmakuEngine.Tests.Games;
 
 public partial class TestGame : Game
 {
