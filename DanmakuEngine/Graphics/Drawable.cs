@@ -1,4 +1,5 @@
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
 using Silk.NET.Maths;
 
@@ -73,6 +74,7 @@ public class Drawable : IDisposable
             return false;
 
         // scheuler update
+        _scheduler?.update();
 
         update();
 
@@ -132,6 +134,33 @@ public class Drawable : IDisposable
     public event Action<Drawable> OnLoad = null!;
 
     public event Action<Drawable> OnStart = null!;
+
+    private static readonly object scheduler_acquisition_lock = new();
+
+    private volatile Scheduler _scheduler = null!;
+
+    /// <summary>
+    /// A lazily-initialized scheduler used to schedule tasks to be invoked in future <see cref="Update"/>s calls.
+    /// The tasks are invoked at the beginning of the <see cref="Update"/> method before anything else.
+    /// </summary>
+    protected internal Scheduler Scheduler
+    {
+        get
+        {
+            if (_scheduler != null)
+                return _scheduler;
+
+            lock (scheduler_acquisition_lock)
+            {
+                if (_scheduler != null)
+                    return _scheduler;
+
+                _scheduler = new Scheduler();
+            }
+
+            return _scheduler;
+        }
+    }
 
     #region IDisposable
 
