@@ -26,4 +26,12 @@ public static class GeneratorHelper
 
     public static string GetIndent(int spaces, int count)
         => new(' ', spaces * count);
+
+    public static string GetClassNameWithNamespace(this INamedTypeSymbol classSymbol)
+    {
+        string nsName = classSymbol.ContainingNamespace.ToDisplayString();
+        string className = classSymbol.Name;
+
+        return $"{nsName}.{className}";
+    }
 }

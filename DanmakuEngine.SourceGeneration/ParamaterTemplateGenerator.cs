@@ -43,7 +43,7 @@ using DanmakuEngine.Arguments;
 
                     var code = HandleClass(classSymbol, membersToInit);
 
-                    context.AddSource($"{classSymbol.Name}_InitlizeChildren.g.cs", SourceText.From(code, Encoding.UTF8));
+                    context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_InitlizeChildren.g.cs", SourceText.From(code, Encoding.UTF8));
                 }
             }
         }

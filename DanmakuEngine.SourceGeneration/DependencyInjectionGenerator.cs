@@ -168,8 +168,8 @@ using DanmakuEngine.Dependency;
                     if ((hasIInjectableInterface && !isInterface) || membersToInject.Any())
                     {
                         var code = HandleClass(classSymbol, membersToInject);
-                        var name_with_ns = $"{classSymbol.ContainingNamespace.ToDisplayString()}.{classSymbol.Name}";
-                        context.AddSource($"{name_with_ns}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
+
+                        context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_Injection.g.cs", SourceText.From(code, Encoding.UTF8));
                     }
                 }
             }
