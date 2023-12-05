@@ -334,7 +334,7 @@ public unsafe partial class GameHost
         RegisterEvents();
 
         Logger.Debug("Everything is ready, let's go!");
-        
+
         // we should do this in the update loop
         // otherwise first screen will block the update loop
         Scheduler.ScheduleTask(Game.begin);
