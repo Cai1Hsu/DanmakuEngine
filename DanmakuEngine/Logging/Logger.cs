@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
 
@@ -109,14 +110,14 @@ public partial class Logger : IInjectable, IAutoloadable
         });
     }
 
-    private static readonly Dictionary<LogLevel, Action> colorMap = new()
+    private static readonly ImmutableDictionary<LogLevel, Action> colorMap = new Dictionary<LogLevel, Action>()
     {
         {LogLevel.Error, () => Console.ForegroundColor = ConsoleColor.Red},
         {LogLevel.Warning, () => Console.ForegroundColor = ConsoleColor.Yellow},
         {LogLevel.Debug, () => Console.ForegroundColor = ConsoleColor.Green},
         {LogLevel.Verbose, () => Console.ResetColor()},
         {LogLevel.Info, () => Console.ForegroundColor = ConsoleColor.DarkGray}
-    };
+    }.ToImmutableDictionary();
 
     private static bool defaultcolor = true;
     private static object _synccolor = new();
