@@ -24,10 +24,13 @@ public class TestScheduler
 
         using var host = new HeadlessGameHost(5000);
 
-        var scheduler = new Scheduler();
+        var clock = new Clock();
+
+        var scheduler = new Scheduler(clock);
 
         host.OnLoad += h =>
         {
+            clock.Start();
             scheduler.ScheduleTask(() => h.RequestClose());
         };
 
@@ -49,7 +52,7 @@ public class TestScheduler
 
         var clock = new Clock(true);
 
-        var scheduler = new Scheduler();
+        var scheduler = new Scheduler(clock);
 
         double current_time = 0;
 
