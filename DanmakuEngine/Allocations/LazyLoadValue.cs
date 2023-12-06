@@ -38,6 +38,19 @@ public class LazyLoadValue<TValue>(Func<TValue> loader)
         }
     }
 
+    public bool HasValue => _value is not null;
+
+    /// <summary>
+    /// Returns the raw value of the instance
+    /// </summary>
+    /// <remarks>
+    /// try to access the value without having to create an instance of <typeparamref name="TValue"/>
+    /// but it will return null if the instance is not created yet
+    /// </remarks>
+    public TValue? RawValue => _value;
+
+    public static implicit operator TValue(LazyLoadValue<TValue> lazyLoadValue) => lazyLoadValue.Value;
+
     private class LazyLoadValueException(string message)
         : Exception(message)
     {
