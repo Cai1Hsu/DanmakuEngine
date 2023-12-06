@@ -345,9 +345,6 @@ public unsafe partial class GameHost
         if (Root == null)
             return;
 
-        if (screens.Empty())
-            isRunning = false;
-
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
 

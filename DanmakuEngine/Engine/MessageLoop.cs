@@ -7,12 +7,6 @@ namespace DanmakuEngine.Engine;
 public unsafe partial class GameHost
 {
     public WindowManager windowManager = null!;
-    public void RequestClose()
-    {
-        Logger.Debug("Requesting close");
-
-        isRunning = false;
-    }
 
     protected bool isRunning = true;
 
@@ -41,7 +35,7 @@ public unsafe partial class GameHost
 
     public virtual void RunMainLoop()
     {
-        while (isRunning)
+        do
         {
             HandleMessages();
 
@@ -59,7 +53,14 @@ public unsafe partial class GameHost
             DoRender();
 
             lastRenderTicks = currentTicks;
-        }
+        } while (isRunning && !screens.Empty());
+    }
+
+    public void RequestClose()
+    {
+        Logger.Debug("Requesting close");
+
+        isRunning = false;
     }
 
     private void HandleMessages()
