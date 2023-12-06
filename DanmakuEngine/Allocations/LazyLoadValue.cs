@@ -49,6 +49,14 @@ public class LazyLoadValue<TValue>(Func<TValue> loader)
     /// </remarks>
     public TValue? RawValue => _value;
 
+    /// <summary>
+    /// Returns the value of the instance
+    /// </summary>
+    /// <remarks>
+    /// useful when you want to pass an anonymous function to a method that requires a <see cref="Func{T}"/> but you don't want to create an instance of <typeparamref name="TValue"/> yet
+    /// </remarks>
+    public TValue GetValue() => Value;
+
     public static implicit operator TValue(LazyLoadValue<TValue> lazyLoadValue) => lazyLoadValue.Value;
 
     private class LazyLoadValueException(string message)
