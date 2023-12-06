@@ -1,4 +1,5 @@
 using System.Data;
+using System.Diagnostics;
 using System.Linq.Expressions;
 using DanmakuEngine.Games;
 using DanmakuEngine.Logging;
@@ -14,17 +15,26 @@ public class Scheduler : IUpdatable
 
     private double CurrentTime => Clock.CurrentTime;
 
-    private Clock? clock = null;
+    private Clock? clock;
 
-    private Clock Clock
+    protected Clock Clock => clock ??= getClock();
+
+    private readonly Func<Clock> getClock = null!;
+
+    public Scheduler(Clock clock)
     {
-        get
-        {
-            if (clock is not null)
-                return clock;
+        this.clock = clock;
+    }
 
-            return clock = new Clock(true);
-        }
+    /// <summary>
+    /// Create a scheduler that uses a lazy-initialized clock
+    /// </summary>
+    /// <param name="getClock"></param>
+    public Scheduler(Func<Clock> getClock)
+    {
+        this.getClock = getClock;
+
+        Debug.Assert(clock == null);
     }
 
     public void ScheduleTask(ScheduledTask task)

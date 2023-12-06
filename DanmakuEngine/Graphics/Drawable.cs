@@ -155,12 +155,29 @@ public class Drawable : IDisposable
                 if (_scheduler != null)
                     return _scheduler;
 
-                _scheduler = new Scheduler();
+                _scheduler = clock is null ? new Scheduler(GetOrCreateClock) 
+                                           : new Scheduler(clock);
             }
 
             return _scheduler;
         }
     }
+
+    # region Clock
+
+    private Clock? clock = null;
+
+    protected Clock Clock => GetOrCreateClock();
+
+    protected Clock GetOrCreateClock()
+    {
+        if (clock is not null)
+            return clock;
+
+        return clock = new Clock(true);
+    }
+
+    #endregion
 
     #region IDisposable
 
