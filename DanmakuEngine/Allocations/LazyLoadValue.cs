@@ -24,13 +24,16 @@ public class LazyLoadValue<TValue>(Func<TValue> loader)
             {
                 lock (_lock)
                 {
-                    _value = _loader();
+                    if (_loader is not null)
+                    {
+                        _value = _loader();
 
-                    if (_value is not null)
-                        // We don't need the loader anymore
-                        _loader = null!;
-                    // otherwise
-                    // we still returns null as it's up to user to decide what to do with the exception
+                        if (_value is not null)
+                            // We don't need the loader anymore
+                            _loader = null!;
+                        // otherwise
+                        // we still returns null as it's up to user to decide what to do with the exception
+                    }
                 }
             }
 
