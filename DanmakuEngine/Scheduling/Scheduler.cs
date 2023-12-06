@@ -101,7 +101,7 @@ public class Scheduler : IUpdatable
     {
         lock (taskLock)
         {
-            var next = new Queue<ScheduledTask>();
+            Queue<ScheduledTask>? next = null;
 
             while (tasks.Count > 0)
             {
@@ -115,12 +115,15 @@ public class Scheduler : IUpdatable
                 }
                 else
                 {
-                    next.Enqueue(task);
+                    (next ??= new()).Enqueue(task);
                 }
             }
 
-            while (next.Count > 0)
-                tasks.Enqueue(next.Dequeue());
+            if (next is not null)
+            {
+                while (next.Count > 0)
+                    tasks.Enqueue(next.Dequeue());
+            }
         }
 
         Update();
