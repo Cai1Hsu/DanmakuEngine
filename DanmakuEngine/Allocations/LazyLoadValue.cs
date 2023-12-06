@@ -7,7 +7,6 @@ namespace DanmakuEngine.Allocations;
 /// <remarks>
 /// Create a lazy load instance of <typeparamref name="TValue"/> with parameters for the constructor
 /// </remarks>
-/// <param name="parameters"></param>
 public class LazyLoadValue<TValue>(Func<TValue> loader)
     where TValue : class
 {
