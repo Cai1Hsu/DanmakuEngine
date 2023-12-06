@@ -12,7 +12,7 @@ public class LazyLoadValue<[DynamicallyAccessedMembers(DynamicallyAccessedMember
 {
     private T? _value;
 
-    private readonly object[] parameters;
+    private object[] parameters;
 
     /// <summary>
     /// Create a lazy load instance of <typeparamref name="T"/> with no parameters
@@ -44,6 +44,9 @@ public class LazyLoadValue<[DynamicallyAccessedMembers(DynamicallyAccessedMember
 
                 if (_value is null)
                     throw new LazyLoadValueException($"Failed to create instance of {typeof(T)}");
+
+                // We don't need the parameters anymore
+                parameters = null!;
             }
 
             return _value;
