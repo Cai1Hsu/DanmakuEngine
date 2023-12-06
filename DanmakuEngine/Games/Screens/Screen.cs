@@ -21,7 +21,7 @@ public partial class Screen : CompositeDrawable
     /// it provides standard time for the screen
     /// be careful when pause the clock or change the rate as it may cause unexpected behavior
     /// </summary>
-    public Clock ScreenClock { get; } = new();
+    public Clock ScreenClock => Clock; 
 
     protected List<IUpdatable> InternalChildren { get; set; } = null!;
 
@@ -103,6 +103,9 @@ public partial class Screen : CompositeDrawable
         // we dont have to assert as early as in the constructor
         Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
 
+        // Create our ScreenClock so that we can use it later
+        GetOrCreateClock();
+        
         base.load();
 
         if (InternalChildren is not null)
