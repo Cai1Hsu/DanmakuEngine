@@ -10,30 +10,35 @@ namespace DanmakuEngine.Allocations;
 public class LazyLoadValue<TValue>(Func<TValue> loader)
     where TValue : class
 {
-    private TValue? _value;
+    private volatile TValue? _value;
 
     private Func<TValue> _loader = loader;
 
-    private readonly object _lock = new();
+    private readonly object loader_lock = new();
+
+    private readonly object value_lock = new();
 
     public TValue Value
     {
         get
         {
-            if (_value is null)
+            if (_value is not null)
+                return _value;
+
+            lock (loader_lock)
             {
-                lock (_lock)
+                if (_loader is not null)
                 {
-                    if (_loader is not null)
+                    lock (value_lock)
                     {
                         _value = _loader();
-
-                        if (_value is not null)
-                            // We don't need the loader anymore
-                            _loader = null!;
-                        // otherwise
-                        // we still returns null as it's up to user to decide what to do with the exception
                     }
+
+                    if (_value is not null)
+                        // We don't need the loader anymore
+                        _loader = null!;
+                    // otherwise
+                    // we still returns null as it's up to user to decide what to do with the exception
                 }
             }
 
