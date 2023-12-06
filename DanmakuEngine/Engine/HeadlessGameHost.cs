@@ -89,12 +89,7 @@ public class HeadlessGameHost : GameHost
 
             OnUpdate?.Invoke(this);
 
-            var isrunning = isRunning;
-
             DoUpdate();
-
-            // This is a hack to prevent Headless gamehost from exiting fast for empty screen stack
-            isRunning = empty_screens ? isrunning : isRunning;
 
             lastUpdateTicks = currentTicks;
 
