@@ -1,55 +1,41 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace DanmakuEngine.Allocations;
 
 /// <summary>
-/// A lazy load value that will create an instance of <typeparamref name="T"/> when <see cref="Value"/> is first accessed
-/// 
-/// You must select and pass correct Parameters for the constructor of <typeparamref name="T"/> when creating an instance of this class
+/// A lazy load value that will create an instance of <typeparamref name="TValue"/> when <see cref="Value"/> is first accessed
 /// </summary>
-/// <typeparam name="T">The type of the instance</typeparam>
-public class LazyLoadValue<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicConstructors | DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]T>
+/// <typeparam name="TValue">The type of the instance</typeparam>
+/// <remarks>
+/// Create a lazy load instance of <typeparamref name="TValue"/> with parameters for the constructor
+/// </remarks>
+/// <param name="parameters"></param>
+public class LazyLoadValue<TValue>(Func<TValue> loader)
+    where TValue : class
 {
-    private T? _value;
+    private TValue? _value;
 
-    private object[] parameters;
+    private Func<TValue> _loader = loader;
 
-    /// <summary>
-    /// Create a lazy load instance of <typeparamref name="T"/> with no parameters
-    /// </summary>
-    private LazyLoadValue()
-    {
-        parameters = null!;
-    }
+    private readonly object _lock = new();
 
-    /// <summary>
-    /// Create a lazy load instance of <typeparamref name="T"/> with parameters for the constructor
-    /// </summary>
-    /// <param name="parameters"></param>
-    public LazyLoadValue(params object[] parameters)
-    {
-        this.parameters = parameters;
-    }
-
-    public T Value
+    public TValue Value
     {
         get
         {
             if (_value is null)
             {
-                if (parameters is null)
-                    _value = Activator.CreateInstance<T>()!;
-                else
-                    _value = (T)Activator.CreateInstance(typeof(T), parameters)!;
+                lock (_lock)
+                {
+                    _value = _loader();
 
-                if (_value is null)
-                    throw new LazyLoadValueException($"Failed to create instance of {typeof(T)}");
-
-                // We don't need the parameters anymore
-                parameters = null!;
+                    if (_value is not null)
+                        // We don't need the loader anymore
+                        _loader = null!;
+                    // otherwise
+                    // we still returns null as it's up to user to decide what to do with the exception
+                }
             }
 
-            return _value;
+            return _value!;
         }
     }
 

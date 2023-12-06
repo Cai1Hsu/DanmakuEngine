@@ -13,7 +13,7 @@ public class TestLazyLoadValue
     [Test]
     public void TestNoParameterConstructor()
     {
-        var lazy = new LazyLoadValue<TestClass>(42);
+        var lazy = new LazyLoadValue<TestClass>(() => new(42));
 
         Assert.That(lazy.Value, Is.Not.Null);
 
@@ -23,7 +23,7 @@ public class TestLazyLoadValue
     [Test]
     public void TestParameterConstructor()
     {
-        var lazy = new LazyLoadValue<TestClass>(42);
+        var lazy = new LazyLoadValue<TestClass>(() => new(42));
 
         Assert.That(lazy.Value, Is.Not.Null);
 
@@ -33,7 +33,7 @@ public class TestLazyLoadValue
     [Test]
     public void TestValueCreatesObject()
     {
-        var lazy = new LazyLoadValue<TestClass>(42);
+        var lazy = new LazyLoadValue<TestClass>(() => new(42));
         var value = lazy.Value;
 
         Assert.That(value, Is.Not.Null);
@@ -44,7 +44,7 @@ public class TestLazyLoadValue
     [Test]
     public void TestValueReturnsSameObject()
     {
-        var lazy = new LazyLoadValue<TestClass>(42);
+        var lazy = new LazyLoadValue<TestClass>(() => new(42));
         var value1 = lazy.Value;
         var value2 = lazy.Value;
 
