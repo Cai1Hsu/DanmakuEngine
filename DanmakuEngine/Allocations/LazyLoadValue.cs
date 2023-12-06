@@ -62,6 +62,8 @@ public class LazyLoadValue<TValue>(Func<TValue> loader)
 
     public static implicit operator TValue(LazyLoadValue<TValue> lazyLoadValue) => lazyLoadValue.Value;
 
+    public static implicit operator LazyLoadValue<TValue>(Func<TValue> loader) => new(loader);
+
     private class LazyLoadValueException(string message)
         : Exception(message)
     {
