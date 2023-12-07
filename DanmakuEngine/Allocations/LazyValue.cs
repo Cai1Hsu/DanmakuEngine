@@ -18,6 +18,8 @@ public class LazyValue<TValue>
 
     private readonly object value_lock = new();
 
+    private bool loading_failed = false;
+
     public TValue Value
     {
         get
@@ -31,7 +33,15 @@ public class LazyValue<TValue>
                 {
                     lock (value_lock)
                     {
-                        _value = _loader();
+                        try
+                        {
+                            _value = _loader();
+                        }
+                        catch (Exception)
+                        {
+                            // ignored
+                            loading_failed = true;
+                        }
                     }
 
                     if (_value is not null)
@@ -70,6 +80,9 @@ public class LazyValue<TValue>
     /// </summary>
     public bool IsLoaderNull
         => _loader is null;
+        
+    public bool IsLoadingFailed
+        => loading_failed;
 
     /// <summary>
     /// Try to create an instance of <typeparamref name="TValue"/> with loader <see cref="Func{T}"/>
