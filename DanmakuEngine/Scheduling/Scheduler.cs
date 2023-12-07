@@ -16,7 +16,7 @@ public class Scheduler : IUpdatable
 
     private double CurrentTime => Clock.CurrentTime;
 
-    private LazyValue<Clock> clock;
+    private readonly LazyValue<Clock> clock;
 
     protected Clock Clock => clock.Value;
 
