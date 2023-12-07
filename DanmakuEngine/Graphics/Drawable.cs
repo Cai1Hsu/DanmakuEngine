@@ -44,7 +44,7 @@ public class Drawable : IDisposable
     {
         Parent = parent;
 
-        lazyScheduler = new(() => new Scheduler(lazyClock));
+        lazyScheduler = new(() => new Scheduler(lazyClock.GetValue));
     }
 
     /// <summary>

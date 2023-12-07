@@ -16,15 +16,15 @@ public class Scheduler : IUpdatable
 
     private double CurrentTime => Clock.CurrentTime;
 
-    private readonly LazyValue<Clock> clock;
+    private readonly LazyValue<IClock> clock;
 
-    protected Clock Clock => clock.Value;
+    protected IClock Clock => clock.Value;
 
     /// <summary>
     /// Create a scheduler that uses a clock
     /// </summary>
     /// <param name="clock">the clock</param>
-    public Scheduler(Clock clock)
+    public Scheduler(IClock clock)
     {
         this.clock = new(clock);
     }
@@ -33,7 +33,7 @@ public class Scheduler : IUpdatable
     /// Create a scheduler that uses a lazy-initialized clock delegate
     /// </summary>
     /// <param name="getClock">the delegate to get a clock</param>
-    public Scheduler(Func<Clock> getClock)
+    public Scheduler(Func<IClock> getClock)
     {
         this.clock = new(getClock);
     }
@@ -42,7 +42,7 @@ public class Scheduler : IUpdatable
     /// Create a scheduler that uses a lazy-initialized clock
     /// </summary>
     /// <param name="clock">the <see cref="LazyValue{Clock}"/> for scheduler</param>
-    public Scheduler(LazyValue<Clock> lazyClock)
+    public Scheduler(LazyValue<IClock> lazyClock)
     {
         this.clock = lazyClock;
     }
@@ -52,7 +52,7 @@ public class Scheduler : IUpdatable
     /// </summary>
     public Scheduler()
     {
-        this.clock = new LazyValue<Clock>(() => new Clock(true));
+        this.clock = new LazyValue<IClock>(() => new TimeProvider());
     }
 
     public void ScheduleTask(ScheduledTask task)
@@ -154,5 +154,14 @@ public class Scheduler : IUpdatable
     public virtual void Update()
     {
 
+    }
+
+    private class TimeProvider : IClock
+    {
+        public double UpdateDelta => Time.UpdateDelta;
+
+        public double RenderDelta => Time.RenderDelta;
+
+        public double CurrentTime => Time.CurrentTime;
     }
 }
