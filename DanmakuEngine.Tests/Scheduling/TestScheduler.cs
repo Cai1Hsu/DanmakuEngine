@@ -24,13 +24,10 @@ public class TestScheduler
 
         using var host = new HeadlessGameHost(5000);
 
-        var clock = new Clock();
-
-        var scheduler = new Scheduler(clock);
+        var scheduler = new Scheduler();
 
         host.OnLoad += h =>
         {
-            clock.Start();
             scheduler.ScheduleTask(() => h.RequestClose());
         };
 
@@ -50,18 +47,13 @@ public class TestScheduler
 
         using var host = new HeadlessGameHost(5000);
 
-        var clock = new Clock(true);
-
-        var scheduler = new Scheduler(clock);
+        var scheduler = new Scheduler();
 
         double current_time = 0;
 
         host.OnLoad += h =>
         {
-            // We didn't start the clock on construction, because the `Time` was not cleared yet
-            clock.Start();
-
-            current_time = clock.CurrentTime;
+            current_time = Time.CurrentTime;
 
             scheduler.ScheduleTaskDelay(() => h.RequestClose(), test_seconds);
         };
@@ -69,7 +61,7 @@ public class TestScheduler
         host.OnUpdate += _ =>
         {
             scheduler.update();
-            current_time = Math.Max(current_time, clock.CurrentTime);
+            current_time = Math.Max(current_time, Time.CurrentTime);
         };
 
         host.OnTimedout += Assert.Fail;
