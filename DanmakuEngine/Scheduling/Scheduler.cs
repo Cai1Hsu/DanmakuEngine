@@ -20,23 +20,39 @@ public class Scheduler : IUpdatable
 
     protected Clock Clock => clock.Value;
 
+    /// <summary>
+    /// Create a scheduler that uses a clock
+    /// </summary>
+    /// <param name="clock">the clock</param>
     public Scheduler(Clock clock)
     {
         this.clock = new(clock);
     }
 
     /// <summary>
-    /// Create a scheduler that uses a lazy-initialized clock
+    /// Create a scheduler that uses a lazy-initialized clock delegate
     /// </summary>
-    /// <param name="getClock"></param>
+    /// <param name="getClock">the delegate to get a clock</param>
     public Scheduler(Func<Clock> getClock)
     {
         this.clock = new(getClock);
     }
 
-    public Scheduler(LazyValue<Clock> clock)
+    /// <summary>
+    /// Create a scheduler that uses a lazy-initialized clock
+    /// </summary>
+    /// <param name="clock">the <see cref="LazyValue{Clock}"/> for scheduler</param>
+    public Scheduler(LazyValue<Clock> lazyClock)
     {
-        this.clock = clock;
+        this.clock = lazyClock;
+    }
+
+    /// <summary>
+    /// Create a scheduler that uses a lazy-initialized clock
+    /// </summary>
+    public Scheduler()
+    {
+        this.clock = new LazyValue<Clock>(() => new Clock(true));
     }
 
     public void ScheduleTask(ScheduledTask task)
