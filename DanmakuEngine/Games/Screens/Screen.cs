@@ -21,7 +21,7 @@ public partial class Screen : CompositeDrawable
     /// it provides standard time for the screen
     /// be careful when pause the clock or change the rate as it may cause unexpected behavior
     /// </summary>
-    public Clock ScreenClock => Clock; 
+    public Clock ScreenClock => Clock;
 
     protected List<IUpdatable> InternalChildren { get; set; } = null!;
 
@@ -105,7 +105,7 @@ public partial class Screen : CompositeDrawable
 
         // Create our ScreenClock so that we can use it later
         var _ = Clock;
-        
+
         base.load();
 
         if (InternalChildren is not null)
