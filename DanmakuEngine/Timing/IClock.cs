@@ -7,4 +7,6 @@ public interface IClock
     public double RenderDelta { get; }
 
     public double CurrentTime { get; }
+
+    public virtual bool IsPaused => true;
 }
