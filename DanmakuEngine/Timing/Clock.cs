@@ -1,7 +1,8 @@
 namespace DanmakuEngine.Timing;
 
-public class Clock
+public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 {
+    #region IClock
     /// <summary>
     /// Represents the current time of the clock in seconds. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
@@ -42,10 +43,6 @@ public class Clock
             return _isPaused;
         }
     }
-
-    private double _playback = 1.00;
-
-    public double Playback => _playback;
 
     /// <summary>
     /// You may want to use this because the delta time is affected by the playback.
@@ -130,6 +127,20 @@ public class Clock
         _theworld = false;
     }
 
+    public void Stop()
+    {
+        this.Pause();
+        this.Reset();
+    }
+
+    #endregion
+
+    #region Playback
+
+    private double _playback = 1.00;
+
+    public double Playback => _playback;
+
     public void ResetPlayback()
     {
         if (Playback == 1)
@@ -163,6 +174,8 @@ public class Clock
 
         _startTime = Time.CurrentTime;
     }
+
+    #endregion
 
     #region StepIn/StepOut
 
