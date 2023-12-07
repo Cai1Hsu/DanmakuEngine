@@ -17,8 +17,4 @@
     <ProjectReference Include="..\DanmakuEngine\DanmakuEngine.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DanmakuEngine.SourceGeneration\DanmakuEngine.SourceGeneration.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-  </ItemGroup>
-
 </Project>
