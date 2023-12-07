@@ -7,7 +7,7 @@ namespace DanmakuEngine.Allocations;
 /// <remarks>
 /// Create a lazy load instance of <typeparamref name="TValue"/> with parameters for the constructor
 /// </remarks>
-public class LazyLoadValue<TValue>(Func<TValue> loader)
+public class LazyValue<TValue>(Func<TValue> loader)
     where TValue : class
 {
     private volatile TValue? _value;
@@ -65,11 +65,11 @@ public class LazyLoadValue<TValue>(Func<TValue> loader)
     /// </remarks>
     public TValue GetValue() => Value;
 
-    public static implicit operator TValue(LazyLoadValue<TValue> lazyLoadValue) => lazyLoadValue.Value;
+    public static implicit operator TValue(LazyValue<TValue> lazyValue) => lazyValue.Value;
 
-    public static implicit operator LazyLoadValue<TValue>(Func<TValue> loader) => new(loader);
+    public static implicit operator LazyValue<TValue>(Func<TValue> loader) => new(loader);
 
-    private class LazyLoadValueException(string message)
+    private class LazyValueException(string message)
         : Exception(message)
     {
     }
