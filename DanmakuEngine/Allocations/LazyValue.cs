@@ -7,12 +7,12 @@ namespace DanmakuEngine.Allocations;
 /// <remarks>
 /// Create a lazy load instance of <typeparamref name="TValue"/> with parameters for the constructor
 /// </remarks>
-public class LazyValue<TValue>(Func<TValue> loader)
+public class LazyValue<TValue>
     where TValue : class
 {
     private volatile TValue? _value;
 
-    private Func<TValue> _loader = loader;
+    private Func<TValue> _loader = null!;
 
     private readonly object loader_lock = new();
 
@@ -65,12 +65,100 @@ public class LazyValue<TValue>(Func<TValue> loader)
     /// </remarks>
     public TValue GetValue() => Value;
 
+    /// <summary>
+    /// Returns whether we can create an instance of <typeparamref name="TValue"/> with loader  <see cref="Func{T}"/>
+    /// </summary>
+    public bool IsLoaderNull
+        => _loader is null;
+
+    /// <summary>
+    /// Try to create an instance of <typeparamref name="TValue"/> with loader <see cref="Func{T}"/>
+    /// </summary>
+    /// <returns>whether created successfully</returns>
+    /// <remarks>
+    /// Value may still be null if the loader returned null
+    /// </remarks>
+    public bool TryLoadValue()
+    {
+        if (IsLoaderNull)
+            return false;
+
+        lock (loader_lock)
+        {
+            lock (value_lock)
+            {
+                _value = _loader();
+            }
+        }
+
+        return true;
+    }
+
+    public bool AssignValue(TValue lazyValue, bool force = false)
+    {
+        if (_value is not null && !force)
+            return false;
+
+        lock (value_lock)
+        {
+            _value = lazyValue;
+        }
+
+        lock (loader_lock)
+        {
+            if (_loader is not null)
+                _loader = null!;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Reset the loader to a new one and clear the value
+    /// </summary>
+    /// <param name="loader">the loader to create a value</param>
+    public void Reset(Func<TValue> loader)
+    {
+        lock (value_lock)
+        {
+            _value = null;
+        }
+
+        lock (loader_lock)
+        {
+            _loader = loader;
+        }
+    }
+
+    public LazyValue(Func<TValue> loader)
+    {
+        _loader = loader;
+    }
+
+    /// <summary>
+    /// You may use this constructor for compatibility reason
+    /// </summary>
+    /// <param name="value"></param>
+    public LazyValue(TValue value)
+    {
+        _value = value;
+    }
+
+    public LazyValue(LazyValue<TValue> lazyValue)
+    {
+        if (lazyValue.HasValue)
+        {
+            _value = lazyValue.Value;
+        }
+        else
+        {
+            _loader = lazyValue._loader;
+        }
+    }
+
+    public static explicit operator LazyValue<TValue>(TValue value) => new(value);
+
     public static implicit operator TValue(LazyValue<TValue> lazyValue) => lazyValue.Value;
 
     public static implicit operator LazyValue<TValue>(Func<TValue> loader) => new(loader);
-
-    private class LazyValueException(string message)
-        : Exception(message)
-    {
-    }
 }
