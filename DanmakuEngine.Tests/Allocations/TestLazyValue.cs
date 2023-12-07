@@ -1,5 +1,6 @@
 using DanmakuEngine.Allocations;
 using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace DanmakuEngine.Tests.Allocations;
 
@@ -135,5 +136,47 @@ public class TestLazyValue
 
         Assert.That(lazyValue.RawValue, Is.Null);
         Assert.That(lazyValue.Value.Value, Is.EqualTo(42));
+    }
+
+    [Test]
+    public void TestThrowExceptionWhenLoading()
+    {
+        Func<TestClass> loader = () => throw new Exception("Test");
+
+        var lazyValue = new LazyValue<TestClass>(loader);
+
+        Assert.That(lazyValue.IsLoadingFailed, Is.False);
+        Assert.That(lazyValue.Value, Is.Null);
+        Assert.That(lazyValue.IsLoadingFailed, Is.True);
+    }
+
+    [Test]
+    public void TestThreadSafety()
+    {
+        var lazyValue = new LazyValue<TestClass>(() => new(42));
+
+        var thread1 = new Thread(() =>
+        {
+            var value = lazyValue.Value;
+
+            Assert.That(value, Is.Not.Null);
+
+            Assert.That(value.Value, Is.EqualTo(42));
+        });
+
+        var thread2 = new Thread(() =>
+        {
+            var value = lazyValue.Value;
+
+            Assert.That(value, Is.Not.Null);
+
+            Assert.That(value.Value, Is.EqualTo(42));
+        });
+
+        thread1.Start();
+        thread2.Start();
+
+        thread1.Join();
+        thread2.Join();
     }
 }
