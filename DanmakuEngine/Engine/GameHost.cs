@@ -272,7 +272,7 @@ public unsafe partial class GameHost
         // we dont use sdl render api anymore
         renderer = _sdl.CreateRenderer(window, -1, (uint)rendererFlag);
 
-        initlizeOpenGL();
+        initializeOpenGL();
 
         if (!ConfigManager.Vsync)
             _sdl.GLSetSwapInterval(0);
@@ -280,7 +280,7 @@ public unsafe partial class GameHost
             _sdl.GLSetSwapInterval(1);
     }
 
-    private void initlizeOpenGL()
+    private void initializeOpenGL()
     {
         windowSurface = _sdl.GetWindowSurface(window);
 
