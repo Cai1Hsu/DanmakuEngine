@@ -1,6 +1,7 @@
 using System.Data;
 using System.Diagnostics;
 using System.Linq.Expressions;
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Games;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
@@ -15,15 +16,13 @@ public class Scheduler : IUpdatable
 
     private double CurrentTime => Clock.CurrentTime;
 
-    private Clock? clock;
+    private LazyValue<Clock> clock;
 
-    protected Clock Clock => clock ??= getClock();
-
-    private readonly Func<Clock> getClock = null!;
+    protected Clock Clock => clock.Value;
 
     public Scheduler(Clock clock)
     {
-        this.clock = clock;
+        this.clock = new(clock);
     }
 
     /// <summary>
@@ -32,9 +31,12 @@ public class Scheduler : IUpdatable
     /// <param name="getClock"></param>
     public Scheduler(Func<Clock> getClock)
     {
-        this.getClock = getClock;
+        this.clock = new(getClock);
+    }
 
-        Debug.Assert(clock == null);
+    public Scheduler(LazyValue<Clock> clock)
+    {
+        this.clock = clock;
     }
 
     public void ScheduleTask(ScheduledTask task)

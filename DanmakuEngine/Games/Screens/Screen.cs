@@ -104,7 +104,7 @@ public partial class Screen : CompositeDrawable
         Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
 
         // Create our ScreenClock so that we can use it later
-        GetOrCreateClock();
+        var _ = Clock;
         
         base.load();
 

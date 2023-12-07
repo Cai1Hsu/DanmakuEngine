@@ -1,3 +1,4 @@
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
@@ -42,6 +43,8 @@ public class Drawable : IDisposable
     public Drawable(CompositeDrawable parent)
     {
         Parent = parent;
+
+        lazyScheduler = new(() => new Scheduler(lazyClock));
     }
 
     /// <summary>
@@ -74,7 +77,7 @@ public class Drawable : IDisposable
             return false;
 
         // scheuler update
-        _scheduler?.update();
+        lazyScheduler.RawValue?.update();
 
         update();
 
@@ -135,47 +138,23 @@ public class Drawable : IDisposable
 
     public event Action<Drawable> OnStart = null!;
 
-    private static readonly object scheduler_acquisition_lock = new();
+    #region Clock
 
-    private volatile Scheduler _scheduler = null!;
+    private readonly LazyValue<Clock> lazyClock = new(() => new Clock(true));
+
+    protected Clock Clock => lazyClock.Value;
+
+    #endregion
+
+    #region Scheduler
+
+    private LazyValue<Scheduler> lazyScheduler;
 
     /// <summary>
     /// A lazily-initialized scheduler used to schedule tasks to be invoked in future <see cref="Update"/>s calls.
     /// The tasks are invoked at the beginning of the <see cref="Update"/> method before anything else.
     /// </summary>
-    protected internal Scheduler Scheduler
-    {
-        get
-        {
-            if (_scheduler != null)
-                return _scheduler;
-
-            lock (scheduler_acquisition_lock)
-            {
-                if (_scheduler != null)
-                    return _scheduler;
-
-                _scheduler = clock is null ? new Scheduler(GetOrCreateClock) 
-                                           : new Scheduler(clock);
-            }
-
-            return _scheduler;
-        }
-    }
-
-    # region Clock
-
-    private Clock? clock = null;
-
-    protected Clock Clock => GetOrCreateClock();
-
-    protected Clock GetOrCreateClock()
-    {
-        if (clock is not null)
-            return clock;
-
-        return clock = new Clock(true);
-    }
+    protected internal Scheduler Scheduler => lazyScheduler.Value;
 
     #endregion
 
