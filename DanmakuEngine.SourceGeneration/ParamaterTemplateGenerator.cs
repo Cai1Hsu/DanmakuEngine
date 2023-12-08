@@ -52,11 +52,6 @@ using DanmakuEngine.Arguments;
 
         private string HandleClass(INamedTypeSymbol classSymbol, List<ISymbol> members)
         {
-            if (!classSymbol.CanBeReferencedByName)
-            {
-                throw new Exception($"The class {classSymbol.Name} must be declared as partial.");
-            }
-
             string nsName = classSymbol.ContainingNamespace.ToDisplayString();
             string className = classSymbol.Name;
 
