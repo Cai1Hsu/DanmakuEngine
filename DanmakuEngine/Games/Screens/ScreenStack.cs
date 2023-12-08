@@ -16,7 +16,6 @@ public class ScreenStack : CompositeDrawable
 
     public ScreenStack(CompositeDrawable parent) : base(parent)
     {
-        this.load();
     }
 
     public void Switch(Screen screen)
@@ -35,6 +34,8 @@ public class ScreenStack : CompositeDrawable
             screens.Push(screen);
         }
 
+        updateAnotherFrame = true;
+
         if (ConfigManager.HasConsole)
             Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {screens.Count}");
     }
@@ -51,6 +52,8 @@ public class ScreenStack : CompositeDrawable
         {
             screens.Push(screen);
         }
+
+        updateAnotherFrame = true;
 
         if (ConfigManager.HasConsole)
             Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {screens.Count}");
@@ -85,15 +88,23 @@ public class ScreenStack : CompositeDrawable
         }
     }
 
+    private bool updateAnotherFrame = false;
+
     protected override bool UpdateChildren()
     {
-        var peek = Peek();
+        do
+        {
+            updateAnotherFrame = false;
 
-        if (peek is null)
-            return true;
+            var peek = Peek();
 
-        if (peek.updateSubTree())
-            return true;
+            if (peek is null)
+                return true;
+
+            if (peek.updateSubTree() && !updateAnotherFrame)
+                return true;
+
+        } while (updateAnotherFrame);
 
         return false;
     }
