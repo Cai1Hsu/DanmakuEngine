@@ -1,5 +1,6 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Games.Screens;
+using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Games;
 
@@ -17,6 +18,8 @@ public partial class Game
     {
         if (this is IInjectable injectable)
             injectable.AutoInject();
+
+        Logger.Log($"Starting {Name}");
 
         this.Begin();
     }
