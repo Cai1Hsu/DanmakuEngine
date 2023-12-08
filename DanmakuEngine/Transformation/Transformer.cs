@@ -11,19 +11,7 @@ public class Transformer : ITransformable
     public double CurrentTime { get; private set; }
 
     public double time
-    {
-        get
-        {
-            var t = CurrentTime / Duration;
-
-            if (t > 1)
-                t = 1;
-            else if (t < -1)
-                t = -1;
-
-            return t;
-        }
-    }
+        => Math.Clamp(CurrentTime / Duration, -1, 1);
 
     public ITransformFunction? Function { get; private set; }
 

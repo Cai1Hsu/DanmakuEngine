@@ -22,21 +22,16 @@ public class Drawable : GameObject, IDisposable
             if (alpha == value)
                 return;
 
-            if (alpha > 1)
-                alpha = 1;
-            else if (alpha < 0)
-                alpha = 0;
-
-            alpha = value;
+            alpha = Math.Clamp(value, 0, 1);
         }
     }
-    const float aplhaMin = 10E-6f * 2;
+    const float alphaMin = 10E-6f * 2;
 
     private bool alwaysPresent = true;
 
     protected virtual bool AlwaysPresent => alwaysPresent;
 
-    public virtual bool IsPresent => AlwaysPresent || Alpha > aplhaMin;
+    public virtual bool IsPresent => AlwaysPresent || Alpha > alphaMin;
 
     public virtual CompositeDrawable Parent { get; private set; } = null!;
 
