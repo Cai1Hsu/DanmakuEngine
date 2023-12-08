@@ -34,10 +34,8 @@ public class Time
     /// </summary>
     public static double UpdateDelta { get; protected set; } = 1 / 60;
 
-    public void ResetTime()
+    public void ResetTime(double refresh_rate)
     {
-        var refresh_rate = ((GameHost)this).ConfigManager.RefreshRate;
-
         UpdateDelta = 1 / refresh_rate;
         RenderDelta = 1 / refresh_rate;
 

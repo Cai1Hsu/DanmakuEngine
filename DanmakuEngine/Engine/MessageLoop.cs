@@ -17,7 +17,7 @@ public unsafe partial class GameHost
 
     public void RunUntilExit()
     {
-        ResetTime();
+        ResetTime(ConfigManager.RefreshRate);
 
         HostTimer.Reset();
         HostTimer.Start();
