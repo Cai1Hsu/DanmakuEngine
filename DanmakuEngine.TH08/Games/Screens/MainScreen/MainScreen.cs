@@ -183,13 +183,13 @@ public partial class MainScreen : Screen
                 transformation.Begin();
         }
 
-        Logger.Info("Scheduled to exit in 5 seconds.");
-        Scheduler.ScheduleTaskDelay(() =>
-        {
-            _host.RequestClose();
+        // Logger.Info("Scheduled to exit in 5 seconds.");
+        // Scheduler.ScheduleTaskDelay(() =>
+        // {
+        //     _host.RequestClose();
 
-            Logger.Info("exiting");
-        }, 5);
+        //     Logger.Info("exiting");
+        // }, 5);
     }
 
     // This method is called every frame for the screen(and it's children object)
