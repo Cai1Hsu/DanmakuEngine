@@ -12,7 +12,10 @@ namespace DanmakuEngine.Scheduling;
 public class Scheduler : IUpdatable
 {
     private readonly Queue<ScheduledTask> tasks = new();
+
     private readonly object taskLock = new();
+
+    private readonly LazyValue<Queue<ScheduledTask>> pendingTasks = new(() => new());
 
     private double CurrentTime => Clock.CurrentTime;
 
@@ -119,8 +122,6 @@ public class Scheduler : IUpdatable
     {
         lock (taskLock)
         {
-            Queue<ScheduledTask>? next = null;
-
             while (tasks.Count > 0)
             {
                 var task = tasks.Dequeue();
@@ -133,14 +134,14 @@ public class Scheduler : IUpdatable
                 }
                 else
                 {
-                    (next ??= new()).Enqueue(task);
+                    pendingTasks.Value.Enqueue(task);
                 }
             }
 
-            if (next is not null)
+            if (pendingTasks.HasValue && pendingTasks.Value.Count > 0)
             {
-                while (next.Count > 0)
-                    tasks.Enqueue(next.Dequeue());
+                while (pendingTasks.Value.Count > 0)
+                    tasks.Enqueue(pendingTasks.Value.Dequeue());
             }
         }
 
