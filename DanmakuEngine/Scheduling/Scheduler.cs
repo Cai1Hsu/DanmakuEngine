@@ -5,7 +5,6 @@ using DanmakuEngine.Allocations;
 using DanmakuEngine.Games;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
-using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Scheduling;
 
