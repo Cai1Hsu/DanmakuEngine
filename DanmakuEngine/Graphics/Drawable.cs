@@ -1,12 +1,14 @@
 using DanmakuEngine.Allocations;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Games;
+using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
 using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics;
 
-public class Drawable : IDisposable
+public class Drawable : GameObject, IDisposable
 {
     private float alpha = 1;
     public float Alpha
@@ -38,106 +40,6 @@ public class Drawable : IDisposable
 
     public virtual CompositeDrawable Parent { get; private set; } = null!;
 
-    protected LoadState LoadState { get; private set; } = LoadState.NotLoaded;
-
-    public Drawable(CompositeDrawable parent)
-    {
-        Parent = parent;
-
-        lazyScheduler = new(() => Scheduler.Create(lazyClock));
-    }
-
-    /// <summary>
-    /// Updates the drawable and all of its children
-    /// </summary>
-    /// <returns>false if continues to update, and true for stops</returns>
-    public virtual bool UpdateSubTree()
-    {
-        if (IsDisposed)
-            return true;
-
-        if (LoadState == LoadState.NotLoaded)
-        {
-            load();
-
-            return true;
-        }
-
-        if (LoadState == LoadState.Ready)
-            start();
-
-        // Since here the LoadState is Complete
-
-        // TODO: Update auto transforms
-        // Transforms contains the transforms that are applied to the drawable
-        // and animations and movement
-        // may be we can implement transform using scheduler
-
-        if (!IsPresent)
-            return false;
-
-        // scheuler update
-        lazyScheduler.RawValue?.update();
-
-        update();
-
-        OnUpdate?.Invoke(this);
-
-        return false;
-    }
-
-    protected virtual void start()
-    {
-        if (LoadState != LoadState.Ready)
-            return;
-
-        LoadState = LoadState.Complete;
-
-        Start();
-
-        OnStart?.Invoke(this);
-        // Since we can only *start* once
-        OnStart = null!;
-    }
-
-    public virtual void Start()
-    {
-
-    }
-
-    public virtual void update()
-    {
-        Update();
-    }
-
-    public virtual void Update()
-    {
-
-    }
-
-    public virtual void load()
-    {
-        if (LoadState != LoadState.NotLoaded)
-            return;
-
-        LoadState = LoadState.Ready;
-
-        Load();
-
-        OnLoad?.Invoke(this);
-    }
-
-    public virtual void Load()
-    {
-
-    }
-
-    public event Action<Drawable> OnUpdate = null!;
-
-    public event Action<Drawable> OnLoad = null!;
-
-    public event Action<Drawable> OnStart = null!;
-
     #region Clock
 
     private readonly LazyValue<Clock> lazyClock = new(() => new Clock(true));
@@ -158,45 +60,23 @@ public class Drawable : IDisposable
 
     #endregion
 
-    #region IDisposable
+    protected override bool UpdateCheck => IsPresent;
 
-    private bool IsDisposed = false;
-
-    public void Dispose()
+    protected override void BeforeUpdate()
     {
-        Dispose(true);
+        // TODO: Update auto transforms
+        // Transforms contains the transforms that are applied to the drawable
+        // and animations and movement
+        // may be we can implement transform using scheduler
 
-        GC.SuppressFinalize(this);
+        // scheuler update
+        lazyScheduler.RawValue?.update();
     }
 
-    protected virtual void Dispose(bool disposing)
+    public Drawable(CompositeDrawable parent)
     {
-        if (!disposing || IsDisposed)
-            return;
+        Parent = parent;
 
-        this.OnLoad = null!;
-        this.OnStart = null!;
-        this.OnUpdate = null!;
-
-        IsDisposed = true;
+        lazyScheduler = new(() => Scheduler.Create(lazyClock));
     }
-
-    #endregion
-}
-
-public enum LoadState
-{
-    /// <summary>
-    /// The drawable is not loaded and has not been initialized
-    /// </summary>
-    NotLoaded,
-    /// <summary>
-    /// The drawable is loaded, but has not been initialized in the Update loop
-    /// </summary>
-    Ready,
-    /// <summary>
-    /// The drawable is loaded and has been initialized in the Update loop
-    /// which means it is ready to be drawn(or has been drawn)
-    /// </summary>
-    Complete
 }

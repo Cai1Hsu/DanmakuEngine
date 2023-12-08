@@ -6,31 +6,40 @@ public abstract class CompositeDrawable : Drawable
 {
     public Vector2D<float> Size = new(0, 0);
 
-    protected virtual ICollection<Drawable> Children { get; set; } = null!;
+    protected virtual IEnumerable<Drawable> Children => children;
+
+    protected virtual LinkedList<Drawable> children { get; set; } = null!;
 
     public CompositeDrawable(CompositeDrawable parent) : base(parent)
     {
-        this.Children = new LinkedList<Drawable>();
+        this.children = new LinkedList<Drawable>();
     }
 
     public void Add(Drawable child)
-        => Children.Add(child);
+        => children.AddLast(child);
 
-    public override bool UpdateSubTree()
+    /// <summary>
+    /// Updates the drawable and all of its children
+    /// </summary>
+    /// <returns>false if continues to update, and true for stops</returns>
+    public override bool updateSubTree()
     {
-        if (base.UpdateSubTree())
+        if (base.updateSubTree())
             return true;
 
-        if (!Children.All(c => !c.UpdateSubTree()))
+        if (UpdateChildren())
             return true;
-
-        // TODO: Something else?
 
         return false;
     }
 
-    public override void Update()
+    protected virtual bool UpdateChildren()
     {
+        bool shouldStop = false;
 
+        foreach (var child in Children)
+            shouldStop |= child.updateSubTree();
+
+        return shouldStop;
     }
 }
