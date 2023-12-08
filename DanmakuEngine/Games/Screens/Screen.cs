@@ -74,7 +74,6 @@ public partial class Screen : CompositeDrawable
 
     protected override void start()
     {
-        ScreenClock.Reset();
         ScreenClock.Start();
 
         base.start();
