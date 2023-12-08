@@ -35,9 +35,6 @@ public partial class Screen : CompositeDrawable
 
     public Screen() : base(null!)
     {
-        if (this is IInjectable injectable)
-            injectable.AutoInject();
-
         // in Drawable.load which is called in the update loop
         // this.load();
     }
