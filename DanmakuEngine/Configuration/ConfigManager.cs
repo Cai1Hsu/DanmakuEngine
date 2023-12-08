@@ -81,7 +81,7 @@ public partial class ConfigManager
             // see DynamicLoadDefaultValues()
             // This helps us to avoid overriding the default value loaded from runtime
             // For example, we load default value of RefreshRate at runtime instead of compile time
-            if (skipProperties.Contains(propInfo.Name))
+            if (!argProvider.Find(flag) && skipProperties.Contains(propInfo.Name))
             {
                 Logger.Debug($"[ConfigManager] skipping: Property {propInfo.Name} is already loaded from runtime, value: {propInfo.GetValue(this)}");
 
