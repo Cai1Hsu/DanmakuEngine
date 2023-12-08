@@ -329,8 +329,6 @@ public unsafe partial class GameHost
 
         Dependencies.Cache(screens);
 
-        Root.load();
-
         RegisterEvents();
 
         Logger.Debug("Everything is ready, let's go!");
@@ -347,8 +345,7 @@ public unsafe partial class GameHost
 
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
-
-        Root.UpdateSubTree();
+        Root.updateSubTree();
         // Root.UpdateSubTreeMasking(Root, Root.ScreenSpaceDrawQuad.AABBFloat);
 
         // using (var buffer = DrawRoots.GetForWrite())
