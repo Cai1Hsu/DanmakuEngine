@@ -31,7 +31,7 @@ public class TestScheduler
             scheduler.ScheduleTask(() => h.RequestClose());
         };
 
-        host.OnUpdate += h => scheduler.update();
+        host.OnUpdate += h => scheduler.updateSubTree();
 
         host.OnTimedout += Assert.Fail;
 
@@ -60,7 +60,7 @@ public class TestScheduler
 
         host.OnUpdate += _ =>
         {
-            scheduler.update();
+            scheduler.updateSubTree();
             current_time = Math.Max(current_time, Time.CurrentTime);
         };
 

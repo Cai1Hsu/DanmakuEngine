@@ -9,7 +9,7 @@ using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Scheduling;
 
-public class Scheduler : IUpdatable
+public class Scheduler : UpdateOnlyObject
 {
     private readonly Queue<ScheduledTask> tasks = new();
 
@@ -108,21 +108,7 @@ public class Scheduler : IUpdatable
         }
     }
 
-    public void load()
-        => Load();
-
-    public virtual void Load()
-    {
-    }
-
-    public void start()
-        => Start();
-
-    public virtual void Start()
-    {
-    }
-
-    public void update()
+    protected override void Update()
     {
         lock (taskLock)
         {
@@ -148,17 +134,6 @@ public class Scheduler : IUpdatable
                     tasks.Enqueue(pendingTasks.Value.Dequeue());
             }
         }
-
-        Update();
-    }
-
-    /// <summary>
-    /// Please do not call this methods directly
-    /// you should override <see cref="Update"/> and call <see cref="update"/> instead
-    /// </summary>
-    public virtual void Update()
-    {
-
     }
 
     private class TimeProvider : IClock
