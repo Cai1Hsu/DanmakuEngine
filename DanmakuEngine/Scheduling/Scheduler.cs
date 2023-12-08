@@ -15,7 +15,7 @@ public class Scheduler : IUpdatable
 
     private readonly object taskLock = new();
 
-    private readonly LazyValue<Queue<ScheduledTask>> pendingTasks = new(() => new());
+    private readonly LazyValue<Queue<ScheduledTask>> pendingTasks = LazyValue.Create<Queue<ScheduledTask>>();
 
     private double CurrentTime => Clock.CurrentTime;
 
@@ -49,6 +49,10 @@ public class Scheduler : IUpdatable
     {
         this.clock = lazyClock;
     }
+
+    public static Scheduler Create<T>(LazyValue<T> lazyClock)
+        where T : class, IClock
+        => new(lazyClock.ToBase<IClock, T>());
 
     /// <summary>
     /// Create a scheduler that uses a lazy-initialized clock
