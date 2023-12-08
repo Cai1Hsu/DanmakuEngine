@@ -187,3 +187,22 @@ public class LazyValue<TValue>
 
     public static implicit operator LazyValue<TValue>(Func<TValue> loader) => new(loader);
 }
+
+public static class LazyValue
+{
+    public static LazyValue<TBase> ToBase<TBase, TSub>(this LazyValue<TSub> lazyValue)
+        where TSub : class, TBase
+        where TBase : class
+    {
+        if (lazyValue.HasValue)
+            return new LazyValue<TBase>(lazyValue.Value);
+
+        return new LazyValue<TBase>(lazyValue.GetValue);
+    }
+
+    public static LazyValue<T> Create<T>()
+        where T : class, new()
+    {
+        return new LazyValue<T>(() => new T());
+    }
+}
