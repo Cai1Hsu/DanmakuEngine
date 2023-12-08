@@ -19,8 +19,6 @@ public partial class Game
         if (this is IInjectable injectable)
             injectable.AutoInject();
 
-        Logger.Log($"Starting {Name}");
-
         this.Begin();
     }
 
