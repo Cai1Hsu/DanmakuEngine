@@ -7,9 +7,10 @@ namespace DanmakuEngine.Games.Screens;
 public class ScreenStack : CompositeDrawable
 {
     private Stack<Screen> screens = new();
+
     private object _lock = new();
 
-    protected override ICollection<Drawable> Children { get => (ICollection<Drawable>)screens; }
+    protected override IEnumerable<Drawable> Children => screens;
 
     protected override bool AlwaysPresent => true;
 
@@ -84,7 +85,7 @@ public class ScreenStack : CompositeDrawable
         }
     }
 
-    public override bool UpdateSubTree()
+    protected override bool UpdateChildren()
     {
         var peek = Peek();
 
