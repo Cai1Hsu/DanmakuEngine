@@ -55,17 +55,19 @@ public class Drawable : GameObject, IDisposable
 
     #endregion
 
-    protected override bool UpdateCheck => IsPresent;
-
-    protected override void BeforeUpdate()
+    protected override bool BeforeUpdate()
     {
+        if (!IsPresent)
+            return false;
         // TODO: Update auto transforms
         // Transforms contains the transforms that are applied to the drawable
         // and animations and movement
         // may be we can implement transform using scheduler
 
         // scheuler update
-        lazyScheduler.RawValue?.update();
+        lazyScheduler.RawValue?.updateSubTree();
+
+        return true;
     }
 
     public Drawable(CompositeDrawable parent)

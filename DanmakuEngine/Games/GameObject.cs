@@ -1,8 +1,8 @@
 namespace DanmakuEngine.Games;
 
-public class GameObject : IDisposable
+public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 {
-    protected LoadState LoadState { get; private set; } = LoadState.NotLoaded;
+    protected LoadState LoadState { get; private set; } = loadState;
 
     /// <summary>
     /// Loads the drawable and its children
@@ -91,21 +91,15 @@ public class GameObject : IDisposable
         if (LoadState == LoadState.Ready)
             start();
 
-        if (!UpdateCheck)
+        if (!BeforeUpdate())
             return true;
-
-        BeforeUpdate();
 
         update();
 
         return false;
     }
 
-    protected virtual bool UpdateCheck => true;
-
-    protected virtual void BeforeUpdate()
-    {
-    }
+    protected virtual bool BeforeUpdate() => true;
 
     public event Action<GameObject> OnUpdate = null!;
 
