@@ -23,7 +23,7 @@ public partial class Screen : CompositeDrawable
     /// </summary>
     public Clock ScreenClock => Clock;
 
-    protected List<IUpdatable> InternalChildren { get; set; } = null!;
+    protected List<GameObject> InternalChildren { get; set; } = null!;
 
     public void SetParent(ScreenStack parent)
     {
@@ -44,14 +44,16 @@ public partial class Screen : CompositeDrawable
         if (base.updateSubTree())
             return true;
 
-        // TODO: update children
+        var shouldStop = false;
+
+        // update children
         if (InternalChildren is not null)
         {
             foreach (var ichild in InternalChildren)
-                ichild.update();
+                shouldStop |= ichild.updateSubTree();
         }
 
-        return false;
+        return shouldStop;
     }
 
     protected override void start()
@@ -59,12 +61,6 @@ public partial class Screen : CompositeDrawable
         ScreenClock.Start();
 
         base.start();
-
-        if (InternalChildren is not null)
-        {
-            foreach (var ichild in InternalChildren)
-                ichild.start();
-        }
     }
 
     protected override void load()
@@ -80,11 +76,5 @@ public partial class Screen : CompositeDrawable
         var _ = Clock;
 
         base.load();
-
-        if (InternalChildren is not null)
-        {
-            foreach (var ichild in InternalChildren)
-                ichild.load();
-        }
     }
 }
