@@ -16,10 +16,9 @@ public class Transformer : ITransformable
         {
             var t = CurrentTime / Duration;
 
-            if (t > 1 && !AllowOverflow)
+            if (t > 1)
                 t = 1;
-
-            if (t < -1 && !AllowOverflow)
+            else if (t < -1)
                 t = -1;
 
             return t;
@@ -33,8 +32,6 @@ public class Transformer : ITransformable
     public Action<double> OnUpdate = null!;
 
     public Action OnDone = null!;
-
-    public bool AllowOverflow = false;
 
     private bool done = false;
 
