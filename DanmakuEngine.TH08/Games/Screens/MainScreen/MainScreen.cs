@@ -20,7 +20,7 @@ public partial class MainScreen : Screen
     private GameHost _host = null!;
 
     // This method is called when the screen(or average object) is loading
-    public override void Load()
+    protected override void Load()
     {
         keyboardHandler = new MainMenuKeyBoardHandler()
         {
@@ -166,7 +166,7 @@ public partial class MainScreen : Screen
     }
 
     // This method is called when the screen(or average object) is starting
-    public override void Start()
+    protected override void Start()
     {
         Logger.Info("Keyboard is handled in this screen.");
         Logger.Info("You can exit the game by pressing ESC.");
@@ -193,7 +193,7 @@ public partial class MainScreen : Screen
     }
 
     // This method is called every frame for the screen(and it's children object)
-    public override void Update()
+    protected override void Update()
     {
         foreach (var transformation in transformations)
             transformation.Update(clock.UpdateDelta * 1000);

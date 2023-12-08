@@ -11,7 +11,7 @@ public partial class LoadingScreen : Screen
     // called by `load` in constructor for screen and manually called for other objects
     // This method is called when the screen(or average object) is loading
     // You can do some initialization for the screen here
-    public override void Load()
+    protected override void Load()
     {
         keyboardHandler = null!;
     }
@@ -19,7 +19,7 @@ public partial class LoadingScreen : Screen
     // This method is called the first frame when the screen(or average object) is completely loaded
     // If you want to do something that takes a long time without blocking the main thread, you can use `Start` method
     // make it async and use `await Task.Delay` to delay the execution
-    public override void Start()
+    protected override void Start()
     {
         Logger.Log("少女祈祷中");
         Logger.Log("    Now loading...");
@@ -49,7 +49,7 @@ public partial class LoadingScreen : Screen
     }
 
     // This method is called every frame, the first call is after `Start` method
-    public override void Update()
+    protected override void Update()
     {
 
     }
