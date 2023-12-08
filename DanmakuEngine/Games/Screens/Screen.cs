@@ -39,37 +39,19 @@ public partial class Screen : CompositeDrawable
         // this.load();
     }
 
-    public bool updateSubTree()
+    public override bool updateSubTree()
     {
-        if (base.UpdateSubTree())
+        if (base.updateSubTree())
             return true;
 
         // TODO: update children
-
-        return UpdateSubTree();
-    }
-
-    // TODO: Whether we should have this
-    public override bool UpdateSubTree()
-    {
-        return false;
-    }
-
-    public override void update()
-    {
-        base.update();
-
         if (InternalChildren is not null)
         {
             foreach (var ichild in InternalChildren)
                 ichild.update();
         }
-    }
 
-    // this is called in Drawable.update()
-    public override void Update()
-    {
-
+        return false;
     }
 
     protected override void start()
@@ -85,12 +67,7 @@ public partial class Screen : CompositeDrawable
         }
     }
 
-    public override void Start()
-    {
-
-    }
-
-    public override void load()
+    protected override void load()
     {
         // we make the Screen base class injectable
         if (this is IInjectable injectable)
@@ -109,10 +86,5 @@ public partial class Screen : CompositeDrawable
             foreach (var ichild in InternalChildren)
                 ichild.load();
         }
-    }
-
-    public override void Load()
-    {
-
     }
 }
