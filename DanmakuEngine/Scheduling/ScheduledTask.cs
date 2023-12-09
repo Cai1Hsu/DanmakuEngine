@@ -33,7 +33,7 @@ public class ScheduledTask : IDisposable
 
     public void Dispose()
     {
-         this.action = null!;
+        this.action = null!;
 
         IsDisposed = true;
 
