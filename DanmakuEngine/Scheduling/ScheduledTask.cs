@@ -33,17 +33,10 @@ public class ScheduledTask : IDisposable
 
     public void Dispose()
     {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (!disposing)
-            return;
-
-        this.action = null!;
+         this.action = null!;
 
         IsDisposed = true;
+
+        GC.SuppressFinalize(this);
     }
 }
