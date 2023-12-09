@@ -116,4 +116,4 @@ jobs:
 
     - name: Push changes
       if: steps.git-check.outputs.changed == 'true'
-      run: git push
+      run: git push origin HEAD:${{ github.head_ref }}
