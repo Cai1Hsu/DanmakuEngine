@@ -7,7 +7,7 @@ public class GravityDropMovement : LinearAccelerateMovement
     /// <summary>
     /// You must be very familiar with this number
     /// </summary>
-    private const double GRAVITY = 9.81;
+    const double GRAVITY = 9.81;
 
     public GravityDropMovement(Clock clock)
         : base(GRAVITY, clock)
