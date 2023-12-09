@@ -79,6 +79,8 @@ public partial class GameHost : Time, IDisposable
     {
         if (ConfigManager.HasConsole)
             Console.CursorVisible = false;
+
+        Console.CancelKeyPress += (_, _) => Console.CursorVisible = true;
     }
 
     private void SetUpDependency()

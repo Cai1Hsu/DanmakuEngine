@@ -39,8 +39,6 @@ public class WindowsGameHost : DesktopGameHost
         if (!Configuration.ConfigManager.HasConsole)
             return;
 
-        Console.CursorVisible = false;
-
         base.SetUpConsole();
     }
 }
