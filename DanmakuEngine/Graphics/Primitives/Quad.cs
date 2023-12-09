@@ -1,12 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
 
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using DanmakuEngine.Extensions.Vector;
 using DanmakuEngine.Utils;
 using Silk.NET.Maths;
 using Silk.NET.SDL;
-using DanmakuEngine.Extensions.Vector;
-using System.Runtime.CompilerServices;
 
 namespace DanmakuEngine.Graphics.Primitives;
 
