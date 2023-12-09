@@ -46,26 +46,14 @@ public struct RectangleF : IEquatable<RectangleF>
 
     public Vector2D<float> Location
     {
-        get
-        {
-            return new(X, Y);
-        }
-        set
-        {
-            (X, Y) = (value.X, value.Y);
-        }
+        get => new(X, Y);
+        set => (X, Y) = (value.X, value.Y);
     }
 
     public Vector2D<float> Size
     {
-        get
-        {
-            return new(Width, Height);
-        }
-        set
-        {
-            (Width, Height) = (value.X, value.Y);
-        }
+        get => new(Width, Height);
+        set => (Width, Height) = (value.X, value.Y);
     }
 
     public float Area
@@ -73,98 +61,50 @@ public struct RectangleF : IEquatable<RectangleF>
 
     public float Left
     {
-        get
-        {
-            return X;
-        }
-        set
-        {
-            X = value;
-        }
+        get => X;
+        set => X = value;
     }
 
     public float Right
     {
-        get
-        {
-            return X + Width;
-        }
-        set
-        {
-            Width = value - X;
-        }
+        get => X + Width;
+        set => Width = value - X;
     }
 
     public float Top
     {
-        get
-        {
-            return Y;
-        }
-        set
-        {
-            Y = value;
-        }
+        get => Y;
+        set => Y = value;
     }
 
     public float Bottom
     {
-        get
-        {
-            return Y + Height;
-        }
-        set
-        {
-            Height = value - Y;
-        }
+        get => Y + Height;
+        set => Height = value - Y;
     }
 
     public Vector2D<float> TopLeft
     {
-        get
-        {
-            return new(Left, Top);
-        }
-        set
-        {
-            (Left, Top) = (value.X, value.Y);
-        }
+        get => new(Left, Top);
+        set => (Left, Top) = (value.X, value.Y);
     }
 
     public Vector2D<float> TopRight
     {
-        get
-        {
-            return new(Right, Top);
-        }
-        set
-        {
-            (Right, Top) = (value.X, value.Y);
-        }
+        get => new(Right, Top);
+        set => (Right, Top) = (value.X, value.Y);
     }
 
     public Vector2D<float> BottomLeft
     {
-        get
-        {
-            return new(Left, Bottom);
-        }
-        set
-        {
-            (Left, Bottom) = (value.X, value.Y);
-        }
+        get => new(Left, Bottom);
+        set => (Left, Bottom) = (value.X, value.Y);
     }
 
     public Vector2D<float> BottomRight
     {
-        get
-        {
-            return new(Right, Bottom);
-        }
-        set
-        {
-            (Right, Bottom) = (value.X, value.Y);
-        }
+        get => new(Right, Bottom);
+        set => (Right, Bottom) = (value.X, value.Y);
     }
 
     public readonly Vector2D<float> Center
