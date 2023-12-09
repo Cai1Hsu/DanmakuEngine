@@ -97,17 +97,13 @@ public partial class ConfigManager
         }
     }
 
-    public static bool DebugBuild
-    {
-        get
-        {
+    public static bool DebugBuild =>
 #if DEBUG
-            return true;
+            true;
 #else
             return false;
 #endif
-        }
-    }
+
 
     private static bool? _hasConsole = null;
     public static bool HasConsole
