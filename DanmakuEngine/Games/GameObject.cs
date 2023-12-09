@@ -52,7 +52,8 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     /// <summary>
     /// Loads the drawable and its children
     /// 
-    /// Most of the time, you should not override this method or call this method directly
+    /// You can override this method to load your own resources
+    /// But don't call this method directly
     /// </summary>
     protected virtual void Load()
     {
@@ -61,7 +62,8 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     /// <summary>
     /// Starts the drawable and its children
     /// 
-    /// Most of the time, you should not override this method or call this method directly
+    /// You can override this method to load your own resources
+    /// But don't call this method directly
     /// </summary>
     protected virtual void Start()
     {
@@ -70,7 +72,8 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     /// <summary>
     /// Updates the drawable and its children
     /// 
-    /// Most of the time, you should not override this method or call this method directly
+    /// You can override this method to load your own resources
+    /// But don't call this method directly
     /// </summary>
     protected virtual void Update()
     {
