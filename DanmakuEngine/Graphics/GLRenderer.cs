@@ -1,10 +1,10 @@
-using DanmakuEngine.Graphics.Primitives;
-using Silk.NET.Maths;
-using Silk.NET.SDL;
-using Silk.NET.OpenGL;
-using DanmakuEngine.Logging;
-using DanmakuEngine.Extensions;
 using System.Numerics;
+using DanmakuEngine.Extensions;
+using DanmakuEngine.Graphics.Primitives;
+using DanmakuEngine.Logging;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Silk.NET.SDL;
 
 namespace DanmakuEngine.Graphics;
 
