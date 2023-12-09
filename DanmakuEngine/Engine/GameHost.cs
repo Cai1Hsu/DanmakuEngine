@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
@@ -9,22 +11,20 @@ using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
 using Silk.NET.Maths;
-using Silk.NET.SDL;
 using Silk.NET.OpenGL;
+using Silk.NET.SDL;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Advanced;
 using SixLabors.ImageSharp.Drawing.Processing;
+using SixLabors.ImageSharp.Memory;
+using SixLabors.ImageSharp.PixelFormats;
+using Color = SixLabors.ImageSharp.Color;
 using PixelFormat = Silk.NET.OpenGL.PixelFormat;
 using PixelType = Silk.NET.OpenGL.PixelType;
-using SixLabors.ImageSharp.Advanced;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using SixLabors.ImageSharp.Memory;
-using Color = SixLabors.ImageSharp.Color;
-using DanmakuEngine.Scheduling;
 
 namespace DanmakuEngine.Engine;
 

@@ -1,8 +1,8 @@
+using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Scheduling;
-using DanmakuEngine.Timing;
-using DanmakuEngine.Arguments;
 using DanmakuEngine.Tests.Games;
+using DanmakuEngine.Timing;
 using NUnit.Framework;
 
 namespace DanmakuEngine.Tests.Scheduling;
