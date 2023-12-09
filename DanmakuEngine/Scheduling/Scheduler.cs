@@ -59,7 +59,7 @@ public class Scheduler : UpdateOnlyObject
     /// </summary>
     public Scheduler()
     {
-        this.clock = new LazyValue<IClock>(() => new TimeProvider());
+        this.clock = new LazyValue<IClock>(() => new StandardClock());
     }
 
     public void ScheduleTask(ScheduledTask task)
@@ -134,14 +134,5 @@ public class Scheduler : UpdateOnlyObject
                     tasks.Enqueue(pendingTasks.Value.Dequeue());
             }
         }
-    }
-
-    private class TimeProvider : IClock
-    {
-        public double UpdateDelta => Time.UpdateDelta;
-
-        public double RenderDelta => Time.RenderDelta;
-
-        public double CurrentTime => Time.CurrentTime;
     }
 }
