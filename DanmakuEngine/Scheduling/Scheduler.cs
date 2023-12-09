@@ -5,7 +5,6 @@ using DanmakuEngine.Allocations;
 using DanmakuEngine.Games;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
-using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Scheduling;
 
@@ -128,7 +127,7 @@ public class Scheduler : UpdateOnlyObject
                 }
             }
 
-            if (pendingTasks.HasValue && pendingTasks.Value.Count > 0)
+            if (pendingTasks.HasValue)
             {
                 while (pendingTasks.Value.Count > 0)
                     tasks.Enqueue(pendingTasks.Value.Dequeue());
