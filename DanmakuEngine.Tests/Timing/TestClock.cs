@@ -40,7 +40,6 @@ public class TestClock
         host.OnLoad += _ =>
         {
             clock.Start();
-            clock.Reset();
         };
 
         host.Run(game, defaultProvider);
@@ -68,7 +67,6 @@ public class TestClock
         host.OnLoad += _ =>
         {
             clock.Start();
-            clock.Reset();
         };
 
         host.Run(game, defaultProvider);
