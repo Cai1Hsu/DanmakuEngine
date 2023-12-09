@@ -1,8 +1,8 @@
-﻿using DanmakuEngine.Arguments;
-using DanmakuEngine.Engine;
+﻿using DanmakuEngine.Engine;
 using DanmakuEngine.Engine.Platform;
-using DanmakuEngine.Logging;
 using DanmakuEngine.TH08.Games;
+using DanmakuEngine.Logging;
+using DanmakuEngine.Arguments;
 
 internal class Program
 {

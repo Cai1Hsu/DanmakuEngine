@@ -13,7 +13,10 @@ public class Drawable : GameObject, IDisposable
     private float alpha = 1;
     public float Alpha
     {
-        get => alpha;
+        get
+        {
+            return alpha;
+        }
         set
         {
             if (alpha == value)
@@ -22,8 +25,7 @@ public class Drawable : GameObject, IDisposable
             alpha = Math.Clamp(value, 0, 1);
         }
     }
-
-    private const float alphaMin = 10E-6f * 2;
+    const float alphaMin = 10E-6f * 2;
 
     private bool alwaysPresent = true;
 

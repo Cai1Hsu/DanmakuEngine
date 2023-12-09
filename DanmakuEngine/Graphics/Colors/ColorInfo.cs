@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
 
-using System.Diagnostics;
 using DanmakuEngine.Graphics.Primitives;
+using System.Diagnostics;
 using OpenTK.Mathematics;
 using Silk.NET.Maths;
 
