@@ -93,7 +93,7 @@ jobs:
         dotnet tool install --global JetBrains.ReSharper.GlobalTools
 
     - name: Auto Format
-      run: dotnet format --check --verbosity diagnostic
+      run: dotnet format --verbosity diagnostic
 
     - name: Check for changes
       id: git-check
