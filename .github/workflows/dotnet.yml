@@ -109,14 +109,14 @@ jobs:
     - name: Setup Git
       if: steps.git-check.outputs.changed == 'true'
       run: |
-        git config --global user.name "GitHub Actions"
-        git config --global user.email "noreply@github.com"
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     - name: Commit changes
       if: steps.git-check.outputs.changed == 'true'
       run: |
         git add .
-        git commit -m "format code"
+        git commit -m "CI format code"
 
     - name: Push changes
       if: steps.git-check.outputs.changed == 'true'
