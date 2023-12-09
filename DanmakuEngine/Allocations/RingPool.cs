@@ -23,8 +23,14 @@ public class RingPool<T>
     /// </summary>
     public T Current
     {
-        get => _pool[_index];
-        set => _pool[_index] = value;
+        get
+        {
+            return _pool[_index];
+        }
+        set
+        {
+            _pool[_index] = value;
+        }
     }
 
     public T CurrentAndNext

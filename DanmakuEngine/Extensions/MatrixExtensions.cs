@@ -54,8 +54,9 @@ public static class MatrixExtensions
     {
         var cos = MathF.Cos(angle);
         var sin = MathF.Sin(angle);
-        _ = matrix.Column1;
-        _ = matrix.Column2;
+
+        var col1 = matrix.Column1;
+        var col2 = matrix.Column2;
 
         //m.Column1 = m.Column1 * cos - m.Column0 * sin;
         float m11 = matrix.M11 * cos - matrix.M12 * sin;
