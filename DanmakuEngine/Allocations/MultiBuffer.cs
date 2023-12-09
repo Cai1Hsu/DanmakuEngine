@@ -7,7 +7,7 @@ namespace DanmakuEngine.Allocations;
 public abstract partial class MultiBuffer<T>
 {
     // This should never happen if we write correct code.
-    const string exception = "You must implement bufferCount and buffers in your own class";
+    private const string exception = "You must implement bufferCount and buffers in your own class";
 
     protected virtual int bufferCount
         => throw new NotImplementedException(exception);
