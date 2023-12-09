@@ -1,7 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
 
-using DanmakuEngine.Graphics.Primitives;
 using Silk.NET.Maths;
+using DanmakuEngine.Graphics.Primitives;
+
 using RectangleF = DanmakuEngine.Graphics.Primitives.RectangleF;
 
 namespace DanmakuEngine.Utils;

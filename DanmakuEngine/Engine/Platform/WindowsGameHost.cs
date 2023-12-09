@@ -5,10 +5,10 @@ namespace DanmakuEngine.Engine.Platform;
 public class WindowsGameHost : DesktopGameHost
 {
     [DllImport("kernel32.dll")]
-    private static extern bool AllocConsole();
+    static extern bool AllocConsole();
 
     [DllImport("kernel32.dll")]
-    private static extern IntPtr GetConsoleWindow();
+    static extern IntPtr GetConsoleWindow();
 
     public static bool HasConsole()
     {

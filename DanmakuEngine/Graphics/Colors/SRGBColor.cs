@@ -1,7 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
 
-using DanmakuEngine.Extensions;
 using OpenTK.Mathematics;
+using DanmakuEngine.Extensions;
 
 namespace DanmakuEngine.Graphics.Colors;
 
