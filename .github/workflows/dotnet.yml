@@ -103,23 +103,23 @@ jobs:
       id: git-check
       run: |
         if [ -n "$(git status --porcelain)" ]; then
-          echo "::set-output name=changed::true"
+          echo "changed=true" >> $GITHUB_ENV
         fi
-    
+
     - name: Setup Git
-      if: steps.git-check.outputs.changed == 'true'
+      if: env.changed == 'true'
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
     - name: Commit changes
-      if: steps.git-check.outputs.changed == 'true'
+      if: env.changed == 'true'
       run: |
         git add .
         git commit -m "CI format code"
 
     - name: Push changes
-      if: steps.git-check.outputs.changed == 'true'
+      if: env.changed == 'true'
       run: |
         ref=${{ github.ref }}
         branch="${ref#refs/heads/}"
