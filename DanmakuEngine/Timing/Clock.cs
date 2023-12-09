@@ -15,7 +15,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         get
         {
-            if (_theworld)
+            if (_state is ClockState.TheWorld)
             {
                 if (!isTheWorldFinished())
                     return 0;
@@ -31,16 +31,14 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     private double _accomulatedTime = 0;
 
-    private bool _isPaused = true;
-
     public bool IsPaused
     {
         get
         {
-            if (_theworld && isTheWorldFinished())
+            if (isTheWorldFinished())
                 finishTheWorld();
 
-            return _isPaused;
+            return _state is ClockState.Paused or ClockState.TheWorld;
         }
     }
 
@@ -54,7 +52,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         get
         {
-            if (_theworld && isTheWorldFinished())
+            if (isTheWorldFinished())
                 finishTheWorld();
 
             return IsPaused ? 0 : Time.UpdateDelta * _playback;
@@ -70,7 +68,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         get
         {
-            if (_theworld && isTheWorldFinished())
+            if (isTheWorldFinished())
                 finishTheWorld();
 
             return IsPaused ? 0 : Time.RenderDelta * _playback;
@@ -91,9 +89,9 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         _startTime = Time.CurrentTime;
 
-        _theworld = false;
-
         _accomulatedTime = 0;
+
+        _state = ClockState.Paused;
     }
 
     /// <summary>
@@ -105,26 +103,21 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         _accomulatedTime = this.CurrentTime;
 
-        _isPaused = true;
-
-        _theworld = false;
+        _state = ClockState.Paused;
     }
 
     public void Start()
     {
         Reset();
 
-        _isPaused = false;
+        _state = ClockState.Running;
     }
 
     public void Resume()
     {
         _startTime = Time.CurrentTime;
 
-        _isPaused = false;
-
-        // reset theworld
-        _theworld = false;
+        _state = ClockState.Running;
     }
 
     public void Stop()
@@ -214,7 +207,6 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     private double _theworldStartTime = 0;
     private double _theworldTime = 0;
-    private bool _theworld = false;
 
     /// <summary>
     /// Pause the clock for a specific time.
@@ -232,15 +224,13 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
         Pause();
 
-        _theworld = true;
+        _state = ClockState.TheWorld;
 
         return true;
     }
 
     private void finishTheWorld()
     {
-        _theworld = false;
-
         Resume();
 
         _startTime = Time.CurrentTime;
@@ -251,10 +241,19 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     private bool isTheWorldFinished()
     {
-        if (!_theworld)
+        if (_state is not ClockState.TheWorld)
             return false;
 
         return Time.CurrentTime - _theworldStartTime >= _theworldTime;
     }
     #endregion
+
+    private ClockState _state = ClockState.Paused;
+
+    private enum ClockState
+    {
+        Running,
+        Paused,
+        TheWorld
+    }
 }
