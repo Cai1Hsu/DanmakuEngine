@@ -7,7 +7,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// Represents the current time of the clock in seconds. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime * Playback);
+    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime);
 
     private double realElapsedTime => Time.CurrentTime - _startTime;
 
@@ -23,7 +23,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
                 finishTheWorld();
             }
 
-            return realElapsedTime;
+            return realElapsedTime * Playback;
         }
     }
 
