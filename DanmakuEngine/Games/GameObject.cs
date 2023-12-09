@@ -135,20 +135,3 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     #endregion
 }
-
-public enum LoadState
-{
-    /// <summary>
-    /// The drawable is not loaded and has not been initialized
-    /// </summary>
-    NotLoaded,
-    /// <summary>
-    /// The drawable is loaded, but has not been initialized in the Update loop
-    /// </summary>
-    Ready,
-    /// <summary>
-    /// The drawable is loaded and has been initialized in the Update loop
-    /// which means it is ready to be drawn(or has been drawn)
-    /// </summary>
-    Complete
-}
