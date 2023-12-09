@@ -12,9 +12,6 @@ jobs:
       IS_CI_ENVIRONMENT: true
 
     runs-on: ${{ matrix.os }}
-    if: &job_if >-
-      (github.event_name == 'push' && github.repository == github.event.repository.full_name) ||
-      (github.event_name == 'pull_request' && github.repository != github.event.pull_request.head.repo.full_name)
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -37,7 +34,6 @@ jobs:
 
   inspect-code:
     runs-on: ubuntu-latest
-    if: *job_if
 
     steps:
     - uses: actions/checkout@v3
@@ -78,7 +74,7 @@ jobs:
 
   auto-format:
     runs-on: ubuntu-latest
-    if: *job_if
+
 
     steps:
     - uses: actions/checkout@v3
