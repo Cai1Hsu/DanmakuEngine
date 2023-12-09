@@ -1,5 +1,5 @@
-using DanmakuEngine.Engine;
 using DanmakuEngine.Input.Handlers;
+using DanmakuEngine.Engine;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Input;
