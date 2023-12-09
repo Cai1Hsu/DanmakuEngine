@@ -1,5 +1,5 @@
-﻿using DanmakuEngine.Logging;
-using DanmakuEngine.Games.Screens.MainMenu;
+﻿using DanmakuEngine.Games.Screens.MainMenu;
+using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
 
 namespace DanmakuEngine.Games.Screens.Welcome;
