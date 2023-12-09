@@ -90,7 +90,7 @@ public class Bindable<T>
 
     public void BindTo(Bindable<T> them)
     {
-        if (them is not Bindable<T> tBindable)
+        if (them is not Bindable<T>)
             throw new InvalidOperationException($"Can NOT bind to a bindable with different type, this: {this.GetType()}, them: {them.GetType()}");
 
         if (!Enabled || !them.Enabled)

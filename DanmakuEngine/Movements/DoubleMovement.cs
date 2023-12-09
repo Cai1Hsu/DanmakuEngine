@@ -48,10 +48,7 @@ public class DoubleMovement
     /// </summary>
     public Action? OnDone = null!;
 
-    public double Value
-    {
-        get => value;
-    }
+    public double Value => value;
 
     public double Speed
     {
