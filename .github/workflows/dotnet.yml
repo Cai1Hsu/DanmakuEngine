@@ -1,9 +1,10 @@
-# This workflow will build a .NET project
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
-
-name: .NET CI
+name: Continuous Integration
 
 on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -66,7 +67,53 @@ jobs:
         exit $exit_code
 
     - name: InspectCode
-      run: jb inspectcode $(pwd)/Danmaku!.sln --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
+      run: dotnet jb inspectcode $(pwd)/Danmaku!.sln --no-build --output="inspectcodereport.xml" --caches-home="inspectcode" --verbosity=WARN
 
     - name: NVika
-      run: nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
+      run: dotnet nvika parsereport "${{github.workspace}}/inspectcodereport.xml" --treatwarningsaserrors
+
+  auto-format:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+  
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Restore Tools
+      run: |
+        dotnet tool restore
+        dotnet tool install --global JetBrains.ReSharper.GlobalTools
+
+    - name: Auto Format
+      run: dotnet format --check --verbosity diagnostic
+
+    - name: Check for changes
+      id: git-check
+      run: |
+        if [ -n "$(git status --porcelain)" ]; then
+          echo "::set-output name=changed::true"
+        fi
+    
+    - name: Setup Git
+      if: steps.git-check.outputs.changed == 'true'
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "noreply@github.com"
+
+    - name: Commit changes
+      if: steps.git-check.outputs.changed == 'true'
+      run: |
+        git add .
+        git commit -m "format code"
+
+    - name: Push changes
+      if: steps.git-check.outputs.changed == 'true'
+      run: git push
