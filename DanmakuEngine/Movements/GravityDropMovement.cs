@@ -9,12 +9,12 @@ public class GravityDropMovement : LinearAccelerateMovement
     /// </summary>
     private const double GRAVITY = 9.81;
 
-    public GravityDropMovement(Clock clock)
+    public GravityDropMovement(IClock clock)
         : base(GRAVITY, clock)
     {
     }
 
-    public GravityDropMovement(double initialSpeed, Clock clock)
+    public GravityDropMovement(double initialSpeed, IClock clock)
         : base(GRAVITY, initialSpeed, clock)
     {
     }
