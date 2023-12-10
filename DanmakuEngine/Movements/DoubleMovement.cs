@@ -5,7 +5,7 @@ namespace DanmakuEngine.Movement;
 /// <summary>
 /// Represents a movement that continues increasing its value until it reaches a certain point
 /// </summary>
-public class DoubleMovement
+public class DoubleMovement : IDisposable
 {
     /// <summary>
     /// the actual value
@@ -121,5 +121,14 @@ public class DoubleMovement
     public DoubleMovement(IClock clock)
     {
         this.Clock = clock;
+    }
+
+    public void Dispose()
+    {
+        Condition = null!;
+        OnDone = null!;
+        UpdateValue = null!;
+
+        GC.SuppressFinalize(this);
     }
 }
