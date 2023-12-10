@@ -41,7 +41,7 @@ public class DoubleMovement : IDisposable
     /// <summary>
     /// The movement stops when the condition returns false
     /// </summary>
-    public Func<bool> Condition = () => true;
+    public Func<DoubleMovement, bool> Condition = (_) => true;
 
     /// <summary>
     /// Called when the movement is done
@@ -56,7 +56,9 @@ public class DoubleMovement : IDisposable
         set => speed = value;
     }
 
-    public bool Done => done;
+    private bool disposed = false;
+
+    public bool Done => done || disposed;
 
     public bool Playing => playing && !done && !Clock.IsPaused;
 
@@ -94,7 +96,7 @@ public class DoubleMovement : IDisposable
 
         UpdateValue?.Invoke();
 
-        if (done |= !Condition())
+        if (done |= !Condition(this))
             OnDone?.Invoke();
     }
 
@@ -121,6 +123,8 @@ public class DoubleMovement : IDisposable
     public DoubleMovement(IClock clock)
     {
         this.Clock = clock;
+
+        OnDone += Dispose;
     }
 
     public void Dispose()
@@ -128,6 +132,8 @@ public class DoubleMovement : IDisposable
         Condition = null!;
         OnDone = null!;
         UpdateValue = null!;
+
+        disposed = true;
 
         GC.SuppressFinalize(this);
     }
