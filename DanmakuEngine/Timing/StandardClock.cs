@@ -7,4 +7,6 @@ public class StandardClock : IClock
     public double RenderDelta => Time.RenderDelta;
 
     public double CurrentTime => Time.CurrentTime;
+
+    public bool IsPaused => false;
 }
