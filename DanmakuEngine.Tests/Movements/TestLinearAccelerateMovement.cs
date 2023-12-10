@@ -40,7 +40,7 @@ public class TestLinearAccelerateMovement
 
         var movement = new LinearAccelerateMovement(acceleration, clock)
         {
-            Condition = () => clock.CurrentTime < time,
+            Condition = _ => clock.CurrentTime < time,
         };
 
         host.OnLoad += h =>
@@ -80,7 +80,7 @@ public class TestLinearAccelerateMovement
 
         var movement = new LinearAccelerateMovement(acceleration, clock)
         {
-            Condition = () => clock.CurrentTime < time,
+            Condition = _ => clock.CurrentTime < time,
             OnDone = () => host.RequestClose(),
         };
 
