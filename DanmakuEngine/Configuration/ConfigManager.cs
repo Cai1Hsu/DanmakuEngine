@@ -101,9 +101,8 @@ public partial class ConfigManager
 #if DEBUG
             true;
 #else
-            return false;
+            false;
 #endif
-
 
     private static bool? _hasConsole = null;
     public static bool HasConsole
