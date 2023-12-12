@@ -158,7 +158,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
         // accomulate time before _playback was changed.
         // it changes CurrentTime calculation
-        _accomulatedTime += this.CurrentTime;
+        _accomulatedTime = this.CurrentTime;
 
         _playback = playback;
 
@@ -191,7 +191,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         {
             // let's try accomulate time
             // and see if it's enough to step out
-            _accomulatedTime = Time.CurrentTime;
+            _accomulatedTime = this.CurrentTime;
             _startTime = Time.CurrentTime;
 
             if (_accomulatedTime < seconds)
@@ -236,7 +236,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         _startTime = Time.CurrentTime;
 
         // accomulate the extra time
-        _accomulatedTime += (Time.CurrentTime - _theworldStartTime) - _theworldTime;
+        _accomulatedTime += ((Time.CurrentTime - _theworldStartTime) - _theworldTime) * Playback;
     }
 
     private bool isTheWorldFinished()
