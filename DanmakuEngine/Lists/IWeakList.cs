@@ -58,7 +58,7 @@ public interface IWeakList<T>
     /// Clears all items from this list.
     /// </summary>
     void Clear();
-    
+
     /// <summary>
     /// The number of items in this list.
     /// </summary>

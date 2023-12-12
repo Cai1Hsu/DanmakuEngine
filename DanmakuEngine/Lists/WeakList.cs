@@ -4,7 +4,7 @@ using System.Collections;
 
 namespace DanmakuEngine.Lists;
 
-public class WeakList<T> : IWeakList<T> , IEnumerable<T>
+public class WeakList<T> : IWeakList<T>, IEnumerable<T>
     where T : class
 {
     /// <summary>
