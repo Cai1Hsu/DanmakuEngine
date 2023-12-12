@@ -1,3 +1,4 @@
+using DanmakuEngine.Bindables;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Movement;
@@ -8,23 +9,10 @@ namespace DanmakuEngine.Movement;
 public class DoubleMovement : IDisposable
 {
     /// <summary>
-    /// the actual value
-    /// </summary>
-    /// <remarks>
-    /// TOOD: We should implement this with <see cref="Bindable{double}"/>.
-    /// </remarks>
-    protected double value = 0;
-
-    /// <summary>
     /// Called after value is updated
     /// use this to update some property
     /// </summary>
     public Action? UpdateValue = null!;
-
-    /// <summary>
-    /// the value to increase every second
-    /// </summary>
-    protected double speed = 1;
 
     /// <summary>
     /// do not use this directly, use <see cref="Playing"/>
@@ -48,13 +36,9 @@ public class DoubleMovement : IDisposable
     /// </summary>
     public Action? OnDone = null!;
 
-    public double Value => value;
+    public readonly Bindable<double> Value = new(0);
 
-    public double Speed
-    {
-        get => speed;
-        set => speed = value;
-    }
+    public readonly Bindable<double> Speed = new(0);
 
     private bool disposed = false;
 
@@ -118,7 +102,7 @@ public class DoubleMovement : IDisposable
     /// You can override this method to update some property before or after the value is actually updated
     /// </summary>
     public virtual void Update()
-        => value += speed * Clock.UpdateDelta;
+        => Value.Value += Speed.Value * Clock.UpdateDelta;
 
     public DoubleMovement(IClock clock)
     {
@@ -126,6 +110,9 @@ public class DoubleMovement : IDisposable
 
         OnDone += Dispose;
     }
+
+    public void BindTo(Bindable<double> bindable)
+        => Value.BindTo(bindable);
 
     public void Dispose()
     {

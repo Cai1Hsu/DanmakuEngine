@@ -4,7 +4,7 @@ namespace DanmakuEngine.Movement;
 
 public class LinearAccelerateMovement : DoubleMovement
 {
-    private readonly double acceleration;
+    public readonly double acceleration;
 
     public override void Update()
     {
@@ -19,14 +19,14 @@ public class LinearAccelerateMovement : DoubleMovement
         //     + 0.5 * acceleration * Math.Pow(Clock.UpdateDelta, 2);
 
         // most accurate version
-        value = 0.5 * acceleration * (Clock.CurrentTime * Clock.CurrentTime);
+        Value.Value = 0.5 * acceleration * (Clock.CurrentTime * Clock.CurrentTime);
     }
 
     public LinearAccelerateMovement
         (double acceleration, double initialSpeed, IClock clock)
         : base(clock)
     {
-        this.speed = initialSpeed;
+        this.Speed.Value = initialSpeed;
         this.acceleration = acceleration;
     }
 

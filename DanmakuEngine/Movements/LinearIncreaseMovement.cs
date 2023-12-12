@@ -7,6 +7,6 @@ public class LinearIncreaseMovement : DoubleMovement
     public LinearIncreaseMovement(double speed, IClock clock)
         : base(clock)
     {
-        this.Speed = speed;
+        this.Speed.Value = speed;
     }
 }
