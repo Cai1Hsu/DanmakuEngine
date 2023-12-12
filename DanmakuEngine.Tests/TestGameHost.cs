@@ -37,10 +37,12 @@ public class TestGameHost : HeadlessGameHost
         }
     }
 
-    public void AddTestPoint(TestPoint point)
+    public TestGameHost AddTestPoint(TestPoint point)
     {
         point.SetHost(this);
 
         _testPoints.AddLast(point);
+
+        return this;
     }
 }
