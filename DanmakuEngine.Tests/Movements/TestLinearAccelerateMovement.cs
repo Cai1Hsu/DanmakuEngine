@@ -55,7 +55,7 @@ public class TestLinearAccelerateMovement
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
-            Assert.That(movement.Value, Is.EqualTo(expected).Within(1E-6));
+            Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         };
 
         host.Run(game, defaultProvider);
@@ -134,7 +134,7 @@ public class TestLinearAccelerateMovement
             // x = 0.5 * a * t^2
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
-            Assert.That(movement.Value, Is.EqualTo(expected).Within(1E-6));
+            Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         };
 
         int count_frame = 0;
@@ -167,7 +167,7 @@ public class TestLinearAccelerateMovement
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
-            Assert.That(movement.Value, Is.EqualTo(expected).Within(1E-6));
+            Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         } while (count_frame++ < 1E6);
     }
 
