@@ -34,13 +34,13 @@ public class TestBindables
         Bindable<int> bindable1 = new(value);
         Bindable<int> bindable2 = new(value);
 
-        Assert.That(bindable1.ValueEquals(bindable2), Is.True);
-        Assert.That(bindable1.ValueEquals(value), Is.True);
+        Assert.That(bindable1.Value, Is.EqualTo(bindable2.Value));
+        Assert.That(bindable1.Value, Is.EqualTo(value));
 
         bindable2.Value++;
 
-        Assert.That(bindable1.ValueEquals(bindable2), Is.False);
-        Assert.That(bindable1.ValueEquals(bindable2.Value), Is.False);
+        Assert.That(bindable1.Value, Is.Not.EqualTo(bindable2.Value));
+        Assert.That(bindable2.Value, Is.Not.EqualTo(value));
     }
 
     [Test]
@@ -50,7 +50,7 @@ public class TestBindables
 
         Assert.That(b.Enabled, Is.True);
 
-        b.Enabled = false;
+        b.Disabled = true;
 
         Assert.That(b.Enabled, Is.False);
 
@@ -73,7 +73,7 @@ public class TestBindables
         bool flag = false;
         Bindable<int> b = new(1);
 
-        b.AddBindValueChangedEvent(_ => flag = true);
+        b.BindValueChanged(_ => flag = true);
 
         Assert.That(flag, Is.False);
 
@@ -88,7 +88,7 @@ public class TestBindables
         bool flag = false;
         Bindable<int> b = new(1);
 
-        b.AddBindValueChangedEvent(_ => flag = true, true);
+        b.BindValueChanged(_ => flag = true, true);
 
         Assert.That(flag, Is.True);
     }
@@ -99,7 +99,7 @@ public class TestBindables
         // Test when new value is equal to old value, the event wont be triggered
         Bindable<int> b = new(1);
 
-        b.AddBindValueChangedEvent(e =>
+        b.BindValueChanged(e =>
         {
             Assert.That(e.NewValue, Is.Not.EqualTo(e.OldValue));
         });
@@ -113,20 +113,22 @@ public class TestBindables
     public void TestRemoveValeChangedEvent()
     {
         bool flag = false;
+
         Bindable<int> b = new(1);
-        Action<BindValueChangedEvent<int>> action4 = _ =>
+
+        Action<ValueChangedEvent<int>> action4 = _ =>
         {
             flag = true;
         };
 
-        b.AddBindValueChangedEvent(action4);
+        b.BindValueChanged(action4);
 
         b.Value = 2;
 
         Assert.That(flag, Is.True);
 
         flag = false;
-        b.RemoveBindValueChangedEvent(action4);
+        b.RemoveValueChangedEvent(action4);
 
         b.Value = 1;
 
@@ -139,16 +141,16 @@ public class TestBindables
         bool flag = false;
         Bindable<int> b = new(1);
 
-        b.AddEnabledChangedEvent(_ => flag = true);
+        b.BindDisabledChanged(_ => flag = true);
 
         Assert.That(flag, Is.False);
 
-        b.Enabled = false;
+        b.Disabled = true;
 
         Assert.That(flag, Is.True);
 
         flag = false;
-        b.Enabled = false;
+        b.Disabled = true;
 
         Assert.That(flag, Is.False);
     }
@@ -159,7 +161,7 @@ public class TestBindables
         bool flag = false;
         Bindable<int> b = new(1);
 
-        b.AddEnabledChangedEvent(_ => flag = true, true);
+        b.BindDisabledChanged(_ => flag = true, true);
 
         Assert.That(flag, Is.True);
     }
@@ -175,16 +177,16 @@ public class TestBindables
             flag = true;
         };
 
-        b.AddEnabledChangedEvent(action);
+        b.BindDisabledChanged(action);
 
-        b.Enabled = false;
+        b.Disabled = true;
 
         Assert.That(flag, Is.True);
 
         flag = false;
-        b.RemoveEnabledChangedEvent(action);
+        b.RemoveDisabledChangedEvent(action);
 
-        b.Enabled = true;
+        b.Disabled = false;
 
         Assert.That(flag, Is.False);
     }
@@ -209,62 +211,6 @@ public class TestBindables
         Assert.That(b1.IsBoundWith(new Bindable<int>(3)), Is.False);
     }
 
-    /// <summary>
-    /// Currently we do not support multiple bindings
-    /// </summary>
-    [Test]
-    public void TestMultipleBinds()
-    {
-        Bindable<int> b1 = new(1);
-        Bindable<int> b2 = new(2);
-
-        b1.BindTo(b2);
-
-        try
-        {
-            b1.BindTo(new Bindable<int>(3));
-
-            // Multiple binds is not allowed
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-
-        try
-        {
-            b2.BindTo(new Bindable<int>(3));
-
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-    }
-
-    [Test]
-    public void TestFailOnBindToDisabledBindable()
-    {
-        Bindable<int> b1 = new(1);
-        Bindable<int> b2 = new(1)
-        {
-            Enabled = false
-        };
-
-        try
-        {
-            b1.BindTo(b2);
-
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-    }
-
     [Test]
     public void TestValueSyncOnBinding()
     {
@@ -273,8 +219,8 @@ public class TestBindables
 
         b1.BindTo(b2);
 
-        Assert.That(b2.Value, Is.EqualTo(1));
-        Assert.That(b1.Value, Is.EqualTo(b2.Value));
+        Assert.That(b2.Value, Is.EqualTo(b1.Value));
+        Assert.That(b1.Value, Is.EqualTo(2));
     }
 
     [Test]
@@ -285,7 +231,7 @@ public class TestBindables
 
         b1.BindTo(b2);
 
-        b1.Enabled = false;
+        b1.Disabled = true;
 
         Assert.That(b2.Enabled, Is.False);
     }
@@ -310,7 +256,7 @@ public class TestBindables
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.Unbind(b2);
+        b1.UnbindFrom(b2);
 
         Assert.That(b1.IsBound(), Is.False);
         Assert.That(b2.IsBound(), Is.False);
@@ -320,68 +266,13 @@ public class TestBindables
     }
 
     [Test]
-    public void TestUnbindDifferent()
-    {
-        Bindable<int> b1 = new(1);
-        Bindable<int> b2 = new(1);
-
-        b1.BindTo(b2);
-
-        try
-        {
-            b1.Unbind(new Bindable<int>(3));
-
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-
-        Assert.Pass();
-    }
-
-    [Test]
-    public void TestUnbindBeforeBind()
-    {
-        Bindable<int> b1 = new(1);
-        Bindable<int> b2 = new(1);
-
-        b1.BindTo(b2);
-
-        try
-        {
-            b1.Unbind(new Bindable<int>(3));
-
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-
-        try
-        {
-            b1.Unbind();
-
-            Assert.Fail();
-        }
-        catch (InvalidOperationException)
-        {
-            Assert.Pass();
-        }
-
-        Assert.Pass();
-    }
-
-    [Test]
     public void TestUnbindValueSync()
     {
         Bindable<int> b1 = new(1);
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.Unbind(b2);
+        b1.UnbindFrom(b2);
 
         b1.Value = 2;
 
@@ -395,9 +286,9 @@ public class TestBindables
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.Unbind(b2);
+        b1.UnbindFrom(b2);
 
-        b1.Enabled = false;
+        b1.Disabled = true;
 
         Assert.That(b2.Enabled, Is.True);
     }
@@ -409,7 +300,7 @@ public class TestBindables
         Bindable<int> b2 = new(1);
 
         b1.BindTo(b2);
-        b1.Unbind();
+        b1.UnbindAll();
 
         Assert.That(b1.IsBound(), Is.False);
         Assert.That(b2.IsBound(), Is.False);
