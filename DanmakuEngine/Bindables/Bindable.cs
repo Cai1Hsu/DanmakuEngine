@@ -1,3 +1,5 @@
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+
 using System.Globalization;
 using DanmakuEngine.Lists;
 
