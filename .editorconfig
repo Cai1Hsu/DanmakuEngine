@@ -13,7 +13,7 @@ trim_trailing_whitespace = true
 generated_code = true
 
 [*.cs]
-end_of_line = crlf
+end_of_line = lf
 insert_final_newline = true
 indent_style = space
 indent_size = 4
