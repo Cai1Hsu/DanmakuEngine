@@ -35,7 +35,7 @@ public partial class LoadingScreen : Screen
         Scheduler.ScheduleTask(() =>
         {
             // if finished, switch to main screen
-            ScreenStack.Switch(new StageScreen.Stage1());
+            ScreenStack.Switch(new MainScreen());
         }, () =>
         {
             // check that if our loading is finished
