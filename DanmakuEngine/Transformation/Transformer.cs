@@ -1,8 +1,7 @@
-using System.Diagnostics;
-using DanmakuEngine.Logging;
-using DanmakuEngine.Transfomation.Functions;
+using DanmakuEngine.Bindables;
+using DanmakuEngine.Transformation.Functions;
 
-namespace DanmakuEngine.Transfomation;
+namespace DanmakuEngine.Transformation;
 
 public class Transformer : ITransformable
 {
@@ -18,6 +17,8 @@ public class Transformer : ITransformable
     public bool IsDone => CurrentTime >= Duration;
 
     public Action<double> OnUpdate = null!;
+
+    private Bindable<double> _binding = new();
 
     public Action OnDone = null!;
 
@@ -35,7 +36,15 @@ public class Transformer : ITransformable
 
         OnDone += () => OnUpdate?.Invoke(Function!.Transform(1));
 
+        if (onUpdate is null)
+            return;
+
         OnUpdate += onUpdate;
+    }
+
+    public Transformer(double duration, ITransformFunction function)
+        : this(duration, function, null!)
+    {
     }
 
     public void Update(double deltaTime)
@@ -56,12 +65,21 @@ public class Transformer : ITransformable
 
         var value = Function.Transform(time);
 
+        _binding.Value = value;
+
         OnUpdate?.Invoke(value);
     }
 
     public void Reset()
     {
         CurrentTime = 0;
+    }
+
+    public Transformer BindTo(Bindable<double> bindable)
+    {
+        _binding.BindTo(bindable);
+
+        return this;
     }
 
     public void Dispose()

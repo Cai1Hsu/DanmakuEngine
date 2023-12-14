@@ -1,4 +1,4 @@
-namespace DanmakuEngine.Transfomation;
+namespace DanmakuEngine.Transformation;
 
 public interface ITransformable
 {

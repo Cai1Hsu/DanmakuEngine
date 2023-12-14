@@ -5,8 +5,8 @@ using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
-using DanmakuEngine.Transfomation;
-using DanmakuEngine.Transfomation.Functions;
+using DanmakuEngine.Transformation;
+using DanmakuEngine.Transformation.Functions;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
