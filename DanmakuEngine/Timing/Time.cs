@@ -34,6 +34,8 @@ public class Time
     /// </summary>
     public static double UpdateDelta { get; protected set; } = 1 / 60;
 
+    public static StandardClock Clock = new();
+
     public void ResetTime(double refresh_rate)
     {
         UpdateDelta = 1 / refresh_rate;
