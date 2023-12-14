@@ -1,9 +1,8 @@
-using DanmakuEngine.Transformation;
+using DanmakuEngine.Arguments;
+using DanmakuEngine.Bindables;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Tests.Games;
-using DanmakuEngine.Bindables;
-using DanmakuEngine.Arguments;
-
+using DanmakuEngine.Transformation;
 using NUnit.Framework;
 
 namespace DanmakuEngine.Tests.Transfomrmation;
