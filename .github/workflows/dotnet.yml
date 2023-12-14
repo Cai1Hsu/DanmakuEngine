@@ -16,8 +16,8 @@ jobs:
       IS_CI_ENVIRONMENT: true
 
     runs-on: ${{ matrix.os }}
-    fail-fast: false
     strategy:
+      fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
 
@@ -55,7 +55,7 @@ jobs:
     # - name: Restore Tools
     #   run: |
     #     dotnet tool restore
-    #     dotnet tool install --global nvika 
+    #     dotnet tool install --global nvika
     #     dotnet tool install --global JetBrains.ReSharper.GlobalTools
 
     # - name: CodeFileSanity
@@ -84,7 +84,7 @@ jobs:
     - uses: actions/checkout@v3
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-  
+
     - name: Setup .NET
       uses: actions/setup-dotnet@v3
       with:
