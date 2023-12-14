@@ -1,4 +1,4 @@
-namespace DanmakuEngine.Transfomation.Functions;
+namespace DanmakuEngine.Transformation.Functions;
 
 public class CubeicIn : ITransformFunction
 {
