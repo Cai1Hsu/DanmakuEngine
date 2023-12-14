@@ -18,6 +18,8 @@ public class Transformer : ITransformable
 
     public Action<double> OnUpdate = null!;
 
+    public double Value => _binding.Value;
+
     private Bindable<double> _binding = new();
 
     public Action OnDone = null!;
