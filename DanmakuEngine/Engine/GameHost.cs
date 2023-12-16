@@ -147,7 +147,7 @@ public partial class GameHost : Time, IDisposable
         if (alwaysOnTop)
             flags |= WindowFlags.AlwaysOnTop;
 
-        // TODO: Add argument for this
+        // TODO: Add an argument for this
         // This restricts the mouse to the window
         // flags |= WindowFlags.InputGrabbed;
 
@@ -242,7 +242,7 @@ public unsafe partial class GameHost
 
     public virtual unsafe void SetUpWindowAndRenderer()
     {
-        // TODO: load form comfig manager
+        // TODO: load form config manager
         var size = new Vector2D<int>(640, 480);
 
         var windowFlag = GenerateWindowFlags(FullScreen: ConfigManager.FullScreen,
@@ -415,14 +415,9 @@ public unsafe partial class GameHost
         _sdl.GLSwapWindow(window);
     }
 
-    protected void UpdateTime(double delta)
+    protected override void UpdateTime()
     {
-        CurrentTime += delta;
-
-        count_time += delta;
-        count_frame++;
-
-        fps_debug_time += delta;
+        base.UpdateTime();
 
         if (fps_debug_time > UpdateFrequency)
         {
@@ -431,21 +426,10 @@ public unsafe partial class GameHost
                 // Prevent IO blocking
                 Task.Run(() =>
                 {
-                    Logger.Write($"FPS: {ActualFPS:F2}\r", true);
+                    Logger.Write($"FPS: {AverageFramerate:F2}\r", true);
                 }).ContinueWith(_ => fps_debug_time = 0, TaskContinuationOptions.ExecuteSynchronously);
             }
         }
-
-        if (count_time < 1)
-            return;
-
-        // fpsText.Mutate(x => x.Clear(Color.Transparent));
-        // fpsText.Mutate(x => x.DrawText($"{ActualFPS:F2}fps", font, Color.White, new PointF(0, 0)));
-
-        ActualFPS = count_frame / count_time;
-
-        count_frame = 0;
-        count_time = 0;
     }
 
     public void PerformExit()
