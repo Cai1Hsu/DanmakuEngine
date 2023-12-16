@@ -44,7 +44,7 @@ public unsafe partial class GameHost
             UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
             RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
 
-            UpdateTime(RenderDelta);
+            UpdateTime();
 
             DoUpdate();
 
