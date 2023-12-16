@@ -6,11 +6,24 @@ public class RingPool<T>
 
     private int _index;
 
+    private int filled_count = 0;
+
+    public int FilledCount => filled_count;
+
     private readonly T[] _pool;
 
     public int Size => _size;
 
-    public int Index => _index;
+    public int Index
+    {
+        get => _index;
+        private set
+        {
+            _index = value % _size;
+
+            filled_count = Math.Max(filled_count, _index);
+        }
+    }
 
     public RingPool(int size)
     {
@@ -32,15 +45,18 @@ public class RingPool<T>
         get
         {
             var current = _pool[_index];
-            _index = (_index + 1) % _size;
+            Index++;
             return current;
         }
         set
         {
             _pool[_index] = value;
-            _index = (_index + 1) % _size;
+            Index++;
         }
     }
+
+    public IEnumerable<T> Get()
+        => Get(FilledCount);
 
     public IEnumerable<T> Get(int count)
     {
