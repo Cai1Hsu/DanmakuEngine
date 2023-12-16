@@ -21,7 +21,7 @@ public class RingPool<T>
         {
             _index = value % _size;
 
-            filled_count = Math.Max(filled_count, _index);
+            filled_count = Math.Max(filled_count, _index + 1);
         }
     }
 
