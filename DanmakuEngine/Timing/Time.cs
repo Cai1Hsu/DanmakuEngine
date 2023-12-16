@@ -1,3 +1,5 @@
+using DanmakuEngine.Allocations;
+
 namespace DanmakuEngine.Timing;
 
 public class Time
@@ -13,7 +15,11 @@ public class Time
     protected double count_time = 0;
     protected int count_frame = 0;
 
-    public double AverageFramerate { get; private set; }
+    public static double AverageFramerate { get; private set; }
+
+    public static double Jitter { get; private set; }
+
+    private RingPool<double> _delta_pool = new(128);
 
     protected virtual void UpdateTime()
     {
@@ -23,6 +29,11 @@ public class Time
         count_frame++;
 
         fps_debug_time += UpdateDelta;
+
+        _delta_pool.CurrentAndNext = UpdateDelta;
+
+        double avg = _delta_pool.Get().Average();
+        Jitter = Math.Sqrt(_delta_pool.Get().Average(v => Math.Pow(v - avg, 2)));
 
         if (count_time < 1)
             return;
