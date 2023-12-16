@@ -1,11 +1,10 @@
-using DanmakuEngine.Transformation;
-using DanmakuEngine.Transformation.Functions;
+using DanmakuEngine.Arguments;
+using DanmakuEngine.Bindables;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Tests.Games;
-using DanmakuEngine.Bindables;
-using DanmakuEngine.Arguments;
 using DanmakuEngine.Timing;
-
+using DanmakuEngine.Transformation;
+using DanmakuEngine.Transformation.Functions;
 using NUnit.Framework;
 
 namespace DanmakuEngine.Tests.Transfomrmation;
