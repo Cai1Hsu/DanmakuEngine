@@ -13,7 +13,7 @@ public class Time
     protected double count_time = 0;
     protected int count_frame = 0;
 
-    public double AverageFramerate { get; protected set; }
+    public double AverageFramerate { get; private set; }
 
     protected virtual void UpdateTime()
     {
