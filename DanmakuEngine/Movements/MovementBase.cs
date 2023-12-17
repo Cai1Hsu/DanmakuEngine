@@ -68,9 +68,18 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
         PostUpdate?.Invoke(this);
     }
 
+    private Action<Bindable<T>>? onBinded;
+
+    public void BindingChanged(Action<Bindable<T>> action)
+    {
+        onBinded += action;
+    }
+
     public MovementBase<T> BindTo(Bindable<T> bindable)
     {
-        bindable.BindTo(Value);
+        Value.BindTo(bindable);
+
+        onBinded?.Invoke(bindable);
 
         return this;
     }
@@ -106,6 +115,11 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
     {
         if (begin)
             BeginMove();
+
+        BindingChanged(b =>
+        {
+            startValue = b.Value;
+        });
     }
 
     protected override void Dispose(bool disposing)
