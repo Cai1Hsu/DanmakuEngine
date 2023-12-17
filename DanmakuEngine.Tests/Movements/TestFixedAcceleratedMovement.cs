@@ -158,9 +158,11 @@ public class TestFixedAcceleratedMovement
 
         int count_frame = 0;
 
+        var rng = new Random();
+
         do
         {
-            var random_delta = new Random().NextDouble() * 100;
+            var random_delta = rng.NextDouble() * 100;
             clock.SetUpdateDelta(random_delta);
             clock.AccomulateTime();
 
