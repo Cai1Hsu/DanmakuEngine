@@ -70,7 +70,7 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
 
     public MovementBase<T> BindTo(Bindable<T> bindable)
     {
-        Value.BindTo(bindable);
+        bindable.BindTo(Value);
 
         return this;
     }
