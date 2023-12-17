@@ -2,14 +2,14 @@ using System.Diagnostics;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Logging;
-using DanmakuEngine.Movement;
+using DanmakuEngine.Movements;
 using DanmakuEngine.Tests.Games;
 using DanmakuEngine.Timing;
 using NUnit.Framework;
 
 namespace DanmakuEngine.Tests.Movements;
 
-public class TestLinearAccelerateMovement
+public class TestFixedAcceleratedMovement
 {
     private ArgumentProvider defaultProvider;
 
@@ -38,7 +38,7 @@ public class TestLinearAccelerateMovement
 
         var clock = new Clock();
 
-        var movement = new LinearAccelerateMovement(acceleration, clock)
+        var movement = new FixedAcceleratedMovementD(0, acceleration)
         {
             Condition = _ => clock.CurrentTime < time,
         };
@@ -51,7 +51,7 @@ public class TestLinearAccelerateMovement
 
         host.OnUpdate += _ =>
         {
-            movement.update();
+            movement.updateSubTree();
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
@@ -78,10 +78,10 @@ public class TestLinearAccelerateMovement
 
         var clock = new Clock();
 
-        var movement = new LinearAccelerateMovement(acceleration, clock)
+        var movement = new FixedAcceleratedMovementD(0, acceleration)
         {
             Condition = _ => clock.CurrentTime < time,
-            OnDone = () => host.RequestClose(),
+            OnDone = _ => host.RequestClose(),
         };
 
         host.OnLoad += h =>
@@ -92,7 +92,7 @@ public class TestLinearAccelerateMovement
 
         host.OnUpdate += _ =>
         {
-            movement.update();
+            movement.updateSubTree();
         };
 
         host.OnTimedout += () =>
@@ -102,7 +102,7 @@ public class TestLinearAccelerateMovement
 
         host.Run(game, defaultProvider);
 
-        Assert.That(movement.Done, Is.True);
+        Assert.That(movement.IsDone, Is.True);
     }
 
     [Test]
@@ -119,7 +119,7 @@ public class TestLinearAccelerateMovement
             IgnoreTimedout = true,
         };
 
-        var movement = new LinearAccelerateMovement(acceleration, clock);
+        var movement = new FixedAcceleratedMovementD(0, acceleration);
 
         host.OnLoad += _ =>
         {
@@ -129,7 +129,7 @@ public class TestLinearAccelerateMovement
 
         host.OnUpdate += _ =>
         {
-            movement.update();
+            movement.updateSubTree();
 
             // x = 0.5 * a * t^2
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
@@ -151,19 +151,22 @@ public class TestLinearAccelerateMovement
 
         var clock = new TestClock();
 
-        var movement = new LinearAccelerateMovement(acceleration, clock);
+        var movement = new FixedAcceleratedMovementD(0, acceleration);
 
-        movement.BeginMove();
+        movement.SetClock(clock)
+                .BeginMove();
 
         int count_frame = 0;
 
+        var rng = new Random();
+
         do
         {
-            var random_delta = new Random().NextDouble() * 100;
+            var random_delta = rng.NextDouble() * 100;
             clock.SetUpdateDelta(random_delta);
             clock.AccomulateTime();
 
-            movement.update();
+            movement.updateSubTree();
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
