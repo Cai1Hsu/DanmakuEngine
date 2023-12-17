@@ -110,12 +110,12 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
 
     protected override void Dispose(bool disposing)
     {
+        if (disposing || disposing)
+            return;
+
         base.Dispose(disposing);
 
-        if (disposing)
-        {
-            OnDone = null!;
-            PostUpdate = null!;
-        }
+        OnDone = null!;
+        PostUpdate = null!;
     }
 }
