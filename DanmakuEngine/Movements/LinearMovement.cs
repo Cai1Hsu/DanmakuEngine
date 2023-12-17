@@ -4,7 +4,7 @@ using Silk.NET.Maths;
 
 namespace DanmakuEngine.Movements;
 
-public abstract class LinearMovement<T> : AccumulatedMovement<T>, ICanGetSpeed<T>, ICanSetSpeed<T>
+public abstract class LinearMovementBase<T> : AccumulatedMovement<T>, ICanGetSpeed<T>, ICanSetSpeed<T>
     where T : IEquatable<T>
 {
     protected double currentPeriodStartTime;
@@ -21,28 +21,24 @@ public abstract class LinearMovement<T> : AccumulatedMovement<T>, ICanGetSpeed<T
 
             _speed = value;
 
-            Active.BindValueChanged(splitPeriod, true);
-
-            void splitPeriod(ValueChangedEvent<bool> e)
-            {
-                if (e.NewValue)
-                {
-                    currentPeriodStartTime = CurrentTime;
-
-                    Active.ValueChanged -= splitPeriod;
-                }
-            }
+            currentPeriodStartTime = CurrentTime;
         }
     }
 
-    public LinearMovement(T speed)
+    public LinearMovementBase(T speed)
     {
         this.Speed = speed;
+
+        Active.BindValueChanged(e =>
+        {
+            if (e.NewValue)
+                currentPeriodStartTime = CurrentTime;
+        });
     }
 }
 
 public class LinearMovementF(float speed)
-    : LinearMovement<float>(speed)
+    : LinearMovementBase<float>(speed)
 {
     protected override float AccumulatedValue()
         => Value.Value +
@@ -52,7 +48,7 @@ public class LinearMovementF(float speed)
 }
 
 public class LinearMovementD(double speed)
-    : LinearMovement<double>(speed)
+    : LinearMovementBase<double>(speed)
 {
     protected override double AccumulatedValue()
         => Value.Value +
@@ -61,7 +57,7 @@ public class LinearMovementD(double speed)
 }
 
 public class LinearMovementV2F(Vector2D<float> speed)
-    : LinearMovement<Vector2D<float>>(speed)
+    : LinearMovementBase<Vector2D<float>>(speed)
 {
     protected override Vector2D<float> AccumulatedValue()
         => Value.Value +
@@ -70,7 +66,7 @@ public class LinearMovementV2F(Vector2D<float> speed)
 }
 
 public class LinearMovementV2D(Vector2D<double> speed)
-    : LinearMovement<Vector2D<double>>(speed)
+    : LinearMovementBase<Vector2D<double>>(speed)
 {
     protected override Vector2D<double> AccumulatedValue()
         => Value.Value +
