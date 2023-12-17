@@ -12,15 +12,15 @@ public abstract class FixedAcceleratedMovementBase<T> : MovementBase<T>, ICanGet
 
     protected abstract override T CurrentValue();
 
-    public FixedAcceleratedMovementBase(T initialSpeed, T Acceleration)
+    public FixedAcceleratedMovementBase(T initialSpeed, T acceleration)
     {
-        this.Acceleration = Acceleration;
+        this.Acceleration = acceleration;
         this.InitialSpeed = initialSpeed;
     }
 }
 
-public class FixedAcceleratedMovementF(float initialSpeed, float Acceleration)
-    : FixedAcceleratedMovementBase<float>(initialSpeed, Acceleration)
+public class FixedAcceleratedMovementF(float initialSpeed, float acceleration)
+    : FixedAcceleratedMovementBase<float>(initialSpeed, acceleration)
 {
     public override float Speed => InitialSpeed +
               Acceleration * (float)ElapsedTime;
@@ -31,8 +31,8 @@ public class FixedAcceleratedMovementF(float initialSpeed, float Acceleration)
            Acceleration * (float)ElapsedTime * (float)ElapsedTime / 2;
 }
 
-public class FixedAcceleratedMovementD(double initialSpeed, double Acceleration)
-    : FixedAcceleratedMovementBase<double>(initialSpeed, Acceleration)
+public class FixedAcceleratedMovementD(double initialSpeed, double acceleration)
+    : FixedAcceleratedMovementBase<double>(initialSpeed, acceleration)
 {
     public override double Speed => InitialSpeed +
               Acceleration * ElapsedTime;
@@ -43,8 +43,8 @@ public class FixedAcceleratedMovementD(double initialSpeed, double Acceleration)
            Acceleration * ElapsedTime * ElapsedTime / 2;
 }
 
-public class FixedAcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<float> Acceleration)
-    : FixedAcceleratedMovementBase<Vector2D<float>>(initialSpeed, Acceleration)
+public class FixedAcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<float> acceleration)
+    : FixedAcceleratedMovementBase<Vector2D<float>>(initialSpeed, acceleration)
 {
     public override Vector2D<float> Speed => InitialSpeed +
               Acceleration * (float)ElapsedTime;
@@ -55,8 +55,8 @@ public class FixedAcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<
            Acceleration * (float)ElapsedTime * (float)ElapsedTime / 2;
 }
 
-public class FixedAcceleratedMovementV2D(Vector2D<double> initialSpeed, Vector2D<double> Acceleration)
-    : FixedAcceleratedMovementBase<Vector2D<double>>(initialSpeed, Acceleration)
+public class FixedAcceleratedMovementV2D(Vector2D<double> initialSpeed, Vector2D<double> acceleration)
+    : FixedAcceleratedMovementBase<Vector2D<double>>(initialSpeed, acceleration)
 {
     public override Vector2D<double> Speed => InitialSpeed +
               Acceleration * ElapsedTime;
