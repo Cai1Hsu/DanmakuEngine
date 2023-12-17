@@ -20,6 +20,8 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
 
     public Action<MovementBase<T>>? OnDone = null;
 
+    public bool IsDone { get; private set;}
+
     public Func<MovementBase<T>, bool> Condition = _ => true;
 
     protected T startValue;
@@ -53,6 +55,8 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
         if (!Active.Value)
         {
             OnDone?.Invoke(this);
+
+            IsDone = true;
 
             Dispose();
 
