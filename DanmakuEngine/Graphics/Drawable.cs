@@ -37,7 +37,11 @@ public class Drawable : GameObject, IDisposable
 
     private readonly LazyValue<Clock> lazyClock = new(() => new Clock(true));
 
-    protected Clock Clock => lazyClock.Value;
+    protected Clock Clock
+    {
+        get => lazyClock.Value;
+        set => lazyClock.AssignValue(value, true);
+    }
 
     #endregion
 
