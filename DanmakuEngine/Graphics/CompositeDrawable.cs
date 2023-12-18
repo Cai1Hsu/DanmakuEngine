@@ -1,3 +1,4 @@
+using DanmakuEngine.Games;
 using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics;
@@ -6,17 +7,32 @@ public abstract class CompositeDrawable : Drawable
 {
     public Vector2D<float> Size = new(0, 0);
 
-    protected virtual IEnumerable<Drawable> Children => children;
+    protected virtual IEnumerable<GameObject> Children => children;
 
-    protected virtual LinkedList<Drawable> children { get; set; } = null!;
+    protected virtual LinkedList<GameObject> children { get; set; } = null!;
 
     public CompositeDrawable(CompositeDrawable parent) : base(parent)
     {
-        this.children = new LinkedList<Drawable>();
+        this.children = new LinkedList<GameObject>();
     }
 
-    public void Add(Drawable child)
+    public void Add(GameObject child)
         => children.AddLast(child);
+
+    public void Remove(GameObject child)
+        => children.Remove(child);
+
+    public void Add(params GameObject[] children)
+    {
+        foreach (var child in children)
+            Add(child);
+    }
+
+    public void Remove(params GameObject[] children)
+    {
+        foreach (var child in children)
+            Remove(child);
+    }
 
     /// <summary>
     /// Updates the drawable and all of its children
