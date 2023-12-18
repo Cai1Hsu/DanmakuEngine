@@ -47,4 +47,30 @@ public static class Vector2DExtensions
 
     public static float Transform(Vector2D<float> vector, Matrix3X3<float> matrix)
         => (float)(vector.X * matrix.M11 + vector.Y * matrix.M21 + matrix.M31);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Vector2D<float> ToNormalize(this Vector2D<float> vector)
+    {
+        var lengthSquared = vector.LengthSquared;
+
+        if (lengthSquared == 0)
+            return Vector2D<float>.Zero;
+
+        var length = Scalar.Sqrt(lengthSquared);
+
+        return new Vector2D<float>(vector.X / length, vector.Y / length);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Vector2D<double> ToNormalize(this Vector2D<double> vector)
+    {
+        var lengthSquared = vector.LengthSquared;
+
+        if (lengthSquared == 0)
+            return Vector2D<double>.Zero;
+
+        var length = Scalar.Sqrt(lengthSquared);
+
+        return new Vector2D<double>(vector.X / length, vector.Y / length);
+    }
 }
