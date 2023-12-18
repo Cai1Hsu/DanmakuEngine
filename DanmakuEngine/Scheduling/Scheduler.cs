@@ -134,4 +134,15 @@ public class Scheduler : UpdateOnlyObject
             }
         }
     }
+
+    /// <summary>
+    /// Change the clock used by this scheduler
+    /// 
+    /// Please note that change the clock of a scheduler that is already in use may cause unexpected behavior
+    /// If you are really intended to change the clock when using a scheduler
+    /// please make sure the CurrentTime of the new clock is the consistent with the old one
+    /// </summary>
+    /// <param name="clock">the new clock</param>
+    public void ChangeClock(IClock clock)
+        => this.clock.AssignValue(clock, true);
 }
