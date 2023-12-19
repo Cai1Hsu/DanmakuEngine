@@ -2,46 +2,42 @@ using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Games.Screens;
+using DanmakuEngine.Input.Keybards;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public partial class TopKeyboardHandler : IInputHandler
+public partial class TopKeyboardHandler : IKeyboardHandler, IInputHandler
 {
     [Inject]
     private ScreenStack screens = null!;
 
-    public TopKeyboardHandler()
+    private IEnumerable<IKeyboardHandler?> handlers()
     {
-    }
+        // TODO: add more handlers that has higher priority
+        // for example, when we are focus on a text box, we should not handle the keyboard event
 
-    public void KeyDown(KeyboardEvent e)
-    {
-        Debug.Assert(e.Type == (uint)EventType.Keydown);
-
-        var repeat = e.Repeat != 0;
-        var keysym = e.Keysym;
-
-        screens.Peek()?.keyboardHandler?.KeyDown(keysym, repeat);
-    }
-
-    public void KeyUp(KeyboardEvent e)
-    {
-        Debug.Assert(e.Type == (uint)EventType.Keyup);
-
-        var repeat = e.Repeat != 0;
-        var keysym = e.Keysym;
-
-        screens.Peek()?.keyboardHandler?.KeyUp(keysym, repeat);
+        yield return screens.Peek()?.keyboardHandler!;
     }
 
     public void Register(GameHost host)
     {
         // check that if we inject the screen stack successfully
         Debug.Assert(screens != null);
+    }
 
-        host.KeyDown += KeyDown;
-        host.KeyUp += KeyUp;
+    public bool HandleEvent(KeyboardEvent e)
+    {
+        foreach (var h in handlers())
+        {
+            if (h is not null && h.HandleEvent(e))
+                return true;
+        }
+
+        // enqueue to a queue
+        Keyboard.Enqueue((KeyCode)e.Keysym.Sym, e.Timestamp);
+
+        return false;
     }
 }
