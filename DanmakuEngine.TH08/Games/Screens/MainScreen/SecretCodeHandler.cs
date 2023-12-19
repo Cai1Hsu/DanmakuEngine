@@ -1,6 +1,6 @@
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
-using Silk.NET.Input;
+using DanmakuEngine.Extensions.Keys;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
@@ -36,18 +36,16 @@ public class SecretCodeHandler
 
     public Action OnSecretCodeEntered { get; set; } = null!;
 
-    public bool HandleKey(Keysym key)
+    public bool HandleKey(KeyCode key)
     {
         if (Clock.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
-        if (key.Sym == (int)secretCode[secretCodeIndex])
+        if (key == secretCode[secretCodeIndex])
         {
             lastKeyDown = Clock.CurrentTime;
 
-            Logger.Debug($"SecretCode: Handled key {((KeyCode)key.Sym).ToString().
-                            // since there is no 'K' key in our list, we could safely trim it
-                            TrimStart('K')}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+            Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
 
             secretCodeIndex++;
 

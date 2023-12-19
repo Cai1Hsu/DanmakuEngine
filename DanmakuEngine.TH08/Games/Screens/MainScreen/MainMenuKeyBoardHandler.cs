@@ -45,7 +45,7 @@ public partial class MainMenuKeyBoardHandler : KeyboardHandler
 
         handled |= !cheating &&
                    secretCodeHandler is not null &&
-                   secretCodeHandler.HandleKey(e.Keysym);
+                   secretCodeHandler.HandleKey((KeyCode)e.Keysym.Sym);
 
         return handled;
     }
