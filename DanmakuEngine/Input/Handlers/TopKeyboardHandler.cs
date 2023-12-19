@@ -8,7 +8,7 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public partial class TopKeyboardHandler : IKeyboardHandler, IInputHandler
+public partial class TopKeyboardHandler : IInputHandler
 {
     [Inject]
     private ScreenStack screens = null!;
@@ -25,19 +25,19 @@ public partial class TopKeyboardHandler : IKeyboardHandler, IInputHandler
     {
         // check that if we inject the screen stack successfully
         Debug.Assert(screens != null);
+
+        host.KeyEvent += HandleEvent;
     }
 
-    public bool HandleEvent(KeyboardEvent e)
+    public void HandleEvent(KeyboardEvent e)
     {
         foreach (var h in handlers())
         {
             if (h is not null && h.HandleEvent(e))
-                return true;
+                return;
         }
 
         // enqueue to a queue
         Keyboard.Enqueue((KeyCode)e.Keysym.Sym, e.Timestamp);
-
-        return false;
     }
 }
