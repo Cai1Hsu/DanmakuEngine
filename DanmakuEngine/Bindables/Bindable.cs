@@ -385,6 +385,8 @@ public class Bindable<T>
     /// <inheritdoc cref="CreateInstance"/>
     protected virtual Bindable<T> CreateInstance() => new Bindable<T>();
 
+    public int BindingCount => Bindings.Count;
+
     public bool IsBound()
         => Bindings is not null && Bindings.Count > 0;
 
