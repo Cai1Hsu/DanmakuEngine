@@ -77,5 +77,7 @@ public partial class Screen : CompositeDrawable
         var _ = Clock;
 
         base.load();
+
+        keyboardHandler?.RegisterKeys();
     }
 }
