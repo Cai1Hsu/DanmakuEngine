@@ -34,6 +34,8 @@ public class SecretCodeHandler
 
     private double lastKeyDown = -1f;
 
+    public Action OnSecretCodeEntered = null!;
+
     public bool HandleKey(Keysym key)
     {
         if (Clock.CurrentTime - lastKeyDown > 1000)
@@ -46,17 +48,20 @@ public class SecretCodeHandler
             Logger.Debug($"SecretCode: Handled key {((KeyCode)key.Sym).ToString().
                             // since there is no 'K' key in our list, we could safely trim it
                             TrimStart('K')}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
-            secretCodeIndex++;
-        }
-        else
-            secretCodeIndex = 0;
 
-        if (secretCodeIndex == secretCode.Length)
-        {
-            secretCodeIndex = 0;
+            secretCodeIndex++;
+
+            if (secretCodeIndex == secretCode.Length)
+            {
+                OnSecretCodeEntered?.Invoke();
+
+                secretCodeIndex = 0;
+            }
 
             return true;
         }
+        else
+            secretCodeIndex = 0;
 
         return false;
     }
