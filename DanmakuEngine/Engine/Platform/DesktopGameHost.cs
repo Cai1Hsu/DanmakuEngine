@@ -1,4 +1,6 @@
 using System.Runtime.InteropServices;
+using DanmakuEngine.Engine.Platform.Windows;
+using DanmakuEngine.Engine.Platform.Linux;
 
 namespace DanmakuEngine.Engine.Platform;
 
