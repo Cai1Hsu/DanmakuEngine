@@ -5,7 +5,7 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public abstract partial class UserKeyboardHandler : KeyHander, IKeyboardHandler
+public abstract partial class UserKeyboardHandler : KeyHandler, IKeyboardHandler
 {
     public UserKeyboardHandler()
         : base()

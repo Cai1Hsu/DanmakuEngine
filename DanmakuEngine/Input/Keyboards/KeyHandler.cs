@@ -9,7 +9,7 @@ using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Input.Keybards;
 
-public class KeyHander : IKeyboardHandler
+public class KeyHandler : IKeyboardHandler
 {
     protected readonly ImmutableDictionary<KeyCode, KeyStatus> keyStatuses;
 
@@ -62,7 +62,7 @@ public class KeyHander : IKeyboardHandler
         return targetKey.HandleEvent(e);
     }
 
-    public KeyHander()
+    public KeyHandler()
     {
         List<KeyStatus> keyStatuses = new();
 
