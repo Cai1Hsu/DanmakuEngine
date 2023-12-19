@@ -1,6 +1,6 @@
+using DanmakuEngine.Extensions.Keys;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
-using DanmakuEngine.Extensions.Keys;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;

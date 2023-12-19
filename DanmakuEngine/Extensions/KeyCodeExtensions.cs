@@ -12,7 +12,7 @@ public static class KeyCodeExtensions
     public static string ToSdlName(this KeyCode key)
     {
         var fieldInfo = typeof(KeyCode).GetField(key.ToString());
-    
+
         var attribute = (NativeNameAttribute)fieldInfo?.GetCustomAttribute(typeof(NativeNameAttribute))!;
 
         if (attribute is null)
