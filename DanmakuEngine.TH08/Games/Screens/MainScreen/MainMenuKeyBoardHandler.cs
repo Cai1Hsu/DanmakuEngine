@@ -1,4 +1,5 @@
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine;
 using DanmakuEngine.Input.Handlers;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
@@ -10,6 +11,9 @@ public partial class MainMenuKeyBoardHandler : UserKeyboardHandler
     [Inject]
     private ScreenStack _screens = null!;
 
+    [Inject]
+    private GameHost _host = null!;
+
     public SecretCodeHandler secretCodeHandler = null!;
 
     private bool cheating = false;
@@ -19,12 +23,13 @@ public partial class MainMenuKeyBoardHandler : UserKeyboardHandler
         // DEMO: Pressing escape closes the game
         Register(KeyCode.KEscape).OnDown += (_, _) =>
         {
-            // TODO: add this action to Scheduler
-            // We should handle actions in the Update loop
-            // This is needed to avoid concurrency issues
-            // as we are planning to use multiple threads
-            while (!_screens.Empty())
-                _screens.Pop();
+            _host.Scheduler.ScheduleTask(() =>
+            {
+                while (!_screens.Empty())
+                    _screens.Pop();
+
+                _host.RequestClose();
+            });
         };
 
         secretCodeHandler.OnSecretCodeEntered += delegate
