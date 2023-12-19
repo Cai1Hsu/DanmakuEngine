@@ -3,6 +3,7 @@
 using System.ComponentModel;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Engine.Platform;
+using DanmakuEngine.Engine.Platform.Windows;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Arguments;

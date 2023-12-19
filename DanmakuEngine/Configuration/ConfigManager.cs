@@ -1,6 +1,6 @@
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Dependency;
-using DanmakuEngine.Engine.Platform;
+using DanmakuEngine.Engine.Platform.Windows;
 using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Configuration;
