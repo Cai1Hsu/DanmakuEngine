@@ -70,19 +70,19 @@ public class KeyStatus
 
         if (e.Type == (uint)EventType.Keydown)
         {
-            Debug.Assert(!IsDown.Value);
-
             if (OnDown is null && !bound)
                 return false;
+
+            Debug.Assert(!IsDown.Value);
 
             IsDown.Value = true;
         }
         else if (e.Type == (uint)EventType.Keyup)
         {
-            Debug.Assert(IsDown.Value);
-
             if (OnUp is null && !bound)
                 return false;
+
+            Debug.Assert(IsDown.Value);
 
             IsDown.Value = false;
         }
