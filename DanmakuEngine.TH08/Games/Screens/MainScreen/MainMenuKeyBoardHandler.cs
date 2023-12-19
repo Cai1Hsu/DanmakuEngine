@@ -18,7 +18,7 @@ public partial class MainMenuKeyBoardHandler : KeyboardHandler
 
     private bool cheating = false;
 
-    protected override void RegisterKeys()
+    public override void RegisterKeys()
     {
         // DEMO: Pressing escape closes the game
         Register(KeyCode.KEscape).OnDown += (_, _) =>
