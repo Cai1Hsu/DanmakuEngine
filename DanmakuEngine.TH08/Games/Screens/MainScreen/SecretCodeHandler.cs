@@ -34,7 +34,7 @@ public class SecretCodeHandler
 
     private double lastKeyDown = -1f;
 
-    public Action OnSecretCodeEntered { get; set; }
+    public Action OnSecretCodeEntered { get; set; } = null!;
 
     public bool HandleKey(Keysym key)
     {
