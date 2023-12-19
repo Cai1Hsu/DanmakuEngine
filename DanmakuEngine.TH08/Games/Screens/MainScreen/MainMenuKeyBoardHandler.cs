@@ -1,12 +1,12 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
-using DanmakuEngine.Input.Handlers;
+using DanmakuEngine.Input.Keybards;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
-public partial class MainMenuKeyBoardHandler : UserKeyboardHandler
+public partial class MainMenuKeyBoardHandler : KeyboardHandler
 {
     [Inject]
     private ScreenStack _screens = null!;

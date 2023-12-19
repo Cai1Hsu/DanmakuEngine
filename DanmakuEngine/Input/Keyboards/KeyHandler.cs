@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using DanmakuEngine.Bindables;
+using DanmakuEngine.Dependency;
 using DanmakuEngine.Input.Handlers;
 using Silk.NET.Input;
 using Silk.NET.SDL;
@@ -9,7 +10,7 @@ using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Input.Keybards;
 
-public class KeyHandler : IKeyboardHandler
+public abstract partial class KeyboardHandler : IKeyboardHandler
 {
     protected readonly ImmutableDictionary<KeyCode, KeyStatus> keyStatuses;
 
@@ -62,7 +63,13 @@ public class KeyHandler : IKeyboardHandler
         return targetKey.HandleEvent(e);
     }
 
-    public KeyHandler()
+
+    protected abstract void RegisterKeys();
+
+    protected KeyStatus Register(KeyCode key)
+        => keyStatuses[key];
+
+    public KeyboardHandler()
     {
         List<KeyStatus> keyStatuses = new();
 
@@ -72,5 +79,8 @@ public class KeyHandler : IKeyboardHandler
         this.keyStatuses = keyStatuses.ToImmutableDictionary(k => k.Key);
 
         Debug.Assert(this.keyStatuses.Count != 0);
+
+        if (this is IInjectable injectable)
+            injectable.AutoInject();
     }
 }
