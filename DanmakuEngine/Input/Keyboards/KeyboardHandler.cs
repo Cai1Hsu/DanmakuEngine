@@ -63,8 +63,7 @@ public abstract partial class KeyboardHandler : IKeyboardHandler
         return targetKey.HandleEvent(e);
     }
 
-
-    protected abstract void RegisterKeys();
+    public abstract void RegisterKeys();
 
     protected KeyStatus Register(KeyCode key)
         => keyStatuses[key];
