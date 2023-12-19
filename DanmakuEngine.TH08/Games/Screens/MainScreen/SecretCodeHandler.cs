@@ -7,13 +7,6 @@ namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class SecretCodeHandler
 {
-    private readonly Clock Clock;
-
-    public SecretCodeHandler(Clock clock)
-    {
-        this.Clock = clock;
-    }
-
     private readonly KeyCode[] secretCode = new KeyCode[]
     {
         KeyCode.KUp,
@@ -38,12 +31,12 @@ public class SecretCodeHandler
 
     public bool HandleKey(KeyCode key)
     {
-        if (Clock.CurrentTime - lastKeyDown > 1000)
+        if (Time.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
         if (key == secretCode[secretCodeIndex])
         {
-            lastKeyDown = Clock.CurrentTime;
+            lastKeyDown = Time.CurrentTime;
 
             Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
 

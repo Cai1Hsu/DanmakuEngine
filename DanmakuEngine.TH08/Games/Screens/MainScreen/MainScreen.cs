@@ -24,7 +24,7 @@ public partial class MainScreen : Screen
     {
         keyboardHandler = new MainMenuKeyBoardHandler()
         {
-            secretCodeHandler = new(ScreenClock),
+            secretCodeHandler = new(),
         };
 
         transformations.AddRange(new TransformSequence[]
