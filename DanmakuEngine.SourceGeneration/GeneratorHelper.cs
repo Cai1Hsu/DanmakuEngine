@@ -42,7 +42,7 @@ public static class GeneratorHelper
         {
             if (member is INamespaceSymbol nestedNs)
             {
-                foreach (var c in GetAllSubClasses(nestedNs))
+                foreach (var c in nestedNs.GetAllSubClasses())
                 {
                     yield return c;
                 }
