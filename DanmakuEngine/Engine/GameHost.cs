@@ -347,7 +347,7 @@ public unsafe partial class GameHost
 
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
-        Root.updateSubTree();
+        Root.UpdateSubTree();
         // Root.UpdateSubTreeMasking(Root, Root.ScreenSpaceDrawQuad.AABBFloat);
 
         // using (var buffer = DrawRoots.GetForWrite())

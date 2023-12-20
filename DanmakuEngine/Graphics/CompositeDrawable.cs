@@ -38,9 +38,9 @@ public abstract class CompositeDrawable : Drawable
     /// Updates the drawable and all of its children
     /// </summary>
     /// <returns>false if continues to update, and true for stops</returns>
-    public override bool updateSubTree()
+    public override bool UpdateSubTree()
     {
-        if (base.updateSubTree())
+        if (base.UpdateSubTree())
             return true;
 
         if (UpdateChildren())
@@ -54,7 +54,7 @@ public abstract class CompositeDrawable : Drawable
         bool shouldStop = false;
 
         foreach (var child in Children)
-            shouldStop |= child.updateSubTree();
+            shouldStop |= child.UpdateSubTree();
 
         return shouldStop;
     }

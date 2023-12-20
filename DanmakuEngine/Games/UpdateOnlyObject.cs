@@ -6,7 +6,7 @@ public class UpdateOnlyObject : GameObject
     {
     }
 
-    public override bool updateSubTree()
+    public override bool UpdateSubTree()
     {
         update();
 

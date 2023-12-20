@@ -40,9 +40,9 @@ public partial class Screen : CompositeDrawable
         // this.load();
     }
 
-    public override bool updateSubTree()
+    public override bool UpdateSubTree()
     {
-        if (base.updateSubTree())
+        if (base.UpdateSubTree())
             return true;
 
         var shouldStop = false;
@@ -51,7 +51,7 @@ public partial class Screen : CompositeDrawable
         if (InternalChildren is not null)
         {
             foreach (var ichild in InternalChildren)
-                shouldStop |= ichild.updateSubTree();
+                shouldStop |= ichild.UpdateSubTree();
         }
 
         return shouldStop;

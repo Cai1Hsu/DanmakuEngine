@@ -51,7 +51,7 @@ public class TestFixedAcceleratedMovement
 
         host.OnUpdate += _ =>
         {
-            movement.updateSubTree();
+            movement.UpdateSubTree();
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 
@@ -92,7 +92,7 @@ public class TestFixedAcceleratedMovement
 
         host.OnUpdate += _ =>
         {
-            movement.updateSubTree();
+            movement.UpdateSubTree();
         };
 
         host.OnTimedout += () =>
@@ -129,7 +129,7 @@ public class TestFixedAcceleratedMovement
 
         host.OnUpdate += _ =>
         {
-            movement.updateSubTree();
+            movement.UpdateSubTree();
 
             // x = 0.5 * a * t^2
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
@@ -166,7 +166,7 @@ public class TestFixedAcceleratedMovement
             clock.SetUpdateDelta(random_delta);
             clock.AccomulateTime();
 
-            movement.updateSubTree();
+            movement.UpdateSubTree();
 
             var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
 

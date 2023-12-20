@@ -67,7 +67,7 @@ public class Drawable : GameObject, IDisposable
         // may be we can implement transform using scheduler
 
         // scheuler update
-        lazyScheduler.RawValue?.updateSubTree();
+        lazyScheduler.RawValue?.UpdateSubTree();
 
         return true;
     }

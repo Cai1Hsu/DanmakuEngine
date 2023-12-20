@@ -2,6 +2,8 @@ namespace DanmakuEngine.Games;
 
 public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 {
+    protected List<GameObject>? PreUpdateChildren = null!;
+
     protected LoadState LoadState { get; private set; } = loadState;
 
     /// <summary>
@@ -83,7 +85,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     /// Updates all children game objects or it self if it is not a composite game object
     /// </summary>
     /// <returns>whether we should stop updating sub tree</returns>
-    public virtual bool updateSubTree()
+    public virtual bool UpdateSubTree()
     {
         if (isDisposed)
             return true;
@@ -93,6 +95,12 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
         if (LoadState == LoadState.Ready)
             start();
+
+        if (PreUpdateChildren is not null)
+        {
+            foreach (var c in PreUpdateChildren)
+                c.UpdateSubTree();
+        }
 
         if (!BeforeUpdate())
             return true;
