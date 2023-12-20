@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using DanmakuEngine.Logging;
+using Silk.NET.Input;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine;
@@ -80,10 +81,12 @@ public unsafe partial class GameHost
                     break;
 
                 case EventType.Keydown:
+                    KeyEvent?.Invoke(e.Key);
                     KeyDown?.Invoke(e.Key);
                     break;
 
                 case EventType.Keyup:
+                    KeyEvent?.Invoke(e.Key);
                     KeyUp?.Invoke(e.Key);
                     break;
 
@@ -116,6 +119,8 @@ public unsafe partial class GameHost
             }
         }
     }
+
+    public event Action<KeyboardEvent> KeyEvent = null!;
 
     public event Action<KeyboardEvent> KeyDown = null!;
 

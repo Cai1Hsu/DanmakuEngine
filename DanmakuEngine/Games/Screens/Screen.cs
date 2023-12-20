@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Input.Handlers;
+using DanmakuEngine.Input.Keybards;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;
@@ -14,7 +15,7 @@ public partial class Screen : CompositeDrawable
 
     protected ScreenStack ScreenStack => Parent;
 
-    public UserKeyboardHandler keyboardHandler = null!;
+    public KeyboardHandler keyboardHandler = null!;
 
     /// <summary>
     /// The clock for the screen
@@ -76,5 +77,7 @@ public partial class Screen : CompositeDrawable
         var _ = Clock;
 
         base.load();
+
+        keyboardHandler?.RegisterKeys();
     }
 }

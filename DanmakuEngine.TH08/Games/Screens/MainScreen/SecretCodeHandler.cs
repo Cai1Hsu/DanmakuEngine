@@ -1,19 +1,12 @@
+using DanmakuEngine.Extensions.Keys;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
-using Silk.NET.Input;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class SecretCodeHandler
 {
-    private readonly Clock Clock;
-
-    public SecretCodeHandler(Clock clock)
-    {
-        this.Clock = clock;
-    }
-
     private readonly KeyCode[] secretCode = new KeyCode[]
     {
         KeyCode.KUp,
@@ -34,29 +27,32 @@ public class SecretCodeHandler
 
     private double lastKeyDown = -1f;
 
-    public bool HandleKey(Keysym key)
+    public Action OnSecretCodeEntered { get; set; } = null!;
+
+    public bool HandleKey(KeyCode key)
     {
-        if (Clock.CurrentTime - lastKeyDown > 1000)
+        if (Time.CurrentTime - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
-        if (key.Sym == (int)secretCode[secretCodeIndex])
+        if (key == secretCode[secretCodeIndex])
         {
-            lastKeyDown = Clock.CurrentTime;
+            lastKeyDown = Time.CurrentTime;
 
-            Logger.Debug($"SecretCode: Handled key {((KeyCode)key.Sym).ToString().
-                            // since there is no 'K' key in our list, we could safely trim it
-                            TrimStart('K')}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+            Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+
             secretCodeIndex++;
-        }
-        else
-            secretCodeIndex = 0;
 
-        if (secretCodeIndex == secretCode.Length)
-        {
-            secretCodeIndex = 0;
+            if (secretCodeIndex == secretCode.Length)
+            {
+                OnSecretCodeEntered?.Invoke();
+
+                secretCodeIndex = 0;
+            }
 
             return true;
         }
+        else
+            secretCodeIndex = 0;
 
         return false;
     }

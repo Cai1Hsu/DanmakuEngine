@@ -1,6 +1,6 @@
 namespace DanmakuEngine.Transformation.Functions;
 
-public class CubeicIn : ITransformFunction
+public class CubicIn : ITransformFunction
 {
     /// <summary>
     /// Cubic-In transformation function
@@ -12,7 +12,7 @@ public class CubeicIn : ITransformFunction
         => time * time * time;
 }
 
-public class CubeicOut : ITransformFunction
+public class CubicOut : ITransformFunction
 {
     /// <summary>
     /// Cubic-Out transformation function

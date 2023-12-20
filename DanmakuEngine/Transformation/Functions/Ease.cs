@@ -1,6 +1,6 @@
 namespace DanmakuEngine.Transformation.Functions;
 
-public class EarseIn : ITransformFunction
+public class EaseIn : ITransformFunction
 {
     public double Transform(double time)
         => time < 0.5 ?
@@ -8,7 +8,7 @@ public class EarseIn : ITransformFunction
             1 - Math.Pow(-2 * time + 2, 2) / 2;
 }
 
-public class EarseOut : ITransformFunction
+public class EaseOut : ITransformFunction
 {
     public double Transform(double time)
     {
