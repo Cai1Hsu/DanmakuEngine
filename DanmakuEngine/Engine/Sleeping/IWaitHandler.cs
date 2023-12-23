@@ -28,7 +28,7 @@ public interface IWaitHandler
 
     public static IWaitHandler Create(bool ForceUseSpin = false)
     {
-        if (_instance is not null && 
+        if (_instance is not null &&
             (!ForceUseSpin || (ForceUseSpin && _instance is SpinWaitHandler)))
             return _instance;
 
