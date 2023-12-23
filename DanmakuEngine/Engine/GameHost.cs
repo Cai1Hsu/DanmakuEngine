@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine.Sleeping;
 using DanmakuEngine.Games;
 using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
@@ -93,6 +94,8 @@ public partial class GameHost : Time, IDisposable
         Dependencies.Cache(this);
 
         Dependencies.Cache((Time)this);
+
+        Dependencies.Cache(IWaitHandler.WaitHandler);
     }
 
     private void LoadConfig()
