@@ -80,14 +80,19 @@ public unsafe partial class GameHost
                     isRunning = false;
                     break;
 
+                // TODO: fix duplicate call
+                // we should only handle the event once
+                // KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case EventType.Keydown:
-                    KeyEvent?.Invoke(e.Key);
-                    KeyDown?.Invoke(e.Key);
+                    if (KeyDown is not null &&
+                        !KeyDown.Invoke(e.Key))
+                        KeyEvent?.Invoke(e.Key);
                     break;
 
                 case EventType.Keyup:
-                    KeyEvent?.Invoke(e.Key);
-                    KeyUp?.Invoke(e.Key);
+                    if (KeyUp is not null &&
+                        !KeyUp.Invoke(e.Key))
+                        KeyEvent?.Invoke(e.Key);
                     break;
 
                 case EventType.Mousebuttondown:
@@ -122,9 +127,9 @@ public unsafe partial class GameHost
 
     public event Action<KeyboardEvent> KeyEvent = null!;
 
-    public event Action<KeyboardEvent> KeyDown = null!;
+    public event Func<KeyboardEvent, bool> KeyDown = null!;
 
-    public event Action<KeyboardEvent> KeyUp = null!;
+    public event Func<KeyboardEvent, bool> KeyUp = null!;
 
     public event Action<MouseButtonEvent> MouseButtonDown = null!;
 
