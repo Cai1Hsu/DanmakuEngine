@@ -46,7 +46,7 @@ public interface IWaitHandler
         _instance?.Register();
 
         // if high resolution is not available, we will fall back to SpinWaitHandler
-        if ( _instance is null ||
+        if (_instance is null ||
             (!_instance.IsHighResolution && _instance is WindowsWaitHandler))
         {
             // don't need this since we didn't create a waitable timer successfully
