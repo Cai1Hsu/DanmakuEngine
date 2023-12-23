@@ -32,5 +32,11 @@ public static class Keyboard
     public static void Dequeue()
         => queue.Dequeue();
 
-    public static int Count => queue.Count;
+    public static int Count()
+        => queue.Count;
+
+    public static bool Empty()
+    {
+        return queue.Count > 0;
+    }
 }

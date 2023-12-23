@@ -37,6 +37,19 @@ public partial class TopKeyboardHandler : IInputHandler
                 return;
         }
 
+        foreach (var h in handlers())
+        {
+            if (h is null)
+                continue;
+
+            if (e.Type == (uint)EventType.Keydown
+                && h.KeyDown(e))
+                return;
+            else if (e.Type == (uint)EventType.Keyup
+                && h.KeyUp(e))
+                return;
+        }
+
         // enqueue to a queue
         Keyboard.Enqueue((KeyCode)e.Keysym.Sym, e.Timestamp);
     }

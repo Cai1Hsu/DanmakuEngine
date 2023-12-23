@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -6,13 +7,12 @@ using DanmakuEngine.Dependency;
 using DanmakuEngine.Input.Handlers;
 using Silk.NET.Input;
 using Silk.NET.SDL;
-using Silk.NET.Vulkan;
 
 namespace DanmakuEngine.Input.Keybards;
 
 public abstract partial class KeyboardHandler : IKeyboardHandler
 {
-    protected readonly ImmutableDictionary<KeyCode, KeyStatus> keyStatuses;
+    protected readonly FrozenDictionary<KeyCode, KeyStatus> keyStatuses;
 
     public KeyStatus this[KeyCode key] => keyStatuses[key];
 
@@ -75,7 +75,7 @@ public abstract partial class KeyboardHandler : IKeyboardHandler
         foreach (var key in Enum.GetValues<KeyCode>())
             keyStatuses.Add(new KeyStatus(key));
 
-        this.keyStatuses = keyStatuses.ToImmutableDictionary(k => k.Key);
+        this.keyStatuses = keyStatuses.ToFrozenDictionary(k => k.Key);
 
         Debug.Assert(this.keyStatuses.Count != 0);
 

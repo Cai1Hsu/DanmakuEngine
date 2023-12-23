@@ -45,9 +45,19 @@ public class KeyStatus
         IsDown.UnbindFrom(bindable);
     }
 
-    public void BindEvent(Action<ValueChangedEvent<bool>> onChange, bool runOnceImmediately = false)
+    public void StatusChanged(Action<ValueChangedEvent<bool>> onChange, bool runOnceImmediately = false)
     {
         IsDown.BindValueChanged(onChange, runOnceImmediately);
+    }
+
+    public void BindKeyDown(Action<KeyStatus, double> onKeyDown)
+    {
+        OnDown += onKeyDown;
+    }
+
+    public void BindKeyUp(Action<KeyStatus, double> onKeyUp)
+    {
+        OnUp += onKeyUp;
     }
 
     /// <summary>
