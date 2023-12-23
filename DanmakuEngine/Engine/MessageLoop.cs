@@ -80,9 +80,8 @@ public unsafe partial class GameHost
                     isRunning = false;
                     break;
 
-                // TODO: fix duplicate call
                 // we should only handle the event once
-                // KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
+                // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case EventType.Keydown:
                     if (KeyDown is not null &&
                         !KeyDown.Invoke(e.Key))
