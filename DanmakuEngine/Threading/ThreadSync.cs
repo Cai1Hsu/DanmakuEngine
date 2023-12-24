@@ -20,7 +20,7 @@ public static class ThreadSync
 
     public static bool NotMainThread() => !IsMainThread;
 
-    public static bool NotUpadteThread() => !IsUpdateThread;
+    public static bool NotUpdateThread() => !IsUpdateThread;
 
     public static bool NotRenderThread() => !IsRenderThread;
 
