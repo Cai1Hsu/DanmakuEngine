@@ -10,7 +10,7 @@ public class FrameExecutor(Action<double> task)
     public double DeltaTime => clock.UpdateDelta;
 
     public virtual double CurrentTime { get; protected set; }
-    
+
     public virtual double LastFrameTime { get; protected set; }
 
     protected RingPool<double> _delta_pool = new(128);
