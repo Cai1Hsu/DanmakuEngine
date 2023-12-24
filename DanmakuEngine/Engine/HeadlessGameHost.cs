@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Threading;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Engine;
@@ -16,6 +18,8 @@ public class HeadlessGameHost : GameHost
 
     public Action<HeadlessGameHost>? OnLoad;
 
+    private bool limitTime = false;
+
     public Action? OnTimedout;
 
     public bool ThrowOnTimedOut = true;
@@ -27,8 +31,6 @@ public class HeadlessGameHost : GameHost
     /// </summary>
     public bool BypassWaitForSync = false;
 
-    private Stopwatch timer = null!;
-
     private double timeout = 0;
 
     /// <summary>
@@ -37,9 +39,9 @@ public class HeadlessGameHost : GameHost
     /// <param name="timeout">timeout in ms</param>
     public HeadlessGameHost(double timeout)
     {
-        timer = new Stopwatch();
-
         this.timeout = timeout;
+
+        limitTime = true;
     }
 
     public HeadlessGameHost(Func<bool> running)
@@ -64,58 +66,44 @@ public class HeadlessGameHost : GameHost
         refreshRate = ConfigManager.RefreshRate;
     }
 
+    public override void RegisterThreads()
+    {
+        base.RegisterThreads();
+
+        // we don't handle messages in HeadlessGameHost
+        threadRunner.Remove(MainThread);
+
+        // We don't render in HeadlessGameHost
+        threadRunner.Remove(RenderThread);
+    }
+
     public override void RunMainLoop()
     {
         OnLoad?.Invoke(this);
 
-        bool empty_screens = screens.Empty();
-
-        // TODO: Reimplement this and GameHost.HandleMessages()
-
-        timer?.Start();
-
-        long LastWaitTicks = HostTimer.ElapsedTicks;
+        long lastWaitTicks = ElapsedTicks;
 
         while (isRunning
             && (Running is null || Running.Invoke())
-            && (timer is null || timer.ElapsedMilliseconds < timeout))
+            && (!limitTime || ElapsedMilliseconds < timeout))
         {
-            long currentTicks = HostTimer.ElapsedTicks;
-
-            UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
-            RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
-
-            UpdateTime();
-
-            OnUpdate?.Invoke(this);
-
-            DoUpdate();
-
-            lastUpdateTicks = currentTicks;
-
-            // we don't render in headless mode
-            // DoRender();
-
-            lastRenderTicks = currentTicks;
+            threadRunner.RunMainLoop();
 
             if (!BypassWaitForSync)
             {
-                // Wait for sync
-                // This is a very simple sync method, only to prevent the CPU from running at 100%
-
                 // Only do this when the wait time is greater than 1ms
                 var waitTime = averageWaitTime - UpdateDelta;
                 if (waitTime > 1E-3)
                 {
-                    SpinWait.SpinUntil(() => (HostTimer.ElapsedTicks - LastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
+                    SpinWait.SpinUntil(() => (ElapsedTicks - lastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
                 }
             }
 
-            LastWaitTicks = HostTimer.ElapsedTicks;
+            lastWaitTicks = ElapsedTicks;
         }
 
         // The host exited with timed out
-        if (timer is not null && timer.IsRunning && timer.ElapsedMilliseconds >= timeout)
+        if (limitTime && ElapsedMilliseconds >= timeout)
         {
             if (!IgnoreTimedout)
                 Logger.Error("[HeadlessGameHost] timed out");
