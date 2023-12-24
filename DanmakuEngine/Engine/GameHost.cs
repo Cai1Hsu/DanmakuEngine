@@ -4,9 +4,11 @@ using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DanmakuEngine.Arguments;
+using DanmakuEngine.Bindables;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine.Sleeping;
+using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Games;
 using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
@@ -17,6 +19,7 @@ using DanmakuEngine.Timing;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
+using Silk.NET.Vulkan;
 using SixLabors.Fonts;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Advanced;
@@ -51,6 +54,14 @@ public partial class GameHost : Time, IDisposable
 
     private ArgumentProvider argProvider = null!;
 
+    public MainThread MainThread { get; protected set; } = null!;
+
+    public UpdateThread UpdateThread { get; protected set; } = null!;
+
+    public RenderThread RenderThread { get; protected set; } = null!;
+
+    public readonly Bindable<bool> MultiThreaded = new(true);
+
     public void Run(Game game, ArgumentProvider argProvider)
     {
         SetUpDependency();
@@ -72,6 +83,8 @@ public partial class GameHost : Time, IDisposable
         SetUpSdl();
 
         SetUpWindowAndRenderer();
+
+        RegisterThreads();
 
         RunUntilExit();
     }
@@ -109,6 +122,9 @@ public partial class GameHost : Time, IDisposable
         doFrontToBackPass = ConfigManager.DebugMode;
         clearOnRender = ConfigManager.ClearScreen;
         UpdateFrequency = ConfigManager.FpsUpdateFrequency;
+
+        // TODO: Add an argument for this
+        // MultiThreaded.Value = 
 
         DependencyContainer.AutoInject(Logger.GetLogger());
 
@@ -338,13 +354,17 @@ public unsafe partial class GameHost
 
         Logger.Debug("Everything is ready, let's go!");
 
-        // we should do this in the update loop
-        // otherwise first screen will block the update loop
-        Scheduler.ScheduleTask(Game.begin);
+        Game.begin();
+
+        screens.Push(Game.FirstScreen);
     }
 
-    protected void DoUpdate()
+    protected void Update(double delta)
     {
+        UpdateDelta = delta;
+
+        UpdateTime();
+
         if (Root == null)
             return;
 
@@ -362,8 +382,10 @@ public unsafe partial class GameHost
     private bool doFrontToBackPass = false;
     private bool clearOnRender = false;
 
-    protected void DoRender()
+    protected void Render(double delta)
     {
+        RenderDelta = delta;
+
         gl.Clear((uint)ClearBufferMask.ColorBufferBit | (uint)ClearBufferMask.DepthBufferBit);
 
         if (clearOnRender)
@@ -429,7 +451,7 @@ public unsafe partial class GameHost
                 // Prevent IO blocking
                 Task.Run(() =>
                 {
-                    Logger.Write($"FPS: {AverageFramerate:F2}\r", true);
+                    Logger.Write($"FPS: {AverageFramerate:F2}, Jitter: {Jitter:F2}ms\r", true);
                 }).ContinueWith(_ => fps_debug_time = 0, TaskContinuationOptions.ExecuteSynchronously);
             }
         }
@@ -437,8 +459,6 @@ public unsafe partial class GameHost
 
     public void PerformExit()
     {
-        HostTimer.Stop();
-
         // This helps HeadlessGameHost to stop
         if (_sdl != null)
         {

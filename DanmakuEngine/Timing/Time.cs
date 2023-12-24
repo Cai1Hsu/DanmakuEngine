@@ -1,8 +1,9 @@
 using DanmakuEngine.Allocations;
+using Silk.NET.OpenGL;
 
 namespace DanmakuEngine.Timing;
 
-public class Time
+public class Time : StopwatchClock
 {
     /// <summary>
     /// Represents and controls the update frequency of the fps in debug console
@@ -23,7 +24,8 @@ public class Time
 
     protected virtual void UpdateTime()
     {
-        CurrentTime += UpdateDelta;
+        // sync time every frame
+        CurrentTime = base.CurrentTime;
 
         count_time += UpdateDelta;
         count_frame++;
@@ -32,8 +34,8 @@ public class Time
 
         _delta_pool.CurrentAndNext = UpdateDelta;
 
-        double avg = _delta_pool.Get().Average();
-        Jitter = Math.Sqrt(_delta_pool.Get().Average(v => Math.Pow(v - avg, 2)));
+        double avg = _delta_pool.Get().Average() * 1000;
+        Jitter = Math.Sqrt(_delta_pool.Get().Average(v => Math.Pow((v * 1000) - avg, 2)));
 
         if (count_time < 1)
             return;
@@ -47,17 +49,17 @@ public class Time
     /// <summary>
     /// Current time of the game main loop in seconds
     /// </summary>
-    public static double CurrentTime { get; protected set; }
+    public new static double CurrentTime { get; protected set; }
 
     /// <summary>
     /// Render delta of the last frame in seconds
     /// </summary>
-    public static double RenderDelta { get; protected set; } = 1 / 60;
+    public new static double RenderDelta { get; protected set; } = 1 / 60;
 
     /// <summary>
     /// Update delta of the last frame in seconds
     /// </summary>
-    public static double UpdateDelta { get; protected set; } = 1 / 60;
+    public new static double UpdateDelta { get; protected set; } = 1 / 60;
 
     public static readonly StandardClock Clock = new();
 
@@ -131,6 +133,6 @@ public class Time
         UpdateDelta = 0;
         RenderDelta = 0;
 
-        CurrentTime = 0;
+        ResetTime();
     }
 }

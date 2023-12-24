@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Threading;
 using Silk.NET.Input;
 using Silk.NET.SDL;
 
@@ -11,26 +13,39 @@ public unsafe partial class GameHost
 
     protected bool isRunning = true;
 
-    protected readonly Stopwatch HostTimer = new();
+    protected long lastUpdateTime = 0;
+    protected long lastRenderTime = 0;
 
-    protected long lastUpdateTicks = 0;
-    protected long lastRenderTicks = 0;
+    protected readonly ThreadRunner threadRunner = new();
+
+    protected void registerThread(GameThread thread)
+        => threadRunner.Add(thread);
+
+    public virtual void RegisterThreads()
+    {
+        threadRunner.MultiThreaded.BindTo(MultiThreaded);
+
+        registerThread(MainThread = new(HandleMessages));
+
+        registerThread(UpdateThread = new(Update));
+
+        registerThread(RenderThread = new(Render));
+    }
 
     public void RunUntilExit()
     {
         ResetTime(ConfigManager.RefreshRate);
-
-        HostTimer.Reset();
-        HostTimer.Start();
 
         // We do it here 
         // because the load process is also a part of the Update Loop
         // The only difference is that it only executes once at the beginning
         DoLoad();
 
+        threadRunner.Start();
+        this.Start();
+
         RunMainLoop();
 
-        HostTimer.Stop();
         PerformExit();
     }
 
@@ -38,23 +53,8 @@ public unsafe partial class GameHost
     {
         do
         {
-            HandleMessages();
-
-            long currentTicks = HostTimer.ElapsedTicks;
-
-            UpdateDelta = (currentTicks - lastUpdateTicks) / (double)Stopwatch.Frequency;
-            RenderDelta = (currentTicks - lastRenderTicks) / (double)Stopwatch.Frequency;
-
-            UpdateTime();
-
-            DoUpdate();
-
-            lastUpdateTicks = currentTicks;
-
-            DoRender();
-
-            lastRenderTicks = currentTicks;
-        } while (isRunning && !screens.Empty());
+            threadRunner.RunMainLoop();
+        } while (isRunning && (!screens.Empty()));
     }
 
     public void RequestClose()
@@ -64,7 +64,7 @@ public unsafe partial class GameHost
         isRunning = false;
     }
 
-    private void HandleMessages()
+    private void HandleMessages(double _)
     {
         Event e = new();
         while (_sdl.PollEvent(ref e) != 0)
