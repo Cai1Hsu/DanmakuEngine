@@ -11,7 +11,7 @@ public partial class Game
     [Inject]
     protected ScreenStack screens = null!;
 
-    public virtual Screen FirstScreen => throw new NotImplementedException();
+    public virtual Screen FirstScreen => throw new NotImplementedException("FirstScreen is not implemented");
 
     /// <summary>
     /// Prepare the game and start it
