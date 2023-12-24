@@ -89,7 +89,7 @@ public class HeadlessGameHost : GameHost
         {
             threadRunner.RunMainLoop();
 
-            if (!BypassWaitForSync)
+            if (!BypassWaitForSync && ConfigManager.Vsync)
             {
                 // Only do this when the wait time is greater than 1ms
                 var waitTime = averageWaitTime - UpdateDelta;
