@@ -1,4 +1,4 @@
-using Silk.NET.SDL; 
+using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine.Sleeping;
 
