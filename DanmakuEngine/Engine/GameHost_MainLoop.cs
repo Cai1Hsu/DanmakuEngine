@@ -11,7 +11,11 @@ public unsafe partial class GameHost
 {
     public WindowManager windowManager = null!;
 
-    protected bool isRunning = true;
+    // Since we have just implemented multi-threading, and most of the time, this variable is accessed in main loop at a rather high frequency
+    // it's possible that the compiler will optimize it to a register, and the CPU may NOT update the value in the register, so the game won't exit even if we request it to exit and the value of isRunning is already true
+    // To avoid this, we must add the volatile keyword to the variable.
+    // However, I don't think it's necessary to use a lock to protect the variable, because we only read it in the main loop, and the only write operation is to make it true. The main loop will detect the change sooner or later as long as the CPU updates the value in the register.
+    protected volatile bool isRunning = true;
 
     protected long lastUpdateTime = 0;
     protected long lastRenderTime = 0;
