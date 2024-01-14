@@ -83,14 +83,12 @@ public unsafe partial class GameHost
                 // we should only handle the event once
                 // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case EventType.Keydown:
-                    if (KeyDown is not null &&
-                        !KeyDown.Invoke(e.Key))
+                    if (KeyDown?.Invoke(e.Key) is not true)
                         KeyEvent?.Invoke(e.Key);
                     break;
 
                 case EventType.Keyup:
-                    if (KeyUp is not null &&
-                        !KeyUp.Invoke(e.Key))
+                    if (KeyUp?.Invoke(e.Key) is not true)
                         KeyEvent?.Invoke(e.Key);
                     break;
 
