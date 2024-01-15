@@ -459,6 +459,8 @@ public unsafe partial class GameHost
 
     public void PerformExit()
     {
+        threadRunner.Stop();
+
         // This helps HeadlessGameHost to stop
         if (_sdl != null)
         {
