@@ -40,6 +40,19 @@ public abstract class GameThread
         thread?.Start();
     }
 
+    public void Stop()
+    {
+        if (Status == ThreadStatus.NotInitialized)
+            return;
+
+        if (Status == ThreadStatus.Zombie)
+            return;
+        
+        thread?.Interrupt();
+
+        Status = ThreadStatus.Zombie;
+    }
+
     public void Pause()
     {
         if (Status != ThreadStatus.Running)

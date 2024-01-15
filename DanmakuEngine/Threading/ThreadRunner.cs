@@ -55,6 +55,16 @@ public class ThreadRunner
         resumeAllThreads();
     }
 
+    public void Pause() => pauseAllThreads();
+
+    public void Stop()
+    {
+        pauseAllThreads();
+
+        foreach (var t in threads)
+            t.Stop();
+    }
+
     private void pauseAllThreads()
     {
         // shut down threads in reverse to ensure audio stops last (other threads may be waiting on a queued event otherwise)
