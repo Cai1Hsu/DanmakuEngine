@@ -1,5 +1,7 @@
 using Silk.NET.OpenGL;
 using Silk.NET.SDL;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using PixelFormat = Silk.NET.OpenGL.PixelFormat;
 using PixelType = Silk.NET.OpenGL.PixelType;
 
