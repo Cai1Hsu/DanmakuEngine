@@ -47,7 +47,7 @@ public abstract class GameThread
 
         if (Status == ThreadStatus.Zombie)
             return;
-        
+
         thread?.Interrupt();
 
         Status = ThreadStatus.Zombie;
