@@ -60,7 +60,7 @@ public partial class GameHost : Time, IDisposable
 
     public RenderThread RenderThread { get; protected set; } = null!;
 
-    public readonly Bindable<bool> MultiThreaded = new(true);
+    public readonly Bindable<bool> MultiThreaded = new(false);
 
     public void Run(Game game, ArgumentProvider argProvider)
     {
@@ -123,13 +123,12 @@ public partial class GameHost : Time, IDisposable
         clearOnRender = ConfigManager.ClearScreen;
         UpdateFrequency = ConfigManager.FpsUpdateFrequency;
 
-        // TODO: Add an argument for this
-        // MultiThreaded.Value = 
+        MultiThreaded.Value = !ConfigManager.singlethreaded; 
 
         DependencyContainer.AutoInject(Logger.GetLogger());
 
         // Logger is loaded with debug flag here
-        if (this is HeadlessGameHost)
+        if (ConfigManager.Headless)
             Logger.Debug("Running in headless mode.");
     }
 

@@ -61,6 +61,10 @@ public partial class ParamTemplate : Paramaters
     public Argument Headless =
         new("-headless", typeof(bool), false);
 
+    [Description("Specify whether to run the game in single-threaded mode")]
+    public Argument SingleThreaded =
+        new("-singlethread", typeof(bool), false);
+
     // For some arguments need non-static support.
     public ParamTemplate()
     {

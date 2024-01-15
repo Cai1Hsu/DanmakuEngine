@@ -128,8 +128,14 @@ public unsafe partial class GameHost
 
     public event Action<KeyboardEvent> KeyEvent = null!;
 
+    /// <summary>
+    /// Return true to prevent the event from being passed to the next handler
+    /// </summary>
     public event Func<KeyboardEvent, bool> KeyDown = null!;
 
+    /// <summary>
+    /// Return true to prevent the event from being passed to the next handler
+    /// </summary>
     public event Func<KeyboardEvent, bool> KeyUp = null!;
 
     public event Action<MouseButtonEvent> MouseButtonDown = null!;
