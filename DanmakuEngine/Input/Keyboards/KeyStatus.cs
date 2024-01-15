@@ -22,6 +22,8 @@ public class KeyStatus
 
     private List<KeyStatus>? Bindings;
 
+    public bool Worthless => !IsDown.IsBound() && OnDown is null && OnUp is null && (Bindings is null || Bindings.Count == 0);
+
     public void BindTo(KeyStatus other)
     {
         IsDown.BindTo(other.IsDown);
@@ -73,23 +75,24 @@ public class KeyStatus
         if (e.Repeat != 0)
             return false;
 
+        // we shouldn't handle modifier this way
+        // consider use a separate method for handling key event and pass the modifier
         Mod = (Keymod)e.Keysym.Mod;
-
-        // if the key is bound with bindables, we assume this action is handled
-        var bound = (IsDown.BindingCount - (Bindings is null ? 0 : Bindings.Count)) > 0;
 
         if (e.Type == (uint)EventType.Keydown)
         {
-            if (OnDown is null && !bound)
+            if (Worthless)
                 return false;
 
+            // This may lead to assertion failure if u have two keyboards
+            // but we leave it here for preventing other bugs such as failing to detect key up
             Debug.Assert(!IsDown.Value);
 
             IsDown.Value = true;
         }
         else if (e.Type == (uint)EventType.Keyup)
         {
-            if (OnUp is null && !bound)
+            if (Worthless)
                 return false;
 
             Debug.Assert(IsDown.Value);

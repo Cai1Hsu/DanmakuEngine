@@ -28,6 +28,9 @@ public partial class ConfigManager
     [LoadFromArgument("-frequency")]
     public double FpsUpdateFrequency { get; private set; }
 
+    [LoadFromArgument("-singlethread")]
+    public bool singlethreaded { get; private set; }
+
     private readonly List<string> skipProperties = new();
 
     public void DynamicLoadDefaultValues()
