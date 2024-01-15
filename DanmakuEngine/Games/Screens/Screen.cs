@@ -17,6 +17,8 @@ public partial class Screen : CompositeDrawable
 
     public KeyboardHandler keyboardHandler = null!;
 
+    protected override IEnumerable<GameObject> Children => InternalChildren;
+
     /// <summary>
     /// The clock for the screen
     /// it provides standard time for the screen
@@ -40,21 +42,12 @@ public partial class Screen : CompositeDrawable
         // this.load();
     }
 
-    public override bool UpdateSubTree()
+    public override bool UpdateSubTree(bool fixedUpdate = false)
     {
-        if (base.UpdateSubTree())
+        if (base.UpdateSubTree(fixedUpdate))
             return true;
 
-        var shouldStop = false;
-
-        // update children
-        if (InternalChildren is not null)
-        {
-            foreach (var ichild in InternalChildren)
-                shouldStop |= ichild.UpdateSubTree();
-        }
-
-        return shouldStop;
+        return false;
     }
 
     protected override void start()

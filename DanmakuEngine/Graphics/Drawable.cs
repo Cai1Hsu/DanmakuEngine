@@ -57,17 +57,13 @@ public class Drawable : GameObject, IDisposable
 
     #endregion
 
-    protected override bool BeforeUpdate()
+    protected override bool BeforeUpdate(bool fixedUpdate = false)
     {
         if (!IsPresent)
             return false;
-        // TODO: Update auto transforms
-        // Transforms contains the transforms that are applied to the drawable
-        // and animations and movement
-        // may be we can implement transform using scheduler
 
         // scheuler update
-        lazyScheduler.RawValue?.UpdateSubTree();
+        lazyScheduler.RawValue?.UpdateSubTree(fixedUpdate);
 
         return true;
     }

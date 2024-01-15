@@ -90,7 +90,7 @@ public class ScreenStack : CompositeDrawable
 
     private bool updateAnotherFrame = false;
 
-    protected override bool UpdateChildren()
+    protected override bool UpdateChildren(bool fixedUpdate = false)
     {
         do
         {
@@ -101,7 +101,8 @@ public class ScreenStack : CompositeDrawable
             if (peek is null)
                 return true;
 
-            if (peek.UpdateSubTree() && !updateAnotherFrame)
+            // We assume that the user won't change the screen stack in the FixedUpdate
+            if (peek.UpdateSubTree(fixedUpdate) && !updateAnotherFrame)
                 return true;
 
         } while (updateAnotherFrame);

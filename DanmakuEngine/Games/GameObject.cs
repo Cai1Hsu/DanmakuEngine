@@ -85,7 +85,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     /// Updates all children game objects or it self if it is not a composite game object
     /// </summary>
     /// <returns>whether we should stop updating sub tree</returns>
-    public virtual bool UpdateSubTree()
+    public virtual bool UpdateSubTree(bool fixedUpdate = false)
     {
         if (isDisposed)
             return true;
@@ -99,18 +99,34 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
         if (PreUpdateChildren is not null)
         {
             foreach (var c in PreUpdateChildren)
-                c.UpdateSubTree();
+                c.UpdateSubTree(fixedUpdate);
         }
 
-        if (!BeforeUpdate())
+        if (!BeforeUpdate(fixedUpdate))
             return true;
 
-        update();
+        if (!fixedUpdate)
+            update();
+        else
+            this.fixedUpdate();
 
         return false;
     }
 
-    protected virtual bool BeforeUpdate() => true;
+    protected virtual bool BeforeUpdate(bool fixedUpdate = false) => true;
+
+    protected virtual void fixedUpdate()
+    {
+        FixedUpdate();
+
+        OnFixedUpdate?.Invoke(this);
+    }
+
+    protected virtual void FixedUpdate()
+    {
+    }
+
+    public event Action<GameObject> OnFixedUpdate = null!;
 
     public event Action<GameObject> OnUpdate = null!;
 

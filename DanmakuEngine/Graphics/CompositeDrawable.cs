@@ -38,23 +38,26 @@ public abstract class CompositeDrawable : Drawable
     /// Updates the drawable and all of its children
     /// </summary>
     /// <returns>false if continues to update, and true for stops</returns>
-    public override bool UpdateSubTree()
+    public override bool UpdateSubTree(bool fixedUpdate = false)
     {
-        if (base.UpdateSubTree())
+        if (base.UpdateSubTree(fixedUpdate))
             return true;
 
-        if (UpdateChildren())
+        if (UpdateChildren(fixedUpdate))
             return true;
 
         return false;
     }
 
-    protected virtual bool UpdateChildren()
+    protected virtual bool UpdateChildren(bool fixedUpdate = false)
     {
         bool shouldStop = false;
 
-        foreach (var child in Children)
-            shouldStop |= child.UpdateSubTree();
+        if (Children is not null)
+        {
+            foreach (var child in Children)
+                shouldStop |= child.UpdateSubTree(fixedUpdate);
+        }
 
         return shouldStop;
     }

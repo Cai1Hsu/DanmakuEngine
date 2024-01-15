@@ -6,9 +6,12 @@ public class UpdateOnlyObject : GameObject
     {
     }
 
-    public override bool UpdateSubTree()
+    public override bool UpdateSubTree(bool fixedUpdate = false)
     {
-        update();
+        if (!fixedUpdate)
+            update();
+        else
+            base.fixedUpdate();
 
         return false;
     }
