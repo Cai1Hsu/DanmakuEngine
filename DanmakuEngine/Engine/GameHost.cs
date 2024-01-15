@@ -123,7 +123,7 @@ public partial class GameHost : Time, IDisposable
         clearOnRender = ConfigManager.ClearScreen;
         UpdateFrequency = ConfigManager.FpsUpdateFrequency;
 
-        MultiThreaded.Value = !ConfigManager.singlethreaded;
+        MultiThreaded.Value = !ConfigManager.Singlethreaded;
 
         DependencyContainer.AutoInject(Logger.GetLogger());
 

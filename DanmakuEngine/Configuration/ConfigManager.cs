@@ -29,7 +29,7 @@ public partial class ConfigManager
     public double FpsUpdateFrequency { get; private set; }
 
     [LoadFromArgument("-singlethread")]
-    public bool singlethreaded { get; private set; }
+    public bool Singlethreaded { get; private set; }
 
     private readonly List<string> skipProperties = new();
 
