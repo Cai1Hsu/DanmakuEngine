@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine.Sleeping;
@@ -13,9 +14,7 @@ public class SDLWaitHandler : IWaitHandler
     }
 
     public void Wait(double milliseconds)
-    {
-        SDL.Delay((uint)milliseconds);
-    }
+        => SDL.Delay((uint)milliseconds);
 
     public void Wait(TimeSpan timeSpan)
         => Wait(timeSpan.TotalMilliseconds);

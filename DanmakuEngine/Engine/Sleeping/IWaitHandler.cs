@@ -14,8 +14,9 @@ public interface IWaitHandler
 
     public bool IsHighResolution { get; }
 
-    // Since SDL_Delay provides higher resolution(at least on Linux), we use it as default
-    // TODO: need more inspection on Windows
+    // Since SDL_Delay provides high resolution(at least on Linux), we use it as default
+    // On Windows, although SDL_Delay provides almost same resolution as Windows FILETIME, it's has better capability, while FILETIME provides lower standard deviation.
+    // So we use SDL_Delay as a fallback.
     private static bool _preferSDL = false;
 
     public static bool PreferSDL
@@ -48,6 +49,8 @@ public interface IWaitHandler
 
     private static SDLWaitHandler _sdlInstance = null!;
 
+    public static SDLWaitHandler SDLWaitHandler => _sdlInstance;
+
     public static IWaitHandler WaitHandler
     {
         get
@@ -64,8 +67,10 @@ public interface IWaitHandler
 
     public static IWaitHandler Create(bool SDL = false)
     {
+        _sdlInstance ??= new SDLWaitHandler();
+
         if (SDL)
-            return _sdlInstance is null ? _sdlInstance = new SDLWaitHandler() : _sdlInstance;
+            return _platformInstance = _sdlInstance;
 
         if (_platformInstance is not null)
             return _platformInstance;
