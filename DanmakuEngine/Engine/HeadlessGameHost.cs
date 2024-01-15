@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Scheduling;
 using DanmakuEngine.Threading;
 using DanmakuEngine.Timing;
 
@@ -68,13 +69,14 @@ public class HeadlessGameHost : GameHost
 
     public override void RegisterThreads()
     {
-        base.RegisterThreads();
+        threadRunner.MultiThreaded.BindTo(MultiThreaded);
 
-        // we don't handle messages in HeadlessGameHost
-        threadRunner.Remove(MainThread);
+        registerThread(UpdateThread = new(delta =>
+        {
+            Update(delta);
 
-        // We don't render in HeadlessGameHost
-        threadRunner.Remove(RenderThread);
+            OnUpdate?.Invoke(this);
+        }));
     }
 
     public override void RunMainLoop()
@@ -83,23 +85,16 @@ public class HeadlessGameHost : GameHost
 
         long lastWaitTicks = ElapsedTicks;
 
+        ThrottledExecutor executor = new(_ => threadRunner.RunMainLoop())
+        {
+            ActiveHz = ConfigManager.Vsync ? refreshRate : 1000,
+        };
+
         while (isRunning
             && (Running is null || Running.Invoke())
             && (!limitTime || ElapsedMilliseconds < timeout))
         {
-            threadRunner.RunMainLoop();
-
-            if (!BypassWaitForSync && ConfigManager.Vsync)
-            {
-                // Only do this when the wait time is greater than 1ms
-                var waitTime = averageWaitTime - UpdateDelta;
-                if (waitTime > 1E-3)
-                {
-                    SpinWait.SpinUntil(() => (ElapsedTicks - lastWaitTicks) / (double)Stopwatch.Frequency > waitTime);
-                }
-            }
-
-            lastWaitTicks = ElapsedTicks;
+            executor.RunNextFrame();
         }
 
         // The host exited with timed out
