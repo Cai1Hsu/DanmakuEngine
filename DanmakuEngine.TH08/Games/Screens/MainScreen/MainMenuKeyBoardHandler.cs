@@ -23,13 +23,10 @@ public partial class MainMenuKeyBoardHandler : KeyboardHandler
         // DEMO: Pressing escape closes the game
         Register(KeyCode.KEscape).OnDown += (_, _) =>
         {
-            _host.Scheduler.ScheduleTask(() =>
-            {
-                while (!_screens.Empty())
-                    _screens.Pop();
+            while (!_screens.Empty())
+                _screens.Pop();
 
-                _host.RequestClose();
-            });
+            _host.RequestClose();
         };
 
         secretCodeHandler.OnSecretCodeEntered += delegate
