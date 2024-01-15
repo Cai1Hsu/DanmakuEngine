@@ -85,16 +85,11 @@ public class HeadlessGameHost : GameHost
 
         long lastWaitTicks = ElapsedTicks;
 
-        ThrottledExecutor executor = new(_ => threadRunner.RunMainLoop())
-        {
-            ActiveHz = ConfigManager.Vsync ? refreshRate : 1000,
-        };
-
         while (isRunning
             && (Running is null || Running.Invoke())
             && (!limitTime || ElapsedMilliseconds < timeout))
         {
-            executor.RunNextFrame();
+            threadRunner.RunMainLoop();
         }
 
         // The host exited with timed out
