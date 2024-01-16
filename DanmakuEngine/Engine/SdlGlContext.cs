@@ -5,26 +5,42 @@ namespace DanmakuEngine.Engine;
 
 public unsafe class SdlGlContext : INativeContext
 {
-    private Sdl sdl;
+    private Sdl _sdl;
 
     public SdlGlContext(Sdl sdl)
     {
-        if (sdl == null)
-            throw new ArgumentNullException(nameof(sdl));
+        ArgumentNullException.ThrowIfNull(sdl);
 
-        this.sdl = sdl;
+        this._sdl = sdl;
     }
 
-    public nint GetProcAddress(string s, int? slot = null)
+    private nint getProcAddress(string symbol)
     {
-        return (nint)sdl.GLGetProcAddress(s);
+        const int error_category = (int)LogCategory.Error;
+
+        var oldPriority = _sdl.LogGetPriority(error_category);
+
+        // Prevent logging calls to SDL_GL_GetProcAddress() that fail on systems which don't have the requested symbol (typically macOS).
+        _sdl.LogSetPriority(error_category, LogPriority.LogPriorityInfo);
+
+        nint ret = (nint)_sdl.GLGetProcAddress(symbol);
+
+        // Reset the logging behaviour.
+        _sdl.LogSetPriority(error_category, oldPriority);
+
+        return ret;
     }
 
-    public bool TryGetProcAddress(string s, out nint addr, int? slot = null)
+    public nint GetProcAddress(string symbol, int? slot = null)
+    {
+        return getProcAddress(symbol);
+    }
+
+    public bool TryGetProcAddress(string symbol, out nint addr, int? slot = null)
     {
         try
         {
-            addr = (nint)sdl.GLGetProcAddress(s);
+            addr = getProcAddress(symbol);
 
             return true;
         }
