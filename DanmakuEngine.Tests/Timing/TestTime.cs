@@ -17,6 +17,12 @@ public class TestTime
         defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        defaultProvider.Dispose();
+    }
+
     [Test]
     public void TestUpdateDelta()
     {

@@ -21,6 +21,12 @@ public class TestTransformer
         testGame = new TestGame();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        defaultProvider.Dispose();
+    }
+
     [Test]
     public void TestWithOnUpdate()
     {
