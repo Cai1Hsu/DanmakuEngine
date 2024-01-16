@@ -19,6 +19,12 @@ public class TestFixedAcceleratedMovement
         defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        defaultProvider.Dispose();
+    }
+
     [Test]
     [TestCase(true)]
     [TestCase(false)]
