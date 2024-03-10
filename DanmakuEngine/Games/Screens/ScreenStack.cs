@@ -131,6 +131,6 @@ public class ScreenStack : CompositeDrawable
                 return;
 
             peek.FixedUpdateSubtree();
-        } while(updateAnotherFrame);
+        } while (updateAnotherFrame);
     }
 }
