@@ -30,9 +30,4 @@ public class RootObject : DrawableContainer
 
         base.update();
     }
-
-    protected override void Start()
-    {
-        base.Start();
-    }
 }
