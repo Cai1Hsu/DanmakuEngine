@@ -127,25 +127,29 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
     {
     }
 
-    protected virtual void FixedUpdateSubtree()
+    public virtual void FixedUpdateSubtree()
     {
         Debug.Assert(!isDisposed);
         Debug.Assert(LoadState == LoadState.Complete);
 
-        // if (isDisposed)
-        //     return;
+        if (isDisposed)
+            return;
 
-        // if (LoadState < LoadState.Complete)
-        //     return;
+        if (LoadState < LoadState.Complete)
+            return;
 
-        FixedUpdate();
+        fixedUpdate();
 
         if (InternalChildren is not null)
         {
             foreach (var c in InternalChildren)
                 c.FixedUpdateSubtree();
         }
+    }
 
+    protected virtual void fixedUpdate()
+    {
+        FixedUpdate();
         OnFixedUpdate?.Invoke(this);
     }
 
