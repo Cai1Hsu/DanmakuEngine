@@ -76,8 +76,4 @@ public partial class Screen : CompositeDrawable
 
         keyboardHandler?.RegisterKeys();
     }
-
-    protected override void LateUpdate()
-    {
-    }
 }
