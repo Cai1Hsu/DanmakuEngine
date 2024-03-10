@@ -23,4 +23,11 @@
     <PackageReference Include="SixLabors.ImageSharp.Drawing" Version="2.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Veldrid" Version="4.9.0" />
+    <PackageReference Include="Veldrid.Sdl2" Version="4.9.0" />
+    <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
+    <PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
+  </ItemGroup>
+
 </Project>
