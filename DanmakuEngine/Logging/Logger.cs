@@ -239,7 +239,12 @@ public readonly struct Log
         this.level = level;
     }
 
-    public override string ToString() => $"{time:yy-MM-dd HH:mm:ss} [{level}]: {message}";
+    public override string ToString()
+#if DEBUG
+        => $"{time:yy-MM-dd HH:mm:ss}.{time.Millisecond:D3} [{level}]: {message}";
+#else
+        => $"{time:yy-MM-dd HH:mm:ss} [{level}]: {message}";
+#endif
 }
 
 public enum LogLevel : byte
