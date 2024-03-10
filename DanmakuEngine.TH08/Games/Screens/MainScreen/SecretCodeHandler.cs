@@ -39,7 +39,7 @@ public class SecretCodeHandler
             lastKeyDown = Time.ElapsedSeconds;
 
 #if DEBUG
-// definitely we don't want to leak the secret code in release build
+            // definitely we don't want to leak the secret code in release build
 
             Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
 

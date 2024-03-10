@@ -3,8 +3,8 @@ using DanmakuEngine.Engine;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
 using DanmakuEngine.TH08.Games;
-using GraphicsBinding = DanmakuEngine.Graphics.Renderers.RendererType;
 using GraphicsBackend = Veldrid.GraphicsBackend;
+using GraphicsBinding = DanmakuEngine.Graphics.Renderers.RendererType;
 
 internal class Program
 {

@@ -29,7 +29,7 @@ public unsafe ref struct StackValue<T>
 
     public StackValue(T* value)
     {
-         _value = ref *value;
+        _value = ref *value;
     }
 
     public static implicit operator StackValue<T>(T* value) => new(value);

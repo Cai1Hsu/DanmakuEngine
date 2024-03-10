@@ -26,7 +26,7 @@ public class UpdateThread : GameThread
 
         Time.ElapsedSeconds = ElapsedSeconds;
 
-        
+
     }
     public override bool IsCurrent => ThreadSync.IsUpdateThread;
 }

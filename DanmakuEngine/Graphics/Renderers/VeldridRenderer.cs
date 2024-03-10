@@ -1,21 +1,21 @@
+using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+using DanmakuEngine.Engine;
+using DanmakuEngine.Engine.Platform;
+using DanmakuEngine.Engine.Windowing;
 using DanmakuEngine.Logging;
+using OpenTK.Graphics.ES11;
 using Silk.NET.SDL;
 using Veldrid;
+using Veldrid.OpenGL;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
+using PixelFormat = Veldrid.PixelFormat;
 using Sdl = Silk.NET.SDL.Sdl;
 using Sdl2Window = DanmakuEngine.Engine.Windowing.Sdl2Window;
 using WMType = Silk.NET.SDL.SysWMType;
-using PixelFormat = Veldrid.PixelFormat;
-using System.Diagnostics;
-using OpenTK.Graphics.ES11;
-using System.Runtime.Versioning;
-using System.Runtime.CompilerServices;
-using DanmakuEngine.Engine.Windowing;
-using Veldrid.OpenGL;
-using DanmakuEngine.Engine;
-using DanmakuEngine.Engine.Platform;
 
 
 namespace DanmakuEngine.Graphics.Renderers;
@@ -127,7 +127,7 @@ public class VeldridRenderer : Renderer
                 default:
                 {
                     if (DesktopGameHost.IsWindows)
-                        goto case  WMType.Windows;
+                        goto case WMType.Windows;
                     else if (DesktopGameHost.IsLinux)
                     {
                         Logger.Warn("============== ATTENTION ==============");
@@ -220,7 +220,7 @@ public class VeldridRenderer : Renderer
         Logger.Debug($@"  Device  :    {_device.DeviceName}");
         Logger.Debug($@"  Vendor  :    {_device.VendorName}");
         if (_device.BackendType is GraphicsBackend.OpenGL or GraphicsBackend.OpenGLES)
-        Logger.Debug($@"  GLSL    :    {_device.GetOpenGLInfo().ShadingLanguageVersion}");
+            Logger.Debug($@"  GLSL    :    {_device.GetOpenGLInfo().ShadingLanguageVersion}");
         Logger.Debug($@"  Binding :    Veldrid");
 
         Initialized = true;
