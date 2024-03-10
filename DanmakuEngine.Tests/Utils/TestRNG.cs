@@ -90,22 +90,22 @@ public class TestRNG
 
     private void testConsitentInt(RNG rng1, RNG rng2)
     {
-        Assert.AreEqual(rng1.Next(), rng2.Next());
+        Assert.That(rng1.Next(), Is.EqualTo(rng2.Next()));
     }
 
     private void testConsitentLong(RNG rng1, RNG rng2)
     {
-        Assert.AreEqual(rng1.NextLong(), rng2.NextLong());
+        Assert.That(rng1.NextLong(), Is.EqualTo(rng2.NextLong()));
     }
 
     private void testConsitentFloat(RNG rng1, RNG rng2)
     {
-        Assert.AreEqual(rng1.NextSingle(), rng2.NextSingle());
+        Assert.That(rng1.NextSingle(), Is.EqualTo(rng2.NextSingle()));
     }
 
     private void testConsitentDouble(RNG rng1, RNG rng2)
     {
-        Assert.AreEqual(rng1.NextDouble(), rng2.NextDouble());
+        Assert.That(rng1.NextDouble(), Is.EqualTo(rng2.NextDouble()));
     }
 
     private void testRadomOperation(RNG rng1, RNG rng2)
