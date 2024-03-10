@@ -1,5 +1,6 @@
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine;
 using DanmakuEngine.Engine.Platform.Windows;
 using DanmakuEngine.Logging;
 
@@ -31,42 +32,12 @@ public partial class ConfigManager
     [LoadFromArgument("-singlethread")]
     public bool Singlethreaded { get; private set; }
 
-    private readonly List<string> skipProperties = new();
+    public bool RunningTest { get; private set; }
 
-    public void DynamicLoadDefaultValues()
+    public void TestModeDectected()
     {
-        DynamicFetchVideoMode();
-    }
-
-    public void DynamicFetchVideoMode()
-    {
-#if !HEADLESS
-        try
-        {
-            var mainMonitor = Silk.NET.Windowing.Monitor.GetMainMonitor(null);
-
-            if (mainMonitor is not null)
-            {
-                var videoMode = mainMonitor.VideoMode;
-
-                Logger.Debug($"Main monitor video mode: {videoMode.Resolution!.Value.X}x{videoMode.Resolution!.Value.Y}@{videoMode.RefreshRate}Hz");
-
-                RefreshRate = videoMode.RefreshRate.GetValueOrDefault(60);
-            }
-            else
-            {
-                Logger.Debug("No main monitor found, using default refresh rate 60Hz");
-
-                RefreshRate = 60;
-            }
-
-            skipProperties.Add(nameof(RefreshRate));
-        }
-        catch (Exception)
-        {
-            // ignored
-        }
-#endif
+        RunningTest = true;
+        Logger.SetPrintLevel(LogLevel.Silent);
     }
 
     public void LoadFromArguments(ArgumentProvider argProvider)
@@ -80,16 +51,6 @@ public partial class ConfigManager
                 continue;
 
             var flag = ((LoadFromArgumentAttribute)attribute.Where(a => a is LoadFromArgumentAttribute).First()).Flag;
-
-            // see DynamicLoadDefaultValues()
-            // This helps us to avoid overriding the default value loaded from runtime
-            // For example, we load default value of RefreshRate at runtime instead of compile time
-            if (!argProvider.Find(flag) && skipProperties.Contains(propInfo.Name))
-            {
-                Logger.Debug($"[ConfigManager] skipping: Property {propInfo.Name} is already loaded from runtime, value: {propInfo.GetValue(this)}");
-
-                continue;
-            }
 
             if (!argProvider.IsSupport(flag))
                 throw new NotSupportedException($"Unrecognized flag {flag} for property {propInfo.Name}");
@@ -115,7 +76,7 @@ public partial class ConfigManager
             if (_hasConsole.HasValue)
                 return _hasConsole.Value;
 
-            _hasConsole = WindowsGameHost.HasConsole();
+            _hasConsole = GameHost.HasConsole();
 
             return _hasConsole.Value;
         }

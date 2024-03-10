@@ -211,7 +211,7 @@ public class ArgumentParser : IDisposable
         helps.ForEach(s => Logger.Write(s, true, true));
     }
 
-    public ArgumentProvider CreateArgumentProvider()
+    public ArgumentProvider CreateProvider()
         => new(this, arguments.ToDictionary(arg => arg.Key, arg => arg));
 
     public bool IsSupport(string key) => avaliableArguments.ContainsKey(key);

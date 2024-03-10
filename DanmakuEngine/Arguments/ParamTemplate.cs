@@ -28,16 +28,13 @@ public partial class ParamTemplate : Paramaters
 
     [Description("Enable debug-mode")]
     public Argument Debug =
-        new("-debug", typeof(bool), false, arg =>
-        {
-            var enabled = arg.GetValue<bool>();
-
-            if (enabled && DesktopGameHost.IsWindows && !ConfigManager.HasConsole)
-                WindowsGameHost.CreateConsole();
-
-            var status = enabled ? "enabled" : "disabled";
-            Logger.Debug($"Debug mode {status}");
-        });
+        new("-debug", typeof(bool),
+#if DEBUG
+        true
+#else
+        false
+#endif
+        );
 
     [Description("Clear screen before rendering the next frame")]
     public Argument ClearScreen =
