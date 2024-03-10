@@ -2,11 +2,9 @@ namespace DanmakuEngine.Timing;
 
 public class StandardClock : IClock
 {
-    public double UpdateDelta => Time.UpdateDelta;
+    public double DeltaTime => Time.UpdateDelta;
 
-    public double RenderDelta => Time.RenderDelta;
-
-    public double CurrentTime => Time.CurrentTime;
+    public double ElapsedSeconds => Time.ElapsedSeconds;
 
     public bool IsPaused => false;
 }

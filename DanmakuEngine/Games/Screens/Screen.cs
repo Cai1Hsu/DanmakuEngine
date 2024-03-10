@@ -24,8 +24,6 @@ public partial class Screen : CompositeDrawable
     /// </summary>
     public Clock ScreenClock => Clock;
 
-    protected List<GameObject> InternalChildren { get; set; } = null!;
-
     public void SetParent(ScreenStack parent)
     {
         if (_parent is not null)
@@ -36,8 +34,6 @@ public partial class Screen : CompositeDrawable
 
     public Screen() : base(null!)
     {
-        // in Drawable.load which is called in the update loop
-        // this.load();
     }
 
     public override bool UpdateSubTree()
@@ -79,5 +75,9 @@ public partial class Screen : CompositeDrawable
         base.load();
 
         keyboardHandler?.RegisterKeys();
+    }
+
+    protected override void LateUpdate()
+    {
     }
 }

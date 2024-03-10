@@ -14,7 +14,7 @@ public class TestScheduler
     [SetUp]
     public void SetUp()
     {
-        defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
+        defaultProvider = ArgumentProvider.CreateDefault(new ParamTemplate(), Array.Empty<string>());
     }
 
     [TearDown]
@@ -28,7 +28,7 @@ public class TestScheduler
     {
         var testGame = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         var scheduler = new Scheduler();
 
@@ -51,7 +51,7 @@ public class TestScheduler
 
         var testGame = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         var scheduler = new Scheduler();
 
@@ -59,7 +59,7 @@ public class TestScheduler
 
         host.OnLoad += h =>
         {
-            current_time = Time.CurrentTime;
+            current_time = Time.ElapsedSeconds;
 
             scheduler.ScheduleTaskDelay(() => h.RequestClose(), test_seconds);
         };
@@ -67,7 +67,7 @@ public class TestScheduler
         host.OnUpdate += _ =>
         {
             scheduler.UpdateSubTree();
-            current_time = Math.Max(current_time, Time.CurrentTime);
+            current_time = Math.Max(current_time, Time.ElapsedSeconds);
         };
 
         host.OnTimedout += Assert.Fail;

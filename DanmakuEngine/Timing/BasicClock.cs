@@ -8,12 +8,10 @@ public class BasicClock : IClock, ICanPause
 
     private bool isPaused;
 
-    public double UpdateDelta => isPaused ? 0 : Time.UpdateDelta;
+    public double DeltaTime => isPaused ? 0 : Time.UpdateDelta;
 
-    public double RenderDelta => isPaused ? 0 : Time.RenderDelta;
-
-    public double CurrentTime
-    => isPaused ? _accumulatedTime : Time.CurrentTime - _startTime + _accumulatedTime;
+    public double ElapsedSeconds
+    => isPaused ? _accumulatedTime : Time.ElapsedSeconds - _startTime + _accumulatedTime;
 
     public bool IsPaused => isPaused;
 
@@ -21,20 +19,20 @@ public class BasicClock : IClock, ICanPause
     {
         isPaused = true;
 
-        _accumulatedTime = CurrentTime;
+        _accumulatedTime = ElapsedSeconds;
     }
 
     public void Reset()
     {
         _accumulatedTime = 0;
-        _startTime = Time.CurrentTime;
+        _startTime = Time.ElapsedSeconds;
         isPaused = true;
     }
 
     public void Resume()
     {
-        _accumulatedTime += Time.CurrentTime - _startTime;
-        _startTime = Time.CurrentTime;
+        _accumulatedTime += Time.ElapsedSeconds - _startTime;
+        _startTime = Time.ElapsedSeconds;
         isPaused = false;
     }
 

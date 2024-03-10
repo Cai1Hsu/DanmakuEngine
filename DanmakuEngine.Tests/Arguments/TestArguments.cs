@@ -39,7 +39,7 @@ public class TestArguments
     public void TestArgumentsSupport()
     {
         using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
-        using (var argProvider = argParser.CreateArgumentProvider())
+        using (var argProvider = argParser.CreateProvider())
         {
             Assert.That(argParser.IsSupport("-help"), Is.True);
 
@@ -53,7 +53,7 @@ public class TestArguments
     public void TestGetDefault()
     {
         using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
-        using (var argProvider = argParser.CreateArgumentProvider())
+        using (var argProvider = argParser.CreateProvider())
         {
             var default_value = argTemplate.RefreshRate.GetValue<int>();
             Assert.That(argParser.GetDefault<int>("-refresh"), Is.EqualTo(default_value));
@@ -102,7 +102,7 @@ public class TestArguments
         // pass "-help" crashed host process??????
         // Seems caused by the operation of "-help"
         using (var argParser = new ArgumentParser(argTemplate, new string[] { "-help" }, false/*remove this will lead to hotst crash*/))
-        using (var argProvider = argParser.CreateArgumentProvider())
+        using (var argProvider = argParser.CreateProvider())
         {
             Assert.That(argProvider.Find("-help"), Is.True);
 
@@ -116,13 +116,13 @@ public class TestArguments
     public void TestArgumentGetValue()
     {
         using (var argParser = new ArgumentParser(argTemplate, new string[] { "-refresh", "120" }))
-        using (var argProvider = argParser.CreateArgumentProvider())
+        using (var argProvider = argParser.CreateProvider())
         {
             Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(120));
         }
 
         using (var argParser = new ArgumentParser(argTemplate, Array.Empty<string>()))
-        using (var argProvider = argParser.CreateArgumentProvider())
+        using (var argProvider = argParser.CreateProvider())
         {
             Assert.That(argProvider.GetValue<int>("-refresh"), Is.EqualTo(argTemplate.RefreshRate.GetValue<int>()));
         }

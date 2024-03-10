@@ -4,29 +4,30 @@ using DanmakuEngine.Logging;
 
 namespace DanmakuEngine.Games;
 
-public partial class Game
+public abstract partial class Game
 {
     public virtual string Name => @"Danmaku!";
 
     [Inject]
     protected ScreenStack screens = null!;
 
+    public abstract Screen EntryScreen { get; }
+
     /// <summary>
-    /// Prepare the game and start it
+    /// Prepare the game
     /// </summary>
-    public void begin()
+    public void prelude()
     {
         if (this is IInjectable injectable)
             injectable.AutoInject();
 
-        this.Begin();
+        this.Prelude();
     }
 
     /// <summary>
     /// The game logic starts here
     /// </summary>
-    protected virtual void Begin()
+    protected virtual void Prelude()
     {
-
     }
 }

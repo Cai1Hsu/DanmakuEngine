@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DanmakuEngine.Bindables;
 using DanmakuEngine.Timing;
 using Silk.NET.SDL;
+using Vortice.DXGI;
 
 namespace DanmakuEngine.Input.Keybards;
 
@@ -21,6 +22,9 @@ public class KeyStatus
         => bindable.BindTo(IsDown);
 
     private List<KeyStatus>? Bindings;
+
+    public bool Worthless
+        => !IsDown.IsBound() && OnDown is null && OnUp is null && (Bindings is null || Bindings.Count == 0);
 
     public void BindTo(KeyStatus other)
     {
@@ -73,28 +77,28 @@ public class KeyStatus
         if (e.Repeat != 0)
             return false;
 
-        Mod = (Keymod)e.Keysym.Mod;
+        if (Worthless)
+            return false;
 
-        // if the key is bound with bindables, we assume this action is handled
-        var bound = (IsDown.BindingCount - (Bindings is null ? 0 : Bindings.Count)) > 0;
+        // we shouldn't handle modifier this way
+        // consider use a separate method for handling key event and pass the modifier
+        Mod = (Keymod)e.Keysym.Mod;
 
         if (e.Type == (uint)EventType.Keydown)
         {
-            if (OnDown is null && !bound)
-                return false;
-
+            // This may lead to assertion failure if u have two keyboards
+            // but we leave it here for preventing other bugs such as failing to detect key up
             Debug.Assert(!IsDown.Value);
 
             IsDown.Value = true;
         }
         else if (e.Type == (uint)EventType.Keyup)
         {
-            if (OnUp is null && !bound)
-                return false;
-
             Debug.Assert(IsDown.Value);
 
             IsDown.Value = false;
+
+            Mod = Keymod.None;
         }
 
         return true;
@@ -107,9 +111,9 @@ public class KeyStatus
         IsDown.BindValueChanged(v =>
         {
             if (v.NewValue)
-                OnDown?.Invoke(this, Time.CurrentTime);
+                OnDown?.Invoke(this, Time.ElapsedSeconds);
             else
-                OnUp?.Invoke(this, Time.CurrentTime);
+                OnUp?.Invoke(this, Time.ElapsedSeconds);
         });
     }
 }

@@ -17,7 +17,7 @@ public class TestTransformer
     [SetUp]
     public void SetUp()
     {
-        defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
+        defaultProvider = ArgumentProvider.CreateDefault(new ParamTemplate(), Array.Empty<string>());
         testGame = new TestGame();
     }
 
@@ -32,7 +32,6 @@ public class TestTransformer
     {
         var host = new TestGameHost(1500)
         {
-            BypassWaitForSync = true,
             IgnoreTimedout = true,
             ThrowOnTimedOut = false,
         };
@@ -48,8 +47,8 @@ public class TestTransformer
 
         host.OnUpdate += h =>
         {
-            t.Update(Time.Clock.UpdateDelta * 1000);
-            expected += Time.Clock.UpdateDelta;
+            t.Update(Time.Clock.DeltaTime * 1000);
+            expected += Time.Clock.DeltaTime;
 
             if (expected > 1)
             {
@@ -71,7 +70,6 @@ public class TestTransformer
         {
             IgnoreTimedout = true,
             ThrowOnTimedOut = false,
-            BypassWaitForSync = true,
         };
 
         Bindable<double> bindable = new();
@@ -80,7 +78,7 @@ public class TestTransformer
 
         host.OnUpdate += _ =>
         {
-            t.Update(Time.Clock.UpdateDelta * 1000);
+            t.Update(Time.Clock.DeltaTime * 1000);
 
             Assert.That(bindable.Value, Is.EqualTo(t.Value));
         };

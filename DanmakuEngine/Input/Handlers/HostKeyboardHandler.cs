@@ -8,7 +8,7 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public partial class TopKeyboardHandler : IInputHandler
+public partial class HostKeyboardHandler : IInputHandler
 {
     [Inject]
     private ScreenStack screens = null!;
@@ -31,6 +31,10 @@ public partial class TopKeyboardHandler : IInputHandler
 
     public void HandleEvent(KeyboardEvent e)
     {
+        // Ignore repeat events in InputHandlers
+        if (e.Repeat != 0)
+            return;
+
         foreach (var h in handlers())
         {
             if (h is not null && h.HandleEvent(e))

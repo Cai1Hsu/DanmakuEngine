@@ -1,6 +1,7 @@
-using System.Collections.Immutable;
+using System.Collections.Frozen;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Logging;
 
@@ -9,29 +10,28 @@ public partial class Logger : IInjectable, IAutoloadable
     [Inject]
     private ConfigManager ConfigManager = null!;
 
-    private static readonly Logger _instence = null!;
+    private static readonly Logger instance;
 
-    private static readonly object _synclog = new();
-    private static readonly object _syncqueue = new();
-    private static readonly object _syncconsole = new();
+    private static readonly object syncqueue = new();
+    private static readonly object syncconsole = new();
 
     private static string log_directory;
 
     private static readonly string log_file;
 
-    private static string FullLogFile => Path.Combine(log_directory, log_file);
+    private static string fullLogFile => Path.Combine(log_directory, log_file);
 
     private const string game = @"DanmakuEngine";
 
     private LogLevel printLevel = LogLevel.Verbose;
 
-    public static Logger GetLogger() => _instence;
+    public static Logger GetLogger() => instance;
 
     public static void SetPrintLevel(LogLevel logLevel)
     {
-        _instence.printLevel = logLevel;
+        instance.printLevel = logLevel;
 
-        Logger.Debug($"Print level updated, current: {_instence.printLevel}");
+        Logger.Debug($"Print level updated, current: {instance.printLevel}");
     }
 
     public static void SetLogDirectory(string directory)
@@ -46,15 +46,7 @@ public partial class Logger : IInjectable, IAutoloadable
 
     public static void Verbose(string message) => Log(message, LogLevel.Verbose);
 
-    public static void Debug(string message)
-    {
-        var logger = GetLogger();
-
-        if (logger.ConfigManager != null && !logger.ConfigManager.DebugMode)
-            return;
-
-        Log(message, LogLevel.Debug);
-    }
+    public static void Debug(string message) => Log(message, LogLevel.Debug);
 
     public static void Warn(string message) => Log(message, LogLevel.Warning);
 
@@ -66,22 +58,15 @@ public partial class Logger : IInjectable, IAutoloadable
     {
         var logger = GetLogger();
 
-        System.Diagnostics.Debug.Assert(logger != null);
-
         logLevel ??= logger.logLevel;
 
         var log = new Log(DateTime.UtcNow, message, logLevel.Value);
 
-        PrintLog(log);
+        printLog(log);
 
-        lock (_synclog)
+        lock (syncqueue)
         {
-            _instence.logs.AddLast(log);
-        }
-
-        lock (_syncqueue)
-        {
-            _instence.pendingWrite.Enqueue(log);
+            instance.pendingWrite.Enqueue(log);
         }
 
         QueueAsyncSave();
@@ -110,24 +95,24 @@ public partial class Logger : IInjectable, IAutoloadable
         });
     }
 
-    private static readonly ImmutableDictionary<LogLevel, Action> colorMap = new Dictionary<LogLevel, Action>()
+    private static readonly FrozenDictionary<LogLevel, Action> colorMap = new Dictionary<LogLevel, Action>()
     {
         {LogLevel.Error, () => Console.ForegroundColor = ConsoleColor.Red},
         {LogLevel.Warning, () => Console.ForegroundColor = ConsoleColor.Yellow},
         {LogLevel.Debug, () => Console.ForegroundColor = ConsoleColor.Green},
         {LogLevel.Verbose, () => Console.ResetColor()},
         {LogLevel.Info, () => Console.ForegroundColor = ConsoleColor.DarkGray}
-    }.ToImmutableDictionary();
+    }.ToFrozenDictionary();
 
     private static bool defaultcolor = true;
     private static object _synccolor = new();
 
-    private static void PrintLog(Log log)
+    private static void printLog(Log log)
     {
         if (!ConfigManager.HasConsole)
             return;
 
-        if (log.level < _instence.printLevel)
+        if (log.level < instance.printLevel)
             return;
 
         lock (_synccolor)
@@ -137,12 +122,10 @@ public partial class Logger : IInjectable, IAutoloadable
             defaultcolor = false;
 
             Write(log.ToString(), false, true);
-        }
 
-        // TODO: Whether we should reset the color
-        // Only needed when we develop the TUI debugging
-        // However this causes performance issue.
-        // Maybe we should do it async
+            Console.ResetColor();
+            defaultcolor = true;
+        }
     }
 
     public static void Write(string str, bool resetColor = false, bool writeLine = false)
@@ -150,7 +133,7 @@ public partial class Logger : IInjectable, IAutoloadable
         if (!ConfigManager.HasConsole)
             return;
 
-        lock (_syncconsole)
+        lock (syncconsole)
         {
             if (resetColor && !defaultcolor)
             {
@@ -175,11 +158,11 @@ public partial class Logger : IInjectable, IAutoloadable
 
     private static void PeriodSave()
     {
-        lock (_syncqueue)
+        lock (syncqueue)
         {
-            var pendings = _instence.pendingWrite;
+            var pendings = instance.pendingWrite;
 
-            using var fs = new StreamWriter(FullLogFile, true);
+            using var fs = new StreamWriter(fullLogFile, true);
             while (pendings.TryDequeue(out Log log))
             {
                 fs.WriteLine(log);
@@ -187,20 +170,18 @@ public partial class Logger : IInjectable, IAutoloadable
         }
     }
 
-    private static readonly DateTime begin = new(1970, 1, 1, 0, 0, 0, 0);
-
     /// <summary>
     /// actually it's every 100ms
     /// </summary>
     /// <returns></returns>
     private static int getTimeStamp()
-        => (int)((DateTime.UtcNow - begin).TotalSeconds * 10);
+        => (int)(Time.AppTimer.ElapsedMilliseconds * 100);
 
     public static void SetLogLevel(LogLevel logLevel)
     {
-        _instence.logLevel = logLevel;
+        instance.logLevel = logLevel;
 
-        Logger.Log($"Log level updated, current: {_instence.logLevel}");
+        Logger.Log($"Log level updated, current: {instance.logLevel}");
     }
 
     public void OnInjected()
@@ -216,13 +197,11 @@ public partial class Logger : IInjectable, IAutoloadable
     /// </summary>
     private LogLevel logLevel = LogLevel.Verbose;
 
-    private LinkedList<Log> logs = new();
-
     private Queue<Log> pendingWrite = new();
 
     static Logger()
     {
-        _instence = new Logger();
+        instance = new Logger();
 
         log_directory = Environment.CurrentDirectory;
 
@@ -232,7 +211,7 @@ public partial class Logger : IInjectable, IAutoloadable
 
         log_file = $"{game}-{DateTime.Now:yy-MM-dd-HH-mm}-{unique_id}.log";
 
-        Logger.Debug($"Log file: {FullLogFile}");
+        Logger.Debug($"Log file: {fullLogFile}");
 
         var ci_env = Environment.GetEnvironmentVariable("IS_CI_ENVIRONMENT");
 
@@ -263,13 +242,12 @@ public readonly struct Log
     public override string ToString() => $"{time:yy-MM-dd HH:mm:ss} [{level}]: {message}";
 }
 
-// Converter
-public enum LogLevel
+public enum LogLevel : byte
 {
-    Silent = 0x7fffffff,
-    Error = 5,
-    Warning = 4,
-    Debug = 3,
-    Verbose = 2,
+    Silent = 1 << (sizeof(byte) * 8 - 1),
+    Error = 1 << 4,
+    Warning = 1 << 3,
+    Verbose = 1 << 2,
+    Debug = 1 << 1,
     Info = 1,
 }

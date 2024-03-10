@@ -28,16 +28,13 @@ public partial class ParamTemplate : Paramaters
 
     [Description("Enable debug-mode")]
     public Argument Debug =
-        new("-debug", typeof(bool), false, arg =>
-        {
-            var enabled = arg.GetValue<bool>();
-
-            if (enabled && DesktopGameHost.IsWindows && !ConfigManager.HasConsole)
-                WindowsGameHost.CreateConsole();
-
-            var status = enabled ? "enabled" : "disabled";
-            Logger.Debug($"Debug mode {status}");
-        });
+        new("-debug", typeof(bool),
+#if DEBUG
+        true
+#else
+        false
+#endif
+        );
 
     [Description("Clear screen before rendering the next frame")]
     public Argument ClearScreen =
@@ -60,6 +57,10 @@ public partial class ParamTemplate : Paramaters
     [Description("Specify whether to run the game in headless mode")]
     public Argument Headless =
         new("-headless", typeof(bool), false);
+
+    [Description("Specify whether to run the game in single-threaded mode")]
+    public Argument SingleThreaded =
+        new("-singlethread", typeof(bool), false);
 
     // For some arguments need non-static support.
     public ParamTemplate()

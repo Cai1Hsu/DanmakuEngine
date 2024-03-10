@@ -12,7 +12,7 @@ public class InputManager
     {
         Handlers = new[]
         {
-            new TopKeyboardHandler(),
+            new HostKeyboardHandler(),
         };
     }
 

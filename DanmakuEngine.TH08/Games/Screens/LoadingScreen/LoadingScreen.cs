@@ -1,6 +1,7 @@
 ﻿using DanmakuEngine.Games.Screens.MainMenu;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
+using DanmakuEngine.TH08.Games;
 
 namespace DanmakuEngine.Games.Screens.Welcome;
 
@@ -13,7 +14,6 @@ public partial class LoadingScreen : Screen
     // You can do some initialization for the screen here
     protected override void Load()
     {
-        keyboardHandler = null!;
     }
 
     // This method is called the first frame when the screen(or average object) is completely loaded
@@ -43,7 +43,9 @@ public partial class LoadingScreen : Screen
 
             // If you want to schedule a task that will be executed after a certain delay,
             // you can use `Scheduler.ScheduleTaskDelay` method
-            return ScreenClock.CurrentTime > 2;
+
+            // FIXME: CurrentTime is always 0
+            return ScreenClock.ElapsedSeconds > 2;
         });
     }
 

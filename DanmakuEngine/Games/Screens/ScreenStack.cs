@@ -6,18 +6,25 @@ namespace DanmakuEngine.Games.Screens;
 
 public class ScreenStack : CompositeDrawable
 {
-    private Stack<Screen> screens = new();
+    private Stack<Screen> _screens = new();
 
     private object _lock = new();
 
-    protected override IEnumerable<Drawable> Children => screens;
+    public new List<Screen> Children => _screens.ToList();
 
     protected override bool AlwaysPresent => true;
 
-    public ScreenStack(CompositeDrawable parent) : base(parent)
+    public ScreenStack(CompositeDrawable parent)
+        : base(parent)
     {
     }
 
+    /// <summary>
+    /// Switch to another screen, pop the current screen and push the new screen
+    /// This method is thread-safe, prevent game from exiting when popping the last screen
+    /// </summary>
+    /// <param name="screen"></param>
+    /// <exception cref="InvalidOperationException"></exception>
     public void Switch(Screen screen)
     {
         if (Empty())
@@ -30,17 +37,18 @@ public class ScreenStack : CompositeDrawable
         lock (_lock)
         {
             last =
-            screens.Pop();
-            screens.Push(screen);
+            _screens.Pop();
+            _screens.Push(screen);
         }
 
         updateAnotherFrame = true;
 
         if (ConfigManager.HasConsole)
-            Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {screens.Count}");
+            Logger.Debug($"ScreenStack: Switchd to(poped {last.GetType()} and pushed) {screen.GetType().Name}, current depth: {_screens.Count}");
     }
 
     /// <summary>
+    /// Push a screen to the stack
     /// If you have to pop the screen, use <see cref="Switch"/> instead
     /// </summary>
     /// <param name="screen">Screen to push</param>
@@ -50,13 +58,13 @@ public class ScreenStack : CompositeDrawable
 
         lock (_lock)
         {
-            screens.Push(screen);
+            _screens.Push(screen);
         }
 
         updateAnotherFrame = true;
 
         if (ConfigManager.HasConsole)
-            Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {screens.Count}");
+            Logger.Debug($"ScreenStack: Pushed {screen.GetType().Name}, current depth: {_screens.Count}");
     }
 
     public Screen? Peek()
@@ -66,16 +74,16 @@ public class ScreenStack : CompositeDrawable
 
         lock (_lock)
         {
-            return (Screen?)screens.Peek();
+            return (Screen?)_screens.Peek();
         }
     }
 
     public Screen Pop()
     {
-        var screen = screens.Pop();
+        var screen = _screens.Pop();
 
         if (ConfigManager.HasConsole)
-            Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {screens.Count}");
+            Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {_screens.Count}");
 
         return screen;
     }
@@ -84,7 +92,7 @@ public class ScreenStack : CompositeDrawable
     {
         lock (_lock)
         {
-            return screens.Count == 0;
+            return _screens.Count == 0;
         }
     }
 

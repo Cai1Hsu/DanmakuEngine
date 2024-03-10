@@ -31,14 +31,19 @@ public class SecretCodeHandler
 
     public bool HandleKey(KeyCode key)
     {
-        if (Time.CurrentTime - lastKeyDown > 1000)
+        if (Time.ElapsedSeconds - lastKeyDown > 1000)
             secretCodeIndex = 0;
 
         if (key == secretCode[secretCodeIndex])
         {
-            lastKeyDown = Time.CurrentTime;
+            lastKeyDown = Time.ElapsedSeconds;
+
+#if DEBUG
+            // definitely we don't want to leak the secret code in release build
 
             Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+
+#endif // DEBUG
 
             secretCodeIndex++;
 

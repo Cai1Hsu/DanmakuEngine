@@ -16,7 +16,7 @@ public class Scheduler : UpdateOnlyObject
 
     private readonly LazyValue<Queue<ScheduledTask>> pendingTasks = LazyValue.Create<Queue<ScheduledTask>>();
 
-    private double CurrentTime => Clock.CurrentTime;
+    private double currentTime => Clock.ElapsedSeconds;
 
     private readonly LazyValue<IClock> clock;
 
@@ -88,7 +88,7 @@ public class Scheduler : UpdateOnlyObject
             return;
         }
 
-        var untilTime = CurrentTime + delay;
+        var untilTime = currentTime + delay;
 
         ScheduleTask(
             scheduleDelayedTask,
@@ -103,34 +103,55 @@ public class Scheduler : UpdateOnlyObject
             if (delay <= 0)
                 return true;
 
-            return CurrentTime >= untilTime;
+            return currentTime >= untilTime;
+        }
+    }
+
+    public bool Empty
+    {
+        get
+        {
+            lock (taskLock)
+            {
+                return tasks.Count == 0;
+            }
+        }
+    }
+
+    private ScheduledTask dequeueTask()
+    {
+        lock (taskLock)
+        {
+            if (tasks.Count == 0)
+                return null!;
+
+            return tasks.Dequeue();
         }
     }
 
     protected override void Update()
     {
+        while (!Empty)
+        {
+            var task = dequeueTask();
+
+            if (task.ShouldRun)
+            {
+                using var t = task;
+
+                t.Run();
+            }
+            else
+            {
+                pendingTasks.Value.Enqueue(task);
+            }
+        }
+
         lock (taskLock)
         {
-            while (tasks.Count > 0)
+            while (pendingTasks.Value.Count > 0)
             {
-                var task = tasks.Dequeue();
-
-                if (task.ShouldRun)
-                {
-                    using var t = task;
-
-                    t.Run();
-                }
-                else
-                {
-                    pendingTasks.Value.Enqueue(task);
-                }
-            }
-
-            if (pendingTasks.HasValue)
-            {
-                while (pendingTasks.Value.Count > 0)
-                    tasks.Enqueue(pendingTasks.Value.Dequeue());
+                tasks.Enqueue(pendingTasks.Value.Dequeue());
             }
         }
     }
@@ -144,5 +165,10 @@ public class Scheduler : UpdateOnlyObject
     /// </summary>
     /// <param name="clock">the new clock</param>
     public void ChangeClock(IClock clock)
-        => this.clock.AssignValue(clock, true);
+    {
+        if (!Empty)
+            throw new InvalidOperationException("Can not change clock when tasks are not empty.");
+
+        this.clock.AssignValue(clock, true);
+    }
 }

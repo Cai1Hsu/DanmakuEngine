@@ -14,7 +14,7 @@ public class TestTime
     [SetUp]
     public void SetUp()
     {
-        defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
+        defaultProvider = ArgumentProvider.CreateDefault(new ParamTemplate(), Array.Empty<string>());
     }
 
     [TearDown]
@@ -24,17 +24,20 @@ public class TestTime
     }
 
     [Test]
-    public void TestUpdateDelta()
+    public void TestDeltaTime()
     {
         var testGame = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000)
+        {
+            SkipFirstFrame = true,
+        };
 
         host.OnUpdate += h =>
         {
             Assert.That(Time.UpdateDelta, Is.GreaterThan(0));
 
-            Assert.That(Time.CurrentTime, Is.GreaterThan(0));
+            Assert.That(Time.ElapsedSeconds, Is.GreaterThan(0));
 
             h.RequestClose();
         };
@@ -47,42 +50,46 @@ public class TestTime
     [Test]
     public void TestTimeReset()
     {
+        // Since the defaultProvider will be disposed after config loadingm, we should declare an extra provider.
+        var argProvider1 = ArgumentProvider.CreateDefault(new ParamTemplate(), []);
+        var argProvider2 = ArgumentProvider.CreateDefault(new ParamTemplate(), []);
+
         var testGame = new TestGame();
 
-        using var host1 = new HeadlessGameHost(5000);
+        using var host1 = new TestGameHost(5000);
 
         host1.OnUpdate += h =>
         {
-            if (Time.CurrentTime > 0.5)
+            if (Time.ElapsedSeconds > 0.5)
                 h.RequestClose();
         };
 
         host1.OnTimedout += Assert.Fail;
 
-        host1.Run(testGame, defaultProvider);
+        host1.Run(testGame, argProvider1);
 
-        using var host2 = new HeadlessGameHost(5000);
+        using var host2 = new TestGameHost(5000);
 
         host2.OnUpdate += h =>
         {
-            Assert.That(Time.CurrentTime, Is.LessThan(0.5));
+            Assert.That(Time.ElapsedSeconds, Is.LessThan(0.5));
 
             h.RequestClose();
         };
 
         host2.OnTimedout += Assert.Fail;
 
-        host2.Run(testGame, defaultProvider);
+        host2.Run(testGame, argProvider2);
     }
 
     [Test]
-    public void TestHeadlessGameHostUpdateFrames()
+    public void TestTestGameHostUpdateFrames()
     {
         var testGame = new TestGame();
 
         int count_frame = 0;
 
-        using var host = new HeadlessGameHost(100)
+        using var host = new TestGameHost(100)
         {
             // Fix error output in CI
             ThrowOnTimedOut = false,

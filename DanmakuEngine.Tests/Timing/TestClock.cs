@@ -14,7 +14,7 @@ public class TestClock
     [SetUp]
     public void SetUp()
     {
-        defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
+        defaultProvider = ArgumentProvider.CreateDefault(new ParamTemplate(), Array.Empty<string>());
     }
 
     [TearDown]
@@ -30,16 +30,15 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
-            Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(Time.ElapsedSeconds));
 
-            Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
-            Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
+            Assert.That(clock.DeltaTime, Is.EqualTo(Time.UpdateDelta));
 
-            if (Time.CurrentTime > 0.1)
+            if (Time.ElapsedSeconds > 0.5)
                 h.RequestClose();
         };
 
@@ -58,14 +57,16 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000)
+        {
+            SkipFirstFrame = true,
+        };
 
         host.OnUpdate += h =>
         {
-            Assert.That(clock.UpdateDelta, Is.GreaterThan(0));
-            Assert.That(clock.RenderDelta, Is.GreaterThan(0));
+            Assert.That(clock.DeltaTime, Is.GreaterThan(0));
 
-            Assert.That(clock.CurrentTime, Is.GreaterThan(0));
+            Assert.That(clock.ElapsedSeconds, Is.GreaterThan(0));
 
             h.RequestClose();
         };
@@ -88,7 +89,7 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
@@ -96,12 +97,12 @@ public class TestClock
 
             if (count_frame == 1)
             {
-                current_time = clock.CurrentTime;
+                current_time = clock.ElapsedSeconds;
 
                 clock.Pause();
             }
 
-            Assert.That(clock.CurrentTime, Is.EqualTo(current_time));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time));
 
             if (count_frame > 60)
                 h.RequestClose();
@@ -122,7 +123,7 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
@@ -131,9 +132,9 @@ public class TestClock
             if (count_frame < 60)
             {
                 if (current_time == 0)
-                    current_time = clock.CurrentTime;
+                    current_time = clock.ElapsedSeconds;
                 else
-                    Assert.That(clock.CurrentTime, Is.LessThan(current_time));
+                    Assert.That(clock.ElapsedSeconds, Is.LessThan(current_time));
             }
             else if (count_frame < 120)
             {
@@ -141,7 +142,7 @@ public class TestClock
             }
             else if (count_frame < 180)
             {
-                Assert.That(clock.CurrentTime, Is.GreaterThan(current_time));
+                Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time));
             }
             else
             {
@@ -166,12 +167,12 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
-            Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta * 2).Within(0.001));
-            Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime * 2).Within(0.001));
+            Assert.That(clock.DeltaTime, Is.EqualTo(Time.UpdateDelta * 2).Within(0.001));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(Time.ElapsedSeconds * 2).Within(0.001));
 
             h.RequestClose();
         };
@@ -197,7 +198,7 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
@@ -205,16 +206,16 @@ public class TestClock
 
             if (count_frame == 30)
             {
-                current_time = Time.CurrentTime;
+                current_time = Time.ElapsedSeconds;
 
                 clock.SetPlayback(2.0);
             }
             else if (count_frame == 60)
             {
                 // half of the second part and the first part
-                var correct_clock_time = (Time.CurrentTime - current_time) * 2 + current_time;
+                var correct_clock_time = (Time.ElapsedSeconds - current_time) * 2 + current_time;
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(correct_clock_time).Within(0.001));
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(correct_clock_time).Within(0.001));
 
                 h.RequestClose();
             }
@@ -232,7 +233,7 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
@@ -260,13 +261,13 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
             clock.Reset();
 
-            Assert.That(clock.CurrentTime, Is.EqualTo(0));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(0));
 
             h.RequestClose();
         };
@@ -283,15 +284,15 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
-            var current_time = clock.CurrentTime;
+            var current_time = clock.ElapsedSeconds;
 
             clock.StepIn(1);
 
-            Assert.That(clock.CurrentTime, Is.EqualTo(current_time + 1));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time + 1));
 
             h.RequestClose();
         };
@@ -308,17 +309,17 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000);
+        using var host = new TestGameHost(5000);
 
         host.OnUpdate += h =>
         {
-            if (Time.CurrentTime > 0.5)
+            if (Time.ElapsedSeconds > 0.5)
             {
-                var current_time = clock.CurrentTime;
+                var current_time = clock.ElapsedSeconds;
 
                 clock.StepOut(0.1);
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(current_time - 0.1));
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1));
 
                 h.RequestClose();
             }
@@ -339,18 +340,13 @@ public class TestClock
     // }
 
     [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public void TestTheWorld(bool sync)
+    public void TestTheWorld()
     {
         Clock clock = new();
 
         var game = new TestGame();
 
-        using var host = new HeadlessGameHost(5000)
-        {
-            BypassWaitForSync = sync
-        };
+        using var host = new TestGameHost(5000);
 
         bool checkpoint1 = true;
         double checkpoint1_time = -1;
@@ -361,46 +357,43 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            if (!checkpoint1 && !checkpoint2 && checkpoint3 && Time.CurrentTime > 0.7)
+            if (!checkpoint1 && !checkpoint2 && checkpoint3 && Time.ElapsedSeconds > 0.7)
             {
                 checkpoint3 = false;
 
                 Assert.That(clock.IsPaused, Is.False);
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(Time.CurrentTime - 0.5).Within(1E-10));
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(Time.ElapsedSeconds - 0.5).Within(1E-10));
 
-                Assert.That(clock.UpdateDelta, Is.EqualTo(Time.UpdateDelta));
-                Assert.That(clock.RenderDelta, Is.EqualTo(Time.RenderDelta));
+                Assert.That(clock.DeltaTime, Is.EqualTo(Time.UpdateDelta));
 
                 h.RequestClose();
             }
 
-            if (!checkpoint1 && checkpoint2 && Time.CurrentTime < 0.2)
+            if (!checkpoint1 && checkpoint2 && Time.ElapsedSeconds < 0.2)
             {
                 checkpoint2 = false;
 
                 Assert.That(clock.IsPaused, Is.True);
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(checkpoint1_time));
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(checkpoint1_time));
 
-                Assert.That(clock.UpdateDelta, Is.EqualTo(0));
-                Assert.That(clock.RenderDelta, Is.EqualTo(0));
+                Assert.That(clock.DeltaTime, Is.EqualTo(0));
             }
 
-            if (checkpoint1 && Time.CurrentTime > 0.05)
+            if (checkpoint1 && Time.ElapsedSeconds > 0.05)
             {
                 checkpoint1 = false;
 
-                checkpoint1_time = clock.CurrentTime;
+                checkpoint1_time = clock.ElapsedSeconds;
 
                 clock.TheWorld(0.5);
 
                 Assert.That(clock.IsPaused, Is.True);
 
-                Assert.That(clock.CurrentTime, Is.EqualTo(checkpoint1_time));
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(checkpoint1_time));
 
-                Assert.That(clock.UpdateDelta, Is.EqualTo(0));
-                Assert.That(clock.RenderDelta, Is.EqualTo(0));
+                Assert.That(clock.DeltaTime, Is.EqualTo(0));
             }
         };
 

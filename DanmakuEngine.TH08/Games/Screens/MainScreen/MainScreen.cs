@@ -129,11 +129,11 @@ public partial class MainScreen : Screen
         // this lead to the animation speed not constant
         // const string bgm = "BGM: 竹取飛翔　～ Lunatic Princess";
         // int wholeDisplayLength = bgm.GetDisplayLength();
-        // 
+        //
         // int displayChars = (int)Math.Round(percentage * wholeDisplayLength);
         // string displayString = "";
         // int currentDisplayLength = 0;
-        // 
+        //
         // for (int i = 0; i < bgm.Length; i++)
         // {
         //     int charDisplayLength = bgm[i] < 128 ? 1 : 2;
@@ -141,14 +141,14 @@ public partial class MainScreen : Screen
         //     {
         //         if (currentDisplayLength + 1 == displayChars)
         //             displayString += "\u2005";
-        // 
+        //
         //         break;
         //     }
-        // 
+        //
         //     displayString += bgm[i];
         //     currentDisplayLength += charDisplayLength;
         // }
-        // 
+        //
         // string line = ' '.Multiply(wholeDisplayLength - currentDisplayLength) + displayString
 
         // Since '\u2005' is not supported in every terminal
@@ -196,6 +196,6 @@ public partial class MainScreen : Screen
     protected override void Update()
     {
         foreach (var transformation in transformations)
-            transformation.Update(clock.UpdateDelta * 1000);
+            transformation.Update(clock.DeltaTime * 1000);
     }
 }

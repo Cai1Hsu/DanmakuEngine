@@ -7,9 +7,9 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// Represents the current time of the clock in seconds. 
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double CurrentTime => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime);
+    public double ElapsedSeconds => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime);
 
-    private double realElapsedTime => Time.CurrentTime - _startTime;
+    private double realElapsedTime => Time.ElapsedSeconds - _startTime;
 
     private double currentPeriodElapsedTime
     {
@@ -48,7 +48,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// 
     /// In seconds.
     /// </summary>
-    public double UpdateDelta
+    public double DeltaTime
     {
         get
         {
@@ -56,22 +56,6 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
                 finishTheWorld();
 
             return IsPaused ? 0 : Time.UpdateDelta * _playback;
-        }
-    }
-
-    /// <summary>
-    /// see <see cref="UpdateDelta"/> for more info.
-    /// 
-    /// In seconds.
-    /// </summary>
-    public double RenderDelta
-    {
-        get
-        {
-            if (isTheWorldFinished())
-                finishTheWorld();
-
-            return IsPaused ? 0 : Time.RenderDelta * _playback;
         }
     }
 
@@ -87,7 +71,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     public void Reset()
     {
-        _startTime = Time.CurrentTime;
+        _startTime = Time.ElapsedSeconds;
 
         _accomulatedTime = 0;
 
@@ -101,7 +85,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// </summary>
     public void Pause()
     {
-        _accomulatedTime = this.CurrentTime;
+        _accomulatedTime = this.ElapsedSeconds;
 
         _state = ClockState.Paused;
     }
@@ -115,7 +99,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     public void Resume()
     {
-        _startTime = Time.CurrentTime;
+        _startTime = Time.ElapsedSeconds;
 
         _state = ClockState.Running;
     }
@@ -158,14 +142,14 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
         // accomulate time before _playback was changed.
         // it changes CurrentTime calculation
-        _accomulatedTime = this.CurrentTime;
+        _accomulatedTime = this.ElapsedSeconds;
 
         _playback = playback;
 
         if (IsPaused)
             return;
 
-        _startTime = Time.CurrentTime;
+        _startTime = Time.ElapsedSeconds;
     }
 
     #endregion
@@ -191,8 +175,8 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         {
             // let's try accomulate time
             // and see if it's enough to step out
-            _accomulatedTime = this.CurrentTime;
-            _startTime = Time.CurrentTime;
+            _accomulatedTime = this.ElapsedSeconds;
+            _startTime = Time.ElapsedSeconds;
 
             if (_accomulatedTime < seconds)
                 throw new ArgumentException($"Cannot step out more than the accomulated time, accomulated time: {_accomulatedTime}, step out time: {seconds}.");
@@ -219,7 +203,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         if (this.IsPaused)
             return false;
 
-        _theworldStartTime = Time.CurrentTime;
+        _theworldStartTime = Time.ElapsedSeconds;
         _theworldTime = seconds;
 
         Pause();
@@ -233,10 +217,10 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         Resume();
 
-        _startTime = Time.CurrentTime;
+        _startTime = Time.ElapsedSeconds;
 
         // accomulate the extra time
-        _accomulatedTime += ((Time.CurrentTime - _theworldStartTime) - _theworldTime) * Playback;
+        _accomulatedTime += ((Time.ElapsedSeconds - _theworldStartTime) - _theworldTime) * Playback;
     }
 
     private bool isTheWorldFinished()
@@ -244,11 +228,11 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         if (_state is not ClockState.TheWorld)
             return false;
 
-        return Time.CurrentTime - _theworldStartTime >= _theworldTime;
+        return Time.ElapsedSeconds - _theworldStartTime >= _theworldTime;
     }
     #endregion
 
-    private ClockState _state = ClockState.Paused;
+    private volatile ClockState _state = ClockState.Paused;
 
     private enum ClockState
     {

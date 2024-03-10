@@ -17,7 +17,7 @@ public class ArgumentProvider : IDisposable
 
     /// <summary>
     /// Try to get the value of the flag. If the user didn't pass the KV pair,
-    /// we return the *Default* value. 
+    /// we return the *Default* value.
     /// </summary>
     /// <typeparam name="TResult">The type of the value</typeparam>
     /// <param name="key">the flag</param>
@@ -57,14 +57,14 @@ public class ArgumentProvider : IDisposable
     }
 
     /// <summary>
-    /// Please be aware that create default provider with this method will 
+    /// Please be aware that create default provider with this method will
     /// access the command line arguments.
     /// </summary>
     /// <param name="template"></param>
     /// <returns></returns>
     public static ArgumentProvider CreateDefaultProvider(Paramaters template)
-        => new ArgumentParser(template).CreateArgumentProvider();
+        => new ArgumentParser(template).CreateProvider();
 
-    public static ArgumentProvider CreateDefaultProvider(Paramaters template, string[] args)
-=> new ArgumentParser(template, args).CreateArgumentProvider();
+    public static ArgumentProvider CreateDefault(Paramaters template, string[] args)
+=> new ArgumentParser(template, args).CreateProvider();
 }

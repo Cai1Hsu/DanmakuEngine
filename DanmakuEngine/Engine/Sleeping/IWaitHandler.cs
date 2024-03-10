@@ -14,49 +14,82 @@ public interface IWaitHandler
 
     public bool IsHighResolution { get; }
 
-    private static IWaitHandler? _instance;
+    // Since SDL_Delay provides high resolution(at least on Linux), we use it as default
+    // On Windows, although SDL_Delay provides almost same resolution as Windows FILETIME, it's has better capability, while FILETIME provides lower standard deviation.
+    // So we use SDL_Delay as a fallback.
+    private static bool _preferSDL = false;
+
+    public static bool PreferSDL
+    {
+        get => _preferSDL;
+        set
+        {
+            if (_preferSDL == value)
+                return;
+
+            _preferSDL = value;
+
+            if (_preferSDL)
+            {
+                _platformInstance = null!;
+
+                _sdlInstance ??= new SDLWaitHandler();
+            }
+            else
+            {
+                if (_platformInstance is SDLWaitHandler)
+                {
+                    _platformInstance = Create(false);
+                }
+            }
+        }
+    }
+
+    private static IWaitHandler? _platformInstance;
+
+    private static SDLWaitHandler _sdlInstance = null!;
+
+    public static SDLWaitHandler SDLWaitHandler => _sdlInstance;
 
     public static IWaitHandler WaitHandler
     {
         get
         {
-            _instance ??= Create();
+            if (_platformInstance is not null)
+                return _platformInstance;
 
-            return _instance;
+            if (_sdlInstance is not null)
+                return _sdlInstance;
+
+            return Create(PreferSDL);
         }
     }
 
-    public static IWaitHandler Create(bool ForceUseSpin = false)
+    public static IWaitHandler Create(bool preferSDL = false)
     {
-        if (_instance is not null &&
-            (!ForceUseSpin || (ForceUseSpin && _instance is SpinWaitHandler)))
-            return _instance;
+        _sdlInstance ??= new SDLWaitHandler();
 
-        if (ForceUseSpin)
-            _instance = new SpinWaitHandler();
-        else
+        if (preferSDL)
+            return _platformInstance = _sdlInstance;
+
+        if (_platformInstance is not null)
+            return _platformInstance;
+
+        if (DesktopGameHost.IsWindows)
         {
-            if (DesktopGameHost.IsWindows)
-                _instance = new WindowsWaitHandler();
+            _platformInstance = new WindowsWaitHandler();
+            _platformInstance.Register();
 
-            if (DesktopGameHost.IsLinux)
-                _instance = new LinuxWaitHandler();
+            if (WaitHandler.IsHighResolution)
+                return _platformInstance;
+
+            _platformInstance = null!;
+        }
+        else if (DesktopGameHost.IsLinux)
+        {
+            _platformInstance = new LinuxWaitHandler();
         }
 
-        // we need to try registering, so that we can check if high resolution is available on Windows
-        _instance?.Register();
-
-        // if high resolution is not available, we will fall back to SpinWaitHandler
-        if (_instance is null ||
-            (!_instance.IsHighResolution && _instance is WindowsWaitHandler))
-        {
-            // don't need this since we didn't create a waitable timer successfully
-            // w.Unregister();
-
-            _instance = new SpinWaitHandler();
-            _instance.Register();
-        }
-
-        return _instance;
+        return _sdlInstance = new SDLWaitHandler();
     }
 }

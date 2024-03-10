@@ -12,8 +12,9 @@ public class WindowsWaitHandler : IWaitHandler
 
     public void Wait(TimeSpan timeSpan)
     {
+        // use SDLWaitHandler as fallback since it also provides high resolution, just higher stddev.
         if (!waitWaitableTimer(timeSpan))
-            Thread.Sleep(timeSpan);
+            IWaitHandler.SDLWaitHandler.Wait(timeSpan);
     }
 
     private IntPtr waitableTimer;
