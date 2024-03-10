@@ -15,28 +15,26 @@ public class ThrottledExecutor : FrameExecutor
 
     public bool Throttling { get; set; } = true;
 
-    public double ActiveHz { get; set; } = 1000;
+    internal double ActiveHz { get; set; } = 1000;
 
-    public double BackgroundHz { get; set; } = 60;
+    internal double BackgroundHz { get; set; } = 60;
 
     public double Hz => Active.Value ? ActiveHz : BackgroundHz;
 
     public double SleptMilliseconds { get; private set; }
 
-    public ThrottledExecutor(Action<double> task)
+    public ThrottledExecutor(Action task)
         : base(task)
     {
     }
 
-    public override void RunNextFrame()
+    public override void RunFrame()
     {
-        Debug.Assert(ActiveHz >= 0);
-
-        base.RunNextFrame();
+        base.RunFrame();
 
         if (Throttling)
         {
-            if (ActiveHz > 0 && ActiveHz < double.MaxValue)
+            if (Hz > 0 && Hz < double.MaxValue)
             {
                 throttle();
             }
@@ -57,12 +55,13 @@ public class ThrottledExecutor : FrameExecutor
 
     private void throttle()
     {
-        double excessFrameTime = 1000d / Hz - (CurrentTime - LastFrameTime);
-        double expectedSleepTime = excessFrameTime - accumulatedSleepError;
+        double excessFrameTime = (1000.0 / Hz) - (DeltaTime * 1000);
 
-        SleptMilliseconds = sleepAndUpdateCurrent(Math.Max(0, expectedSleepTime));
+        SleptMilliseconds = sleepAndUpdateCurrent(Math.Max(0, excessFrameTime + accumulatedSleepError));
 
-        accumulatedSleepError = SleptMilliseconds - expectedSleepTime;
+        // Logger.Log($"Slept {SleptMilliseconds:F4}ms, ExcessFrameTime {excessFrameTime:F4}ms, AccumulatedSleepError {accumulatedSleepError:F4}ms, DeltaTime: {DeltaTime:F4}ms");
+
+        accumulatedSleepError += excessFrameTime - SleptMilliseconds;
 
         // Never allow the sleep error to become too negative and induce too many catch-up frames
         accumulatedSleepError = Math.Max(-1000 / 30.0, accumulatedSleepError);
@@ -75,8 +74,10 @@ public class ThrottledExecutor : FrameExecutor
         if (milliseconds <= 0)
             return 0;
 
+        double before = CurrentTime;
+
         WaitHandler.Wait(milliseconds);
 
-        return (clock.CurrentTime - CurrentTime) * 1000;
+        return ((CurrentTime = SourceTime) - before) * 1000;
     }
 }

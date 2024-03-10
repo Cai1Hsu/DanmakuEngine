@@ -40,8 +40,8 @@ public class AcceleratedMovementF(float initialSpeed, float acceleration)
 
     protected override float AccumulatedValue()
         => Value.Value +
-           initialSpeed * (float)Clock.UpdateDelta +
-           Acceleration * (float)Clock.UpdateDelta * (float)Clock.UpdateDelta / 2;
+           initialSpeed * (float)Clock.DeltaTime +
+           Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2;
 }
 
 public class AcceleratedMovementD(double initialSpeed, double acceleration)
@@ -52,8 +52,8 @@ public class AcceleratedMovementD(double initialSpeed, double acceleration)
 
     protected override double AccumulatedValue()
         => Value.Value +
-           initialSpeed * Clock.UpdateDelta +
-           Acceleration * Clock.UpdateDelta * Clock.UpdateDelta / 2;
+           initialSpeed * Clock.DeltaTime +
+           Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2;
 }
 
 public class AcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<float> acceleration)
@@ -64,8 +64,8 @@ public class AcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<float
 
     protected override Vector2D<float> AccumulatedValue()
         => Value.Value +
-           initialSpeed * (float)Clock.UpdateDelta +
-           Acceleration * (float)Clock.UpdateDelta * (float)Clock.UpdateDelta / 2;
+           initialSpeed * (float)Clock.DeltaTime +
+           Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2;
 }
 
 public class AcceleratedMovementV2D(Vector2D<double> initialSpeed, Vector2D<double> acceleration)
@@ -76,6 +76,6 @@ public class AcceleratedMovementV2D(Vector2D<double> initialSpeed, Vector2D<doub
 
     protected override Vector2D<double> AccumulatedValue()
         => Value.Value +
-           initialSpeed * Clock.UpdateDelta +
-           Acceleration * Clock.UpdateDelta * Clock.UpdateDelta / 2;
+           initialSpeed * Clock.DeltaTime +
+           Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2;
 }

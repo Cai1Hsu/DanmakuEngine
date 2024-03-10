@@ -16,22 +16,26 @@ public class TestFixedAcceleratedMovement
     [SetUp]
     public void SetUp()
     {
-        defaultProvider = ArgumentProvider.CreateDefaultProvider(new ParamTemplate(), Array.Empty<string>());
+        defaultProvider = ArgumentProvider.CreateDefault(new ParamTemplate(), Array.Empty<string>());
+    }
+
+    [TearDown]
+    public void TearDown()
+
+    {
+        defaultProvider.Dispose();
     }
 
     [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public void TestMove(bool vsync)
+    public void TestMove()
     {
         const double time = 1;
         const double acceleration = 1;
 
         var game = new TestGame();
 
-        var host = new HeadlessGameHost(500)
+        var host = new TestGameHost(500)
         {
-            BypassWaitForSync = vsync,
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
         };
@@ -40,7 +44,7 @@ public class TestFixedAcceleratedMovement
 
         var movement = new FixedAcceleratedMovementD(0, acceleration)
         {
-            Condition = _ => clock.CurrentTime < time,
+            Condition = _ => clock.ElapsedSeconds < time,
         };
 
         host.OnLoad += h =>
@@ -53,7 +57,7 @@ public class TestFixedAcceleratedMovement
         {
             movement.UpdateSubTree();
 
-            var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
+            var expected = 0.5 * acceleration * (clock.ElapsedSeconds * clock.ElapsedSeconds);
 
             Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         };
@@ -62,31 +66,26 @@ public class TestFixedAcceleratedMovement
     }
 
     [Test]
-    [TestCase(true)]
-    [TestCase(false)]
-    public void TestStop(bool vsync)
+    public void TestStop()
     {
         const double time = 0.1;
         const double acceleration = 1;
 
         var game = new TestGame();
 
-        var host = new HeadlessGameHost(500)
-        {
-            BypassWaitForSync = vsync,
-        };
-
-        var clock = new Clock();
+        var host = new TestGameHost(500);
 
         var movement = new FixedAcceleratedMovementD(0, acceleration)
         {
-            Condition = _ => clock.CurrentTime < time,
-            OnDone = _ => host.RequestClose(),
+            Condition = _ => Time.ElapsedSeconds < time,
+            OnDone = _ =>
+            {
+                host.RequestClose();
+            },
         };
 
-        host.OnLoad += h =>
+        host.OnLoad += _ =>
         {
-            clock.Start();
             movement.BeginMove();
         };
 
@@ -97,7 +96,7 @@ public class TestFixedAcceleratedMovement
 
         host.OnTimedout += () =>
         {
-            Assert.Fail("OnDone is not called");
+            Assert.Fail($"OnDone is not called.");
         };
 
         host.Run(game, defaultProvider);
@@ -112,9 +111,8 @@ public class TestFixedAcceleratedMovement
         var clock = new Clock();
 
         var game = new TestGame();
-        var host = new HeadlessGameHost(1000)
+        var host = new TestGameHost(1000)
         {
-            BypassWaitForSync = true,
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
         };
@@ -132,7 +130,7 @@ public class TestFixedAcceleratedMovement
             movement.UpdateSubTree();
 
             // x = 0.5 * a * t^2
-            var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
+            var expected = 0.5 * acceleration * (clock.ElapsedSeconds * clock.ElapsedSeconds);
 
             Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         };
@@ -163,12 +161,12 @@ public class TestFixedAcceleratedMovement
         do
         {
             var random_delta = rng.NextDouble() * 100;
-            clock.SetUpdateDelta(random_delta);
+            clock.SetDeltaTime(random_delta);
             clock.AccomulateTime();
 
             movement.UpdateSubTree();
 
-            var expected = 0.5 * acceleration * (clock.CurrentTime * clock.CurrentTime);
+            var expected = 0.5 * acceleration * (clock.ElapsedSeconds * clock.ElapsedSeconds);
 
             Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
         } while (count_frame++ < 1E6);
@@ -180,17 +178,17 @@ public class TestFixedAcceleratedMovement
 
         private double currentTime;
 
-        public double UpdateDelta => updateDelta;
+        public double DeltaTime => updateDelta;
 
         // We dont use this here
         public double RenderDelta => 0;
 
-        public double CurrentTime
+        public double ElapsedSeconds
             => currentTime;
 
         public bool IsPaused => false;
 
-        public void SetUpdateDelta(double delta)
+        public void SetDeltaTime(double delta)
         {
             updateDelta = delta;
         }

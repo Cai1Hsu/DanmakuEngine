@@ -2,6 +2,7 @@ using System.Collections.Frozen;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using DanmakuEngine.Bindables;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Input.Handlers;
@@ -68,8 +69,15 @@ public abstract partial class KeyboardHandler : IKeyboardHandler
     protected KeyStatus Register(KeyCode key)
         => keyStatuses[key];
 
+    protected bool IsKeyDown(KeyboardEvent e)
+        => e.Type == (uint)EventType.Keydown;
+
+    protected bool IsKeyUp(KeyboardEvent e)
+        => e.Type == (uint)EventType.Keyup;
+
     public KeyboardHandler()
     {
+        // TODO: generate map only after the keys are registered
         List<KeyStatus> keyStatuses = new();
 
         foreach (var key in Enum.GetValues<KeyCode>())

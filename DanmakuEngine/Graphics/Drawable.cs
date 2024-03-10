@@ -33,6 +33,22 @@ public class Drawable : GameObject, IDisposable
 
     public virtual CompositeDrawable Parent { get; private set; } = null!;
 
+    public override bool CanUpdate => IsPresent;
+
+
+    #region Scheduler
+
+    private LazyValue<Scheduler> lazyScheduler;
+
+    /// <summary>
+    /// A lazily-initialized scheduler used to schedule tasks to be invoked in future <see cref="Update"/>s calls.
+    /// The tasks are invoked at the beginning of the <see cref="Update"/> method before anything else.
+    /// </summary>
+    protected internal Scheduler Scheduler
+        => lazyScheduler.Value;
+
+    #endregion
+
     #region Clock
 
     private readonly LazyValue<Clock> lazyClock = new(() => new Clock(true));
@@ -45,31 +61,9 @@ public class Drawable : GameObject, IDisposable
 
     #endregion
 
-    #region Scheduler
-
-    private LazyValue<Scheduler> lazyScheduler;
-
-    /// <summary>
-    /// A lazily-initialized scheduler used to schedule tasks to be invoked in future <see cref="Update"/>s calls.
-    /// The tasks are invoked at the beginning of the <see cref="Update"/> method before anything else.
-    /// </summary>
-    protected internal Scheduler Scheduler => lazyScheduler.Value;
-
-    #endregion
-
-    protected override bool BeforeUpdate()
+    protected override void PreUpdate()
     {
-        if (!IsPresent)
-            return false;
-        // TODO: Update auto transforms
-        // Transforms contains the transforms that are applied to the drawable
-        // and animations and movement
-        // may be we can implement transform using scheduler
-
-        // scheuler update
-        lazyScheduler.RawValue?.UpdateSubTree();
-
-        return true;
+        lazyScheduler.Value.UpdateSubTree();
     }
 
     public Drawable(CompositeDrawable parent)

@@ -18,6 +18,8 @@ public static class ThreadSync
         // IsAudioThread = false;
     }
 
+    internal static bool MultiThreaded { get; set; }
+
     public static bool NotMainThread() => !IsMainThread;
 
     public static bool NotUpdateThread() => !IsUpdateThread;
@@ -26,3 +28,15 @@ public static class ThreadSync
 
     // public static bool NotAudioThread() => !IsAudioThread;
 }
+
+
+public enum ThreadType
+{
+    Main,
+    Update,
+    Render,
+
+    // we haven't implemented these yet
+    // Audio,
+}
+

@@ -2,11 +2,9 @@ namespace DanmakuEngine.Timing;
 
 public interface IClock
 {
-    public double UpdateDelta { get; }
+    public double DeltaTime { get; }
 
-    public double RenderDelta { get; }
+    public double ElapsedSeconds { get; }
 
-    public double CurrentTime { get; }
-
-    public virtual bool IsPaused => true;
+    public bool IsPaused { get; }
 }

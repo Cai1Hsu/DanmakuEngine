@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DanmakuEngine.Bindables;
 using DanmakuEngine.Timing;
 using Silk.NET.SDL;
+using Vortice.DXGI;
 
 namespace DanmakuEngine.Input.Keybards;
 
@@ -22,7 +23,8 @@ public class KeyStatus
 
     private List<KeyStatus>? Bindings;
 
-    public bool Worthless => !IsDown.IsBound() && OnDown is null && OnUp is null && (Bindings is null || Bindings.Count == 0);
+    public bool Worthless
+        => !IsDown.IsBound() && OnDown is null && OnUp is null && (Bindings is null || Bindings.Count == 0);
 
     public void BindTo(KeyStatus other)
     {
@@ -75,15 +77,15 @@ public class KeyStatus
         if (e.Repeat != 0)
             return false;
 
+        if (Worthless)
+            return false;
+
         // we shouldn't handle modifier this way
         // consider use a separate method for handling key event and pass the modifier
         Mod = (Keymod)e.Keysym.Mod;
 
         if (e.Type == (uint)EventType.Keydown)
         {
-            if (Worthless)
-                return false;
-
             // This may lead to assertion failure if u have two keyboards
             // but we leave it here for preventing other bugs such as failing to detect key up
             Debug.Assert(!IsDown.Value);
@@ -92,12 +94,11 @@ public class KeyStatus
         }
         else if (e.Type == (uint)EventType.Keyup)
         {
-            if (Worthless)
-                return false;
-
             Debug.Assert(IsDown.Value);
 
             IsDown.Value = false;
+
+            Mod = Keymod.None;
         }
 
         return true;
@@ -110,9 +111,9 @@ public class KeyStatus
         IsDown.BindValueChanged(v =>
         {
             if (v.NewValue)
-                OnDown?.Invoke(this, Time.CurrentTime);
+                OnDown?.Invoke(this, Time.ElapsedSeconds);
             else
-                OnUp?.Invoke(this, Time.CurrentTime);
+                OnUp?.Invoke(this, Time.ElapsedSeconds);
         });
     }
 }

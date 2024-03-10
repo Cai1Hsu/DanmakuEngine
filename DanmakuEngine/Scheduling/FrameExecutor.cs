@@ -3,11 +3,13 @@ using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Scheduling;
 
-public class FrameExecutor(Action<double> task)
+public class FrameExecutor(Action onFrame)
 {
-    protected readonly Action<double> runFrame = task;
+    protected readonly Action runFrame = onFrame;
 
-    public double DeltaTime => clock.UpdateDelta;
+    public double DeltaTime => CurrentTime - LastFrameTime;
+
+    public double SourceTime => clock.ElapsedSeconds;
 
     public virtual double CurrentTime { get; protected set; }
 
@@ -17,32 +19,36 @@ public class FrameExecutor(Action<double> task)
 
     public double Jitter { get; private set; }
 
-    public double AverageFramerate { get; private set; }
+    public double AverageFramerate { get; private set; } = 1000; // an optimistic initial value
 
     public double CountCooldown { get; set; } = 1;
+
+    public long FrameCount { get; set; } = 0;
 
     protected double count_time = 0;
     protected int count_frame = 0;
 
-    protected StopwatchClock clock = new();
+    protected readonly StopwatchClock clock = new();
 
-    public virtual void RunNextFrame()
+    public virtual void RunFrame()
     {
+        ++FrameCount;
+
         clock.Update();
 
         // do work
-        runFrame.Invoke(DeltaTime);
+        runFrame.Invoke();
 
-        _delta_pool.CurrentAndNext = clock.UpdateDelta;
+        _delta_pool.CurrentAndNext = clock.DeltaTime;
 
         // standard deviation
-        double avg = _delta_pool.Get().Average();
-        Jitter = Math.Sqrt(_delta_pool.Get().Average(v => Math.Pow(v - avg, 2)));
+        double avg = _delta_pool.Average();
+        Jitter = Math.Sqrt(_delta_pool.Average(v => Math.Pow(v - avg, 2)));
 
         if (count_time < CountCooldown)
         {
             ++count_frame;
-            ++count_time;
+            count_time += DeltaTime;
         }
         else
         {
@@ -53,6 +59,6 @@ public class FrameExecutor(Action<double> task)
         }
 
         LastFrameTime = CurrentTime;
-        CurrentTime = clock.CurrentTime;
+        CurrentTime = SourceTime;
     }
 }

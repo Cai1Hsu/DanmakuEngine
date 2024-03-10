@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using DanmakuEngine.Games;
 using Silk.NET.Maths;
 
@@ -7,20 +8,30 @@ public abstract class CompositeDrawable : Drawable
 {
     public Vector2D<float> Size = new(0, 0);
 
-    protected virtual IEnumerable<GameObject> Children => children;
-
-    protected virtual LinkedList<GameObject> children { get; set; } = null!;
-
-    public CompositeDrawable(CompositeDrawable parent) : base(parent)
+    public virtual List<GameObject> Children
     {
-        this.children = new LinkedList<GameObject>();
+        get => children ??= new List<GameObject>();
+        set
+        {
+            if (children is null)
+                children = value.ToList();
+            else
+                throw new InvalidOperationException("Children is already assigned");
+        }
+    }
+
+    protected virtual List<GameObject> children { get; set; } = null!;
+
+    public CompositeDrawable(CompositeDrawable parent)
+        : base(parent)
+    {
     }
 
     public void Add(GameObject child)
-        => children.AddLast(child);
+        => Children.Add(child);
 
     public void Remove(GameObject child)
-        => children.Remove(child);
+        => Children.Remove(child);
 
     public void Add(params GameObject[] children)
     {

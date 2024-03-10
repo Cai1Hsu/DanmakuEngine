@@ -3,23 +3,27 @@ using DanmakuEngine.Engine;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
 using DanmakuEngine.TH08.Games;
+using GraphicsBinding = DanmakuEngine.Graphics.Renderers.RendererType;
+using GraphicsBackend = Veldrid.GraphicsBackend;
 
 internal class Program
 {
 
     [STAThread]
-    private static void Main(string[] args)
+    internal static void Main(string[] args)
     {
-        var game = new TH08Game();
+        using var argParser = new ArgumentParser(new ParamTemplate(), args);
 
-        using var argParser = new ArgumentParser(new ParamTemplate());
-        using var argProvider = argParser.CreateArgumentProvider();
+        var argProvider = argParser.CreateProvider();
 
         var headless = argProvider.GetValue<bool>("-headless");
 
         using GameHost host = headless ? new HeadlessGameHost(() => true)
                                   : DesktopGameHost.GetSuitableHost();
 
-        host.Run(game, argProvider);
+        // host.GraphicsBackend = GraphicsBackend.OpenGL;
+        // host.RendererType = GraphicsBinding.Silk;
+
+        host.Run(new TH08Game(), argProvider);
     }
 }

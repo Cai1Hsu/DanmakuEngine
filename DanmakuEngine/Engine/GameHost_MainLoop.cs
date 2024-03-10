@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using DanmakuEngine.Engine.Threading;
+using DanmakuEngine.Engine.Windowing;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Threading;
 using Silk.NET.Input;
@@ -7,142 +8,103 @@ using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine;
 
-public unsafe partial class GameHost
+public partial class GameHost
 {
-    public WindowManager windowManager = null!;
-
-    // Since we have just implemented multi-threading, and most of the time, this variable is accessed in main loop at a rather high frequency
-    // it's possible that the compiler will optimize it to a register, and the CPU may NOT update the value in the register, so the game won't exit even if we request it to exit and the value of isRunning is already true
-    // To avoid this, we must add the volatile keyword to the variable.
-    // However, I don't think it's necessary to use a lock to protect the variable, because we only read it in the main loop, and the only write operation is to make it true. The main loop will detect the change sooner or later as long as the CPU updates the value in the register.
-    protected volatile bool isRunning = true;
-
     protected long lastUpdateTime = 0;
     protected long lastRenderTime = 0;
 
-    protected readonly ThreadRunner threadRunner = new();
-
-    protected void registerThread(GameThread thread)
-        => threadRunner.Add(thread);
+    protected ThreadRunner threadRunner = null!;
 
     public virtual void RegisterThreads()
     {
+        threadRunner = window is not null ? new ThreadRunner(MainThread = new(window.PumpEvents))
+                                          : new ThreadRunner(MainThread = new(() => { /* Run like the wind */ }));
+
         threadRunner.MultiThreaded.BindTo(MultiThreaded);
 
-        registerThread(MainThread = new(HandleMessages));
+        threadRunner.AddThread(UpdateThread = new(Update));
 
-        registerThread(UpdateThread = new(Update));
-
-        registerThread(RenderThread = new(Render));
+        if (Renderer is not null)
+        {
+            threadRunner.AddThread(RenderThread = new(Render));
+        }
     }
 
     public void RunUntilExit()
     {
-        ResetTime(ConfigManager.RefreshRate);
-
-        // We do it here 
-        // because the load process is also a part of the Update Loop
-        // The only difference is that it only executes once at the beginning
-        DoLoad();
-
-        threadRunner.Start();
-        this.Start();
-
-        RunMainLoop();
-
-        PerformExit();
-    }
-
-    public virtual void RunMainLoop()
-    {
-        do
+        try
         {
-            threadRunner.RunMainLoop();
-        } while (isRunning && (!screens.Empty()));
-    }
+            threadRunner.Start();
 
-    public void RequestClose()
-    {
-        Logger.Debug("Requesting close");
+            State = EngineState.Running;
 
-        isRunning = false;
-    }
-
-    private void HandleMessages(double _)
-    {
-        Event e = new();
-        while (_sdl.PollEvent(ref e) != 0)
-        {
-            switch ((EventType)e.Type)
+            if (window is not null)
             {
-                case EventType.Firstevent:
-                    // This is not reliable, so we ignore it
-                    break;
-
-                case EventType.AppTerminating:
-                case EventType.Quit:
-                    isRunning = false;
-                    break;
-
-                // we should only handle the event once
-                // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
-                case EventType.Keydown:
-                    if (KeyDown?.Invoke(e.Key) is not true)
-                        KeyEvent?.Invoke(e.Key);
-                    break;
-
-                case EventType.Keyup:
-                    if (KeyUp?.Invoke(e.Key) is not true)
-                        KeyEvent?.Invoke(e.Key);
-                    break;
-
-                case EventType.Mousebuttondown:
-                    MouseButtonDown?.Invoke(e.Button);
-                    break;
-
-                case EventType.Mousebuttonup:
-                    MouseButtonUp?.Invoke(e.Button);
-                    break;
-
-                case EventType.Mousemotion:
-                    MouseMove?.Invoke(e.Motion);
-                    break;
-
-                case EventType.Mousewheel:
-                    MouseScroll?.Invoke(e.Wheel);
-                    break;
-
-                case EventType.Windowevent:
-                    windowManager?.HandleWindowEvent(e.Window);
-                    break;
-
-                case EventType.AppWillenterbackground:
-                case EventType.AppWillenterforeground:
-                case EventType.AppDidenterforeground:
-                case EventType.AppDidenterbackground:
-                    windowManager?.HandleAppEvent(e.Type);
-                    break;
+                window.RunWhile(threadRunner.RunMainLoop,
+                                () => !ScreenStack.Empty(), false);
             }
+            else
+            {
+                if (this is HeadlessGameHost headlessGameHost)
+                    headlessGameHost.RunMainLoop();
+                else
+                    throw new Exception("No window was set up");
+            }
+        }
+        catch (Exception e)
+        {
+            Logger.Error(e.Message);
         }
     }
 
-    public event Action<KeyboardEvent> KeyEvent = null!;
+    public void RequestClose()
+        => window?.RequestClose();
+
+    public event Action<KeyboardEvent> KeyEvent
+    {
+        add => window.KeyEvent += value;
+        remove => window.KeyEvent -= value;
+    }
 
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> KeyDown = null!;
+    public event Func<KeyboardEvent, bool> Keydown
+    {
+        add => window.KeyDown += value;
+        remove => window.KeyDown -= value;
+    }
 
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> KeyUp = null!;
+    public event Func<KeyboardEvent, bool> KeyUp
+    {
+        add => window.KeyUp += value;
+        remove => window.KeyUp -= value;
+    }
 
-    public event Action<MouseButtonEvent> MouseButtonDown = null!;
+    public event Action<MouseButtonEvent> Mousebuttondown
+    {
+        add => window.MouseButtonDown += value;
+        remove => window.MouseButtonDown -= value;
+    }
 
-    public event Action<MouseButtonEvent> MouseButtonUp = null!;
+    public event Action<MouseButtonEvent> MouseButtonUp
+    {
+        add => window.MouseButtonUp += value;
+        remove => window.MouseButtonUp -= value;
+    }
 
-    public event Action<MouseMotionEvent> MouseMove = null!;
+    public event Action<MouseMotionEvent> MouseMove
+    {
+        add => window.MouseMove += value;
+        remove => window.MouseMove -= value;
+    }
 
-    public event Action<MouseWheelEvent> MouseScroll = null!;
+    public event Action<MouseWheelEvent> MouseScroll
+    {
+        add => window.MouseScroll += value;
+        remove => window.MouseScroll -= value;
+    }
 }

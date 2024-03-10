@@ -12,7 +12,7 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
 
     public double StartTime { get; private set; }
 
-    public double CurrentTime => _clock.CurrentTime;
+    public double CurrentTime => _clock.ElapsedSeconds;
 
     public double ElapsedTime => CurrentTime - StartTime;
 
@@ -36,7 +36,7 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
         {
             _clock = clock;
 
-            StartTime = _clock.CurrentTime;
+            StartTime = _clock.ElapsedSeconds;
             startValue = Value.Value;
         }
 
@@ -89,7 +89,7 @@ public abstract class MovementBase<T> : UpdateOnlyObject, IDisposable
         if (Active.Value)
             return;
 
-        StartTime = _clock.CurrentTime;
+        StartTime = _clock.ElapsedSeconds;
 
         startValue = Value.Value;
 

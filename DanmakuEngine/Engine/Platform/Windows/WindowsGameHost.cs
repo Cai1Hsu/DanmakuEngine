@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace DanmakuEngine.Engine.Platform.Windows;
 
@@ -10,14 +11,16 @@ public class WindowsGameHost : DesktopGameHost
     [DllImport("kernel32.dll")]
     private static extern IntPtr GetConsoleWindow();
 
-    public static bool HasConsole()
+    [SupportedOSPlatform("Windows")]
+    public new static bool HasConsole()
     {
         if (!IsWindows)
-            return true;
+            throw new InvalidOperationException("This method is only supported on Windows");
 
         return GetConsoleWindow() != IntPtr.Zero;
     }
 
+    [SupportedOSPlatform("Windows")]
     public static void CreateConsole()
     {
         if (GetConsoleWindow() != IntPtr.Zero)
@@ -34,11 +37,11 @@ public class WindowsGameHost : DesktopGameHost
         Configuration.ConfigManager.UpdateConsoleStatus(true);
     }
 
-    protected override void SetUpConsole()
+    protected override void SetUpDebugConsole()
     {
         if (!Configuration.ConfigManager.HasConsole)
             return;
 
-        base.SetUpConsole();
+        base.SetUpDebugConsole();
     }
 }

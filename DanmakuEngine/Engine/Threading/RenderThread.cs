@@ -4,12 +4,12 @@ namespace DanmakuEngine.Engine.Threading;
 
 public class RenderThread : GameThread
 {
-    public RenderThread(Action<double> task)
+    public RenderThread(Action task)
         : base(task, ThreadType.Render)
     {
     }
 
-    public override void MakeCurrent()
+    internal override void MakeCurrent()
     {
         base.MakeCurrent();
 

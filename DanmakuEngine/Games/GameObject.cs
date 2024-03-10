@@ -1,14 +1,22 @@
+using System.Diagnostics;
+using DanmakuEngine.Allocations;
+using DanmakuEngine.Logging;
+using DanmakuEngine.Scheduling;
+using DanmakuEngine.Timing;
+
 namespace DanmakuEngine.Games;
 
 public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 {
-    protected List<GameObject>? PreUpdateChildren = null!;
+    protected List<GameObject>? InternalChildren = null!;
 
     protected LoadState LoadState { get; private set; } = loadState;
 
+    public virtual bool CanUpdate => true;
+
     /// <summary>
     /// Loads the drawable and its children
-    /// 
+    ///
     /// Most of the time, you should not override this method or call this method directly
     /// </summary>
     protected virtual void load()
@@ -27,7 +35,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     /// <summary>
     /// Starts the drawable and its children
-    /// 
+    ///
     /// Most of the time, you should not override this method or call this method directly
     /// </summary>
     protected virtual void start()
@@ -53,7 +61,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     /// <summary>
     /// Loads the drawable and its children
-    /// 
+    ///
     /// You can override this method to load your own resources
     /// But don't call this method directly
     /// </summary>
@@ -63,7 +71,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     /// <summary>
     /// Starts the drawable and its children
-    /// 
+    ///
     /// You can override this method to load your own resources
     /// But don't call this method directly
     /// </summary>
@@ -73,7 +81,7 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     /// <summary>
     /// Updates the drawable and its children
-    /// 
+    ///
     /// You can override this method to load your own resources
     /// But don't call this method directly
     /// </summary>
@@ -96,27 +104,82 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
         if (LoadState == LoadState.Ready)
             start();
 
-        if (PreUpdateChildren is not null)
-        {
-            foreach (var c in PreUpdateChildren)
-                c.UpdateSubTree();
-        }
-
-        if (!BeforeUpdate())
+        if (!CanUpdate)
             return true;
 
+        preUpdate();
+
         update();
+
+        lateUpdate();
 
         return false;
     }
 
-    protected virtual bool BeforeUpdate() => true;
+    protected void preUpdate()
+    {
+        PreUpdate();
 
-    public event Action<GameObject> OnUpdate = null!;
+        OnPreUpdate?.Invoke(this);
+    }
 
-    public event Action<GameObject> OnLoad = null!;
+    protected virtual void PreUpdate()
+    {
+    }
 
-    public event Action<GameObject> OnStart = null!;
+    protected virtual void FixedUpdateSubtree()
+    {
+        Debug.Assert(!isDisposed);
+        Debug.Assert(LoadState == LoadState.Complete);
+
+        // if (isDisposed)
+        //     return;
+
+        // if (LoadState < LoadState.Complete)
+        //     return;
+
+        FixedUpdate();
+
+        if (InternalChildren is not null)
+        {
+            foreach (var c in InternalChildren)
+                c.FixedUpdateSubtree();
+        }
+
+        OnFixedUpdate?.Invoke(this);
+    }
+
+    protected virtual void FixedUpdate()
+    {
+    }
+
+    protected void lateUpdate()
+    {
+        LateUpdate();
+
+        OnLateUpdate?.Invoke(this);
+    }
+
+    protected virtual void LateUpdate()
+    {
+        if (InternalChildren is not null)
+        {
+            foreach (var c in InternalChildren)
+                c.UpdateSubTree();
+        }
+    }
+
+    public event Action<GameObject>? OnPreUpdate = null;
+
+    public event Action<GameObject>? OnLateUpdate = null;
+
+    public event Action<GameObject>? OnFixedUpdate = null;
+
+    public event Action<GameObject>? OnUpdate = null;
+
+    public event Action<GameObject>? OnLoad = null;
+
+    public Action<GameObject>? OnStart = null;
 
     #region IDisposable
 
@@ -137,6 +200,9 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
         this.OnLoad = null!;
         this.OnStart = null!;
         this.OnUpdate = null!;
+        this.OnFixedUpdate = null!;
+        this.OnLateUpdate = null!;
+        this.OnPreUpdate = null!;
 
         isDisposed = true;
     }

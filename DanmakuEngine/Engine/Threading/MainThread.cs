@@ -1,19 +1,30 @@
+using System.Diagnostics;
 using DanmakuEngine.Threading;
 
 namespace DanmakuEngine.Engine.Threading;
 
 public class MainThread : GameThread
 {
-    public MainThread(Action<double> task)
+    public MainThread(Action task)
         : base(task, ThreadType.Main)
     {
     }
 
-    public override void MakeCurrent()
+    internal override void MakeCurrent()
     {
         base.MakeCurrent();
 
         ThreadSync.IsMainThread = true;
+    }
+
+    protected override void PrepareForWork()
+    {
+        Initialize();
+
+        Thread.CurrentThread.Name = "GameThread-Main";
+
+        // Do not create extra thread for Main GameThread.
+        Debug.Assert(this.Thread is null);
     }
 
     public override bool IsCurrent => ThreadSync.IsMainThread;

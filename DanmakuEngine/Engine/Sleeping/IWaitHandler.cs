@@ -65,11 +65,11 @@ public interface IWaitHandler
         }
     }
 
-    public static IWaitHandler Create(bool SDL = false)
+    public static IWaitHandler Create(bool preferSDL = false)
     {
         _sdlInstance ??= new SDLWaitHandler();
 
-        if (SDL)
+        if (preferSDL)
             return _platformInstance = _sdlInstance;
 
         if (_platformInstance is not null)

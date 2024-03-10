@@ -37,10 +37,10 @@ public unsafe class GLRenderer : IRenderer
 
         Logger.Debug(
         $@"OpenGL Info:
-            Version:    {ByteExtensions.BytesToString(gl.GetString(StringName.Version))}
-            Renderer:   {ByteExtensions.BytesToString(gl.GetString(StringName.Renderer))}
-            Vendor:     {ByteExtensions.BytesToString(gl.GetString(StringName.Vendor))}
-            GLSL:       {ByteExtensions.BytesToString(gl.GetString(StringName.ShadingLanguageVersion))}
+            Version:    {ByteExtensions.ToString(gl.GetString(StringName.Version))}
+            Renderer:   {ByteExtensions.ToString(gl.GetString(StringName.Renderer))}
+            Vendor:     {ByteExtensions.ToString(gl.GetString(StringName.Vendor))}
+            GLSL:       {ByteExtensions.ToString(gl.GetString(StringName.ShadingLanguageVersion))}
             ");
     }
 

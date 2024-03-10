@@ -4,16 +4,14 @@ namespace DanmakuEngine.Timing;
 
 public class StopwatchClock : Stopwatch, IClock
 {
-    public double UpdateDelta => _elapsedTime;
+    public bool IsPaused => IsRunning;
 
-    public double RenderDelta => UpdateDelta;
+    public double ElapsedSeconds
+        => IsPaused ? ElapsedTicks / (double)Frequency : 0;
 
-    public double CurrentTime
-        => this.IsRunning ? ElapsedTicks / (double)Frequency : 0;
+    public double DeltaTime { get; private set; }
 
-    private double _last_tick = 0;
-
-    private double _elapsedTime = 0;
+    private long _last_tick = 0;
 
     public void BeginTimer()
     {
@@ -32,14 +30,12 @@ public class StopwatchClock : Stopwatch, IClock
         if (!IsRunning)
         {
             Start();
-
+            _last_tick = ElapsedTicks;
             return;
         }
 
-        double _elapsedTicks = this.ElapsedTicks;
-
-        _elapsedTime = (_elapsedTicks - _last_tick) / (double)Frequency;
-
-        _last_tick = _elapsedTicks;
+        long this_tick = ElapsedTicks;
+        DeltaTime = (this_tick - _last_tick) / (double)Frequency;
+        _last_tick = this_tick;
     }
 }

@@ -1,21 +1,22 @@
 using System.Runtime.CompilerServices;
+using DanmakuEngine.Engine;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Engine.Sleeping;
 
 public class SDLWaitHandler : IWaitHandler
 {
-    private static Sdl SDL = Sdl.GetApi();
-
     public bool IsHighResolution => true;
 
     public void Register()
     {
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Wait(double milliseconds)
-        => SDL.Delay((uint)milliseconds);
+        => SDL.Api.Delay((uint)milliseconds);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Wait(TimeSpan timeSpan)
         => Wait(timeSpan.TotalMilliseconds);
 }

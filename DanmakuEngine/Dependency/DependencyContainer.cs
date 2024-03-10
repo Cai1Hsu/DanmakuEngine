@@ -1,4 +1,5 @@
-﻿using DanmakuEngine.Engine;
+﻿using System.Diagnostics;
+using DanmakuEngine.Engine;
 
 namespace DanmakuEngine.Dependency;
 
@@ -8,7 +9,7 @@ public class DependencyContainer
 
     private static object _instanceLock = new();
 
-    private readonly object _lock = new();
+    private readonly object _cacheLock = new();
 
     private readonly Dictionary<Type, object?> _cache = new();
 
@@ -17,13 +18,11 @@ public class DependencyContainer
 
     public void Cache(Type T, object obj)
     {
-        if (obj == null)
-            throw new ArgumentNullException(nameof(obj));
+        ArgumentNullException.ThrowIfNull(obj);
 
-        if (!T.IsInstanceOfType(obj))
-            throw new InvalidOperationException($"Can not cache a instance of another type, expected {T} got {obj.GetType()}");
+        Debug.Assert(T.IsInstanceOfType(obj));
 
-        lock (_lock)
+        lock (_cacheLock)
         {
             var added = _cache.TryAdd(T, obj);
 
@@ -43,9 +42,12 @@ public class DependencyContainer
         obj.AutoInject();
     }
 
+    /// <summary>
+    /// If you don't have a reason, use the generic method.
+    /// </summary>
     public void CacheAndInject(Type T, object obj)
     {
-        if (!typeof(IInjectable).IsAssignableFrom(T))
+        if (T is not IInjectable)        
             throw new InvalidOperationException("Can not inject a non IInjectable object");
 
         Cache(T, obj);
@@ -62,7 +64,7 @@ public class DependencyContainer
 
     public object Get(Type T)
     {
-        lock (_lock)
+        lock (_cacheLock)
         {
             if (_cache.TryGetValue(T, out var obj))
             {
@@ -87,6 +89,45 @@ public class DependencyContainer
         }
 
         return Instance;
+    }
+
+    public static void UpdateValue<T>(T obj, bool assertContain = true)
+        where T : IWorkingUsage
+    {
+        if (obj is null)
+        {
+            Remove<T>(false);
+
+            return;
+        }
+
+        lock (_instanceLock)
+        {
+            lock (Instance._cacheLock)
+            {
+                Instance._cache[typeof(T)] = obj;
+            }
+        }
+    }
+
+    public static void Remove<T>(bool assertContain = true)
+    {
+        lock (_instanceLock)
+        {
+            lock (Instance._cacheLock)
+            {
+                if (!Instance._cache.ContainsKey(typeof(T)))
+                {
+                    if (assertContain)
+                        throw new InvalidOperationException($"There is no such dependency. Type: {typeof(T)}");
+
+                    return;
+                }
+
+                Instance._cache.Remove(typeof(T));
+            }
+
+        }
     }
 
     static DependencyContainer()

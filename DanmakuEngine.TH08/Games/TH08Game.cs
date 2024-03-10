@@ -8,9 +8,6 @@ public partial class TH08Game : Game
 {
     public override string Name => @"TH08";
 
-    public override Screen FirstScreen => new LoadingScreen();
-
-    protected override void Begin()
-    {
-    }
+    public override Screen EntryScreen
+        => new LoadingScreen();
 }

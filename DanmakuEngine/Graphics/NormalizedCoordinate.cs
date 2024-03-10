@@ -2,10 +2,10 @@ namespace DanmakuEngine.Graphics;
 
 public readonly struct Coordinate : IEquatable<Coordinate>
 {
-    public readonly uint X { get; }
-    public readonly uint Y { get; }
+    public readonly float X { get; }
+    public readonly float Y { get; }
 
-    public Coordinate(uint x, uint y)
+    public Coordinate(float x, float y)
          => (this.X, this.Y) = (x, y);
 
     public bool Equals(Coordinate other)

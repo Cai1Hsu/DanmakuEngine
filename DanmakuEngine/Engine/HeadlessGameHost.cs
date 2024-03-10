@@ -9,36 +9,34 @@ namespace DanmakuEngine.Engine;
 
 public class HeadlessGameHost : GameHost
 {
+    private volatile bool isRunning = true;
     private Func<bool> Running { get; } = null!;
 
-    private double refreshRate = 60;
+    public event Action<HeadlessGameHost>? OnUpdate;
 
-    private double averageWaitTime => 1 / refreshRate;
-
-    public Action<HeadlessGameHost>? OnUpdate;
-
-    public Action<HeadlessGameHost>? OnLoad;
+    public event Action<HeadlessGameHost>? OnLoad;
 
     private bool limitTime = false;
 
-    public Action? OnTimedout;
+    public event Action OnTimedout = null!;
 
     public bool ThrowOnTimedOut = true;
 
     public bool IgnoreTimedout = false;
 
-    /// <summary>
-    /// Bypass the wait for sync, if you want high refresh rate
-    /// </summary>
-    public bool BypassWaitForSync = false;
-
     private double timeout = 0;
+
+    public long CurrentFrame => UpdateThread.Executor.FrameCount;
+
+    public bool SkipFirstFrame { get; set; } = false;
+
 
     /// <summary>
     /// Create an instance of HeadlessGameHost with a specified timeout
     /// </summary>
     /// <param name="timeout">timeout in ms</param>
     public HeadlessGameHost(double timeout)
+        : base()
     {
         this.timeout = timeout;
 
@@ -46,13 +44,9 @@ public class HeadlessGameHost : GameHost
     }
 
     public HeadlessGameHost(Func<bool> running)
+        : base()
     {
         this.Running = running;
-    }
-
-    public override void SetUpSdl()
-    {
-        // Do nothing
     }
 
     public override void SetUpWindowAndRenderer()
@@ -63,37 +57,39 @@ public class HeadlessGameHost : GameHost
     public override void RegisterEvents()
     {
         // Do nothing
-
-        refreshRate = ConfigManager.RefreshRate;
     }
 
-    public override void RegisterThreads()
+    public new void RequestClose()
     {
-        threadRunner.MultiThreaded.BindTo(MultiThreaded);
+        isRunning = false;
+    }
 
-        registerThread(UpdateThread = new(delta =>
+    public void RunMainLoop()
+    {
+        Root.OnStart += _ => OnLoad?.Invoke(this);
+
+        Root.OnUpdate += _ =>
         {
-            Update(delta);
+            if (SkipFirstFrame && CurrentFrame == 1)
+                return;
 
             OnUpdate?.Invoke(this);
-        }));
-    }
+        };
 
-    public override void RunMainLoop()
-    {
-        OnLoad?.Invoke(this);
-
-        long lastWaitTicks = ElapsedTicks;
+        if (HasConsole())
+        {
+            Console.CancelKeyPress += (_, _) => isRunning = false;
+        }
 
         while (isRunning
             && (Running is null || Running.Invoke())
-            && (!limitTime || ElapsedMilliseconds < timeout))
+            && (!limitTime || EngineTimer.ElapsedMilliseconds < timeout))
         {
             threadRunner.RunMainLoop();
         }
 
         // The host exited with timed out
-        if (limitTime && ElapsedMilliseconds >= timeout)
+        if (limitTime && EngineTimer.ElapsedMilliseconds >= timeout)
         {
             if (!IgnoreTimedout)
                 Logger.Error("[HeadlessGameHost] timed out");
