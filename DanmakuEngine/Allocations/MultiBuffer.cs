@@ -6,14 +6,9 @@ namespace DanmakuEngine.Allocations;
 
 public abstract partial class MultiBuffer<T>
 {
-    // This should never happen if we write correct code.
-    private const string exception = "You must implement bufferCount and buffers in your own class";
+    protected abstract int bufferCount { get; }
 
-    protected virtual int bufferCount
-        => throw new NotImplementedException(exception);
-
-    protected virtual UsageValue<T>[] buffers
-        => throw new NotImplementedException(exception);
+    protected virtual UsageValue<T>[] buffers { get; }
 
     /// <summary>
     /// The freshest buffer index which has finished a write, and is waiting to be read.
@@ -36,10 +31,7 @@ public abstract partial class MultiBuffer<T>
 
     public MultiBuffer()
     {
-        // Try to fetch bufferCount
-        // to check whether the user implemented bufferCount and buffers
-        Debug.Assert(bufferCount > 0);
-        Debug.Assert(buffers.Length == bufferCount);
+        Debug.Assert(buffers != null);
 
         for (int i = 0; i < bufferCount; i++)
         {
