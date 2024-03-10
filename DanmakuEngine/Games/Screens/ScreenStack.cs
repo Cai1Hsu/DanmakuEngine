@@ -116,4 +116,21 @@ public class ScreenStack : CompositeDrawable
 
         return false;
     }
+
+    protected override void FixedUpdateChildren()
+    {
+        Logger.Debug($"ScreenStack fixed updating children");
+
+        do
+        {
+            updateAnotherFrame = false;
+
+            var peek = Peek();
+
+            if (peek is null)
+                return;
+
+            peek.FixedUpdateSubtree();
+        } while(updateAnotherFrame);
+    }
 }

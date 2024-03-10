@@ -275,12 +275,8 @@ public partial class GameHost : Time, IDisposable
             if (ConfigManager.HasConsole
              && ConfigManager.DebugMode)
             {
-                // Prevent IO blocking
-                Task.Run(() =>
-                {
-                    Logger.Write($"FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms)          \r", true, false);
-                    last_debug_fps = this_debug;
-                });
+                Logger.Write($"FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms)          \r", true, false);
+                last_debug_fps = this_debug;
             }
         }
     }

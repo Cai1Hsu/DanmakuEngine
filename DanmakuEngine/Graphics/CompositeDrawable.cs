@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using DanmakuEngine.Games;
 using Silk.NET.Maths;
 
@@ -68,5 +67,21 @@ public abstract class CompositeDrawable : Drawable
             shouldStop |= child.UpdateSubTree();
 
         return shouldStop;
+    }
+
+    public override void FixedUpdateSubtree()
+    {
+        base.FixedUpdateSubtree();
+
+        FixedUpdateChildren();
+    }
+
+    protected virtual void FixedUpdateChildren()
+    {
+        if (children is not null)
+        {
+            foreach (var child in children)
+                child.FixedUpdateSubtree();
+        }
     }
 }
