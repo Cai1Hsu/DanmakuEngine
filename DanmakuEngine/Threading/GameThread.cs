@@ -406,7 +406,7 @@ public class GameThread
             Thread = null;
             OnSuspended();
 
-            if (exitState is ThreadStatus.Zombie )
+            if (exitState is ThreadStatus.Zombie)
             {
                 initializedEvent?.Dispose();
 

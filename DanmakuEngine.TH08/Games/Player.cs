@@ -1,12 +1,12 @@
 using DanmakuEngine.Bindables;
+using DanmakuEngine.Extensions.Vector;
 using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Movements;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
-using DanmakuEngine.Extensions.Vector;
-using Silk.NET.Maths;
 using DanmakuEngine.Utils;
+using Silk.NET.Maths;
 
 namespace DanmakuEngine.TH08.Games;
 
@@ -198,7 +198,7 @@ public class Player : CompositeDrawable
 
     protected override void Update()
     {
-       // shouldn't render in the update method
+        // shouldn't render in the update method
         // but this is only a demo
         renderPlayer();
 

@@ -47,7 +47,7 @@ public class DependencyContainer
     /// </summary>
     public void CacheAndInject(Type T, object obj)
     {
-        if (T is not IInjectable)        
+        if (T is not IInjectable)
             throw new InvalidOperationException("Can not inject a non IInjectable object");
 
         Cache(T, obj);

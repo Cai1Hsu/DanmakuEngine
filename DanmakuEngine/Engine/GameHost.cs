@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Bindables;
 using DanmakuEngine.Configuration;
@@ -31,11 +32,10 @@ using SixLabors.ImageSharp.Drawing.Processing;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
-using Renderer = DanmakuEngine.Graphics.Renderers.Renderer;
 using Color = SixLabors.ImageSharp.Color;
 using PixelFormat = Silk.NET.OpenGL.PixelFormat;
 using PixelType = Silk.NET.OpenGL.PixelType;
-using DanmakuEngine.Allocations;
+using Renderer = DanmakuEngine.Graphics.Renderers.Renderer;
 
 namespace DanmakuEngine.Engine;
 

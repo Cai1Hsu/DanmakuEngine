@@ -25,6 +25,12 @@ public class TestFixedAcceleratedMovement
         defaultProvider.Dispose();
     }
 
+    [TearDown]
+    public void TearDown()
+    {
+        defaultProvider.Dispose();
+    }
+
     [Test]
     public void TestMove()
     {
