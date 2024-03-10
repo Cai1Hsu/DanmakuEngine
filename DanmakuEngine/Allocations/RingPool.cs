@@ -1,6 +1,8 @@
+using System.Collections;
+
 namespace DanmakuEngine.Allocations;
 
-public class RingPool<T>
+public partial class RingPool<T> : IEnumerable<T>
 {
     private readonly int _size;
 
@@ -9,6 +11,8 @@ public class RingPool<T>
     private int filled_count = 0;
 
     public int FilledCount => filled_count;
+
+    public bool FullFilled => filled_count == _size;
 
     private readonly T[] _pool;
 
@@ -40,6 +44,7 @@ public class RingPool<T>
         set => _pool[_index] = value;
     }
 
+    // FIXME: This should not be a property
     public T CurrentAndNext
     {
         get
@@ -55,17 +60,43 @@ public class RingPool<T>
         }
     }
 
-    public IEnumerable<T> Get()
-        => Get(FilledCount);
-
-    public IEnumerable<T> Get(int count)
+    public T this[int index]
     {
-        if (count > _size)
-            throw new ArgumentException($"Count cannot be greater than the size of the pool. Size: {_size}, but found: {count}");
-
-        for (var i = 0; i < count; i++)
+        get
         {
-            yield return CurrentAndNext;
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _size, nameof(index));
+            ArgumentOutOfRangeException.ThrowIfNegative(index, nameof(index));
+
+            return _pool[(_index // start at current index
+                 + index) % _size];
+        }
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(index, _size, nameof(index));
+            ArgumentOutOfRangeException.ThrowIfNegative(index, nameof(index));
+
+            _pool[(_index // start at current index
+                 + index) % _size] = value;
         }
     }
+
+    public void Clear()
+    {
+        Array.Clear(_pool, 0, _size);
+
+        filled_count = 0;
+    }
+
+    public void Reset()
+    {
+        Clear();
+
+        _index = 0;
+    }
+
+    public IEnumerator<T> GetEnumerator()
+        => new RingPoolEnumerator<T>(this);
+
+    IEnumerator IEnumerable.GetEnumerator()
+        => GetEnumerator();
 }
