@@ -21,6 +21,7 @@ public class TestTestGameHost
     [TearDown]
     public void TearDown()
     {
+        defaultProvider.Dispose();
     }
 
     [Test]
