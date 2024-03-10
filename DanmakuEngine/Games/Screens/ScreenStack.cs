@@ -119,8 +119,6 @@ public class ScreenStack : CompositeDrawable
 
     protected override void FixedUpdateChildren()
     {
-        Logger.Debug($"ScreenStack fixed updating children");
-
         do
         {
             updateAnotherFrame = false;
