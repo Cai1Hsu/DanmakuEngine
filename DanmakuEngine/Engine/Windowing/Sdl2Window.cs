@@ -144,60 +144,59 @@ public unsafe class Sdl2Window : IWindow
 
     public unsafe void PumpEvents()
     {
-        fixed (Event* e = stackalloc Event[1])
+        Event* e = stackalloc Event[1];
+
+        while (_sdl.PollEvent(e) != 0)
         {
-            while (_sdl.PollEvent(e) != 0)
+            switch (e->Type)
             {
-                switch (e->Type)
-                {
-                    case (uint)EventType.Firstevent:
-                        // This is not reliable, so we ignore it
-                        break;
+                case (uint)EventType.Firstevent:
+                    // This is not reliable, so we ignore it
+                    break;
 
-                    case (uint)EventType.AppTerminating:
-                    case (uint)EventType.Quit:
-                        exists = false;
-                        break;
+                case (uint)EventType.AppTerminating:
+                case (uint)EventType.Quit:
+                    exists = false;
+                    break;
 
-                    // we should only handle the event once
-                    // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
-                    case (uint)EventType.Keydown:
-                        if (KeyDown?.Invoke(e->Key) is not true)
-                            KeyEvent?.Invoke(e->Key);
-                        break;
+                // we should only handle the event once
+                // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
+                case (uint)EventType.Keydown:
+                    if (KeyDown?.Invoke(e->Key) is not true)
+                        KeyEvent?.Invoke(e->Key);
+                    break;
 
-                    case (uint)EventType.Keyup:
-                        if (KeyUp?.Invoke(e->Key) is not true)
-                            KeyEvent?.Invoke(e->Key);
-                        break;
+                case (uint)EventType.Keyup:
+                    if (KeyUp?.Invoke(e->Key) is not true)
+                        KeyEvent?.Invoke(e->Key);
+                    break;
 
-                    case (uint)EventType.Mousebuttondown:
-                        MouseButtonDown?.Invoke(e->Button);
-                        break;
+                case (uint)EventType.Mousebuttondown:
+                    MouseButtonDown?.Invoke(e->Button);
+                    break;
 
-                    case (uint)EventType.Mousebuttonup:
-                        MouseButtonUp?.Invoke(e->Button);
-                        break;
+                case (uint)EventType.Mousebuttonup:
+                    MouseButtonUp?.Invoke(e->Button);
+                    break;
 
-                    case (uint)EventType.Mousemotion:
-                        MouseMove?.Invoke(e->Motion);
-                        break;
+                case (uint)EventType.Mousemotion:
+                    MouseMove?.Invoke(e->Motion);
+                    break;
 
-                    case (uint)EventType.Mousewheel:
-                        MouseScroll?.Invoke(e->Wheel);
-                        break;
+                case (uint)EventType.Mousewheel:
+                    MouseScroll?.Invoke(e->Wheel);
+                    break;
 
-                    case (uint)EventType.Windowevent:
-                        pumpWindowEvent(e->Window);
-                        break;
+                case (uint)EventType.Windowevent:
+                    pumpWindowEvent(e->Window);
+                    break;
 
-                    case (uint)EventType.AppWillenterbackground:
-                    case (uint)EventType.AppWillenterforeground:
-                    case (uint)EventType.AppDidenterforeground:
-                    case (uint)EventType.AppDidenterbackground:
-                        pumpAppEvent(e->Type);
-                        break;
-                }
+                case (uint)EventType.AppWillenterbackground:
+                case (uint)EventType.AppWillenterforeground:
+                case (uint)EventType.AppDidenterforeground:
+                case (uint)EventType.AppDidenterbackground:
+                    pumpAppEvent(e->Type);
+                    break;
             }
         }
     }
