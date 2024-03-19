@@ -11,8 +11,6 @@ public class Time
 
     public static readonly StandardClock Clock = new();
 
-    protected double DebugFpsHz = 1;
-
     /// <summary>
     /// Elapsed seconds in the update loop.
     /// </summary>
@@ -30,9 +28,11 @@ public class Time
 
     public static float UpdateDeltaF { get; internal set; }
 
-    public static double FixedUpdateHz { get; protected set; } = 60.0;
+    public static double FixedUpdateHz { get; set; } = 60.0;
 
     public static double FixedUpdateDelta => 1.0 / FixedUpdateHz;
 
     public static double FixedUpdateDeltaF => (float)FixedUpdateDelta;
+
+    protected double DebugFpsHz = 1;
 }
