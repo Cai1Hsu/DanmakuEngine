@@ -56,16 +56,6 @@ public class HeadlessGameHost : GameHost
 
     public override void RegisterEvents()
     {
-        // Do nothing
-    }
-
-    public new void RequestClose()
-    {
-        isRunning = false;
-    }
-
-    public void RunMainLoop()
-    {
         Root.OnStart += _ => OnLoad?.Invoke(this);
 
         Root.OnUpdate += _ =>
@@ -75,18 +65,31 @@ public class HeadlessGameHost : GameHost
 
             OnUpdate?.Invoke(this);
         };
+    }
 
+    public override void RequestClose()
+    {
+        isRunning = false;
+    }
+
+    public void RunMainLoop()
+    {
         if (HasConsole())
         {
             Console.CancelKeyPress += (_, _) => isRunning = false;
         }
 
-        while (isRunning
-            && (Running is null || Running.Invoke())
-            && (!limitTime || EngineTimer.ElapsedMilliseconds < timeout))
+        // Start the update thread
+        threadRunner.Start();
+
+        do
         {
             threadRunner.RunMainLoop();
         }
+        while (isRunning
+            && (Running is null || Running.Invoke())
+            && (!limitTime || EngineTimer.ElapsedMilliseconds < timeout)
+            && !ScreenStack.Empty());
 
         // The host exited with timed out
         if (limitTime && EngineTimer.ElapsedMilliseconds >= timeout)

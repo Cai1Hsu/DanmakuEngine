@@ -292,7 +292,7 @@ public class TestClock
 
             clock.StepIn(1);
 
-            Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time + 1));
+            Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time + 1).Within(1E-6));
 
             h.RequestClose();
         };

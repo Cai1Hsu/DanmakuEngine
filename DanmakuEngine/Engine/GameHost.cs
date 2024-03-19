@@ -145,7 +145,7 @@ public partial class GameHost : Time, IDisposable
         Time.ElapsedSeconds = 0;
         Time.UpdateDelta = 0;
 
-        EngineTimer = Stopwatch.StartNew();
+        EngineTimer = null!;
 
         Logger.Debug($"====== DanmakuEngine ======");
 
@@ -175,10 +175,10 @@ public partial class GameHost : Time, IDisposable
         Dependencies.Cache(Root);
         Dependencies.Cache(ScreenStack);
 
+        RegisterEvents();
+
         if (window is not null)
         {
-            RegisterEvents();
-
             InputManager = new InputManager();
 
             Dependencies.Cache(InputManager);
@@ -415,11 +415,14 @@ public partial class GameHost : Time, IDisposable
 
     public virtual void RegisterEvents()
     {
-        window.WindowSizeChanged += Coordinate.OnResized;
+        if (window is not null)
+        {
+            window.WindowSizeChanged += Coordinate.OnResized;
 
-        // window.WindowMinimized
-        // window.AppDidenterbackground
-        // window.AppWillenterforeground
+            // window.WindowMinimized
+            // window.AppDidenterbackground
+            // window.AppWillenterforeground
+        }
 
 #if DEBUG
         Root.OnUpdate += _ => DebugTime();
