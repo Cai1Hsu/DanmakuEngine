@@ -15,7 +15,7 @@ public partial class GameHost
 
     protected ThreadRunner threadRunner = null!;
 
-    public virtual void RegisterThreads()
+    public void RegisterThreads()
     {
         threadRunner = window is not null ? new ThreadRunner(MainThread = new(window.PumpEvents))
                                           : new ThreadRunner(MainThread = new(() => { /* Run like the wind */ }));
@@ -34,6 +34,9 @@ public partial class GameHost
     {
         try
         {
+            // start timer here to prevent jit compiling time from being counted
+            EngineTimer = Stopwatch.StartNew();
+
             threadRunner.Start();
 
             State = EngineState.Running;
@@ -57,7 +60,7 @@ public partial class GameHost
         }
     }
 
-    public void RequestClose()
+    public virtual void RequestClose()
         => window?.RequestClose();
 
     public event Action<KeyboardEvent> KeyEvent
