@@ -288,7 +288,7 @@ public partial class GameHost : Time, IDisposable
 
         var enabled = ConfigManager.DebugMode;
 
-        if (enabled && DesktopGameHost.IsWindows && !ConfigManager.HasConsole)
+        if (enabled && RuntimeInfo.IsWindows && !ConfigManager.HasConsole)
 #pragma warning disable CA1416
             WindowsGameHost.CreateConsole();
 #pragma warning restore CA1416
@@ -477,7 +477,7 @@ public partial class GameHost : Time, IDisposable
     }
 
     public static bool HasConsole()
-        => !DesktopGameHost.IsWindows
+        => !RuntimeInfo.IsWindows
 #pragma warning disable CA1416
         || WindowsGameHost.HasConsole();
 #pragma warning restore CA1416
@@ -650,6 +650,7 @@ public unsafe partial class GameHost
             StackValue<DisplayMode> first_mode = stackalloc DisplayMode[1];
             SDL.Api.GetDisplayMode(0, 0, first_mode);
 
+            // The max refresh rate of the native display mode.
             int max_rate = first_mode.Value.RefreshRate;
 
             int nums = SDL.Api.GetNumDisplayModes(0);
@@ -669,9 +670,19 @@ public unsafe partial class GameHost
                     if (mode.W > first_mode.Value.W || mode.H > first_mode.Value.H)
                         continue;
 
+                    // TODO: Fetch display modes directly from XRandR
                     // Hacky workaround to fix refresh rate calculation
-                    if (mode.RefreshRate > max_rate)
-                        mode.RefreshRate /= 2;
+                    if (RuntimeInfo.IsLinux // only X11 is affected
+                                            // This prevents our workaround from being applied to displays with a 60hz native resolution but has higher refresh rate in lower resolutions.
+                        && max_rate > 119)
+                    {
+                        // see https://github.com/libsdl-org/SDL/pull/8933/files for more details
+                        if (mode.RefreshRate > max_rate
+                            || (mode.RefreshRate > 100 && mode.RefreshRate < 118))
+                        {
+                            mode.RefreshRate /= 2;
+                        }
+                    }
 
                     modes.Add(mode);
 

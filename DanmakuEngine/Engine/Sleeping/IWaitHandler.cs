@@ -75,7 +75,7 @@ public interface IWaitHandler
         if (_platformInstance is not null)
             return _platformInstance;
 
-        if (DesktopGameHost.IsWindows)
+        if (RuntimeInfo.IsWindows)
         {
             _platformInstance = new WindowsWaitHandler();
             _platformInstance.Register();
@@ -85,7 +85,7 @@ public interface IWaitHandler
 
             _platformInstance = null!;
         }
-        else if (DesktopGameHost.IsLinux)
+        else if (RuntimeInfo.IsLinux)
         {
             _platformInstance = new LinuxWaitHandler();
         }

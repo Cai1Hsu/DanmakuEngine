@@ -14,7 +14,7 @@ public class WindowsGameHost : DesktopGameHost
     [SupportedOSPlatform("Windows")]
     public new static bool HasConsole()
     {
-        if (!IsWindows)
+        if (!RuntimeInfo.IsWindows)
             throw new InvalidOperationException("This method is only supported on Windows");
 
         return GetConsoleWindow() != IntPtr.Zero;
@@ -29,7 +29,7 @@ public class WindowsGameHost : DesktopGameHost
         if (Configuration.ConfigManager.DebugBuild)
             return;
 
-        if (!IsWindows)
+        if (!RuntimeInfo.IsWindows)
             return;
 
         AllocConsole();
