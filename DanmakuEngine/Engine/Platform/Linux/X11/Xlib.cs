@@ -4,7 +4,7 @@ namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
 internal static unsafe partial class Xlib
 {
-    
+
     [LibraryImport("libX11.so.6")]
     internal static partial IntPtr XOpenDisplay(char* display);
 

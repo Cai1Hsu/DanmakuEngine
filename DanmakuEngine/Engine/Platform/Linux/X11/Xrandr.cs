@@ -20,7 +20,7 @@ internal static unsafe partial class Xrandr
     internal static partial XRRCrtcInfo* XRRGetCrtcInfo(IntPtr display, XRRScreenResources* resources, ulong crtc);
 
     [LibraryImport("libXrandr.so.2")]
-    internal static partial void XRRFreeCrtcInfo(XRRCrtcInfo *crtcInfo);
+    internal static partial void XRRFreeCrtcInfo(XRRCrtcInfo* crtcInfo);
 
     [LibraryImport("libXrandr.so.2")]
     internal static partial int XRRGetCrtcTransform(IntPtr display, ulong crtc, XRRCrtcTransformAttributes** attributes);

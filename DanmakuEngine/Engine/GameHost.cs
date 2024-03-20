@@ -619,7 +619,7 @@ public unsafe partial class GameHost
 
     private IList<DisplayMode> GetDisplayModes()
     {
-        
+
         var displays = _sdl.GetNumVideoDisplays();
 
         if (displays == 0)
@@ -666,7 +666,7 @@ public unsafe partial class GameHost
 
         if (matcheds.Any())
         {
-            closest = matcheds.First();            
+            closest = matcheds.First();
         }
         else
         {
