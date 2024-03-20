@@ -126,9 +126,9 @@ public class VeldridRenderer : Renderer
 
                 default:
                 {
-                    if (DesktopGameHost.IsWindows)
+                    if (RuntimeInfo.IsWindows)
                         goto case WMType.Windows;
-                    else if (DesktopGameHost.IsLinux)
+                    else if (RuntimeInfo.IsLinux)
                     {
                         Logger.Warn("============== ATTENTION ==============");
                         Logger.Warn("Failed to determine WM, defaulting to X11.");
