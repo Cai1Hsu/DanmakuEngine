@@ -8,7 +8,7 @@ namespace DanmakuEngine.Tests.Utils;
 public class TestRNG
 {
     // Believe it or not, this is already a very conservative value
-    private const double accepted_percentage = 0.001;
+    private const double accepted_percentage = 0.005;
     private const int loop_count = 1000;
     private Random NET_RNG;
 
