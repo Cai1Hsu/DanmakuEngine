@@ -14,12 +14,14 @@ jobs:
   test:
     env:
       IS_CI_ENVIRONMENT: true
+      DE_EXECUTION_MODE: ${{ matrix.threading }}
 
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest]
+        threading: [singlethreaded, multithreaded]
 
     steps:
     - uses: actions/checkout@v3
