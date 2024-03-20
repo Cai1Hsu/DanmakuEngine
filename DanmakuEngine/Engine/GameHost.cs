@@ -673,7 +673,7 @@ public unsafe partial class GameHost
                     // TODO: Fetch display modes directly from XRandR
                     // Hacky workaround to fix refresh rate calculation
                     if (RuntimeInfo.IsLinux // only X11 is affected
-                        // This prevents our workaround from being applied to displays with a 60hz native resolution but has higher refresh rate in lower resolutions.
+                                            // This prevents our workaround from being applied to displays with a 60hz native resolution but has higher refresh rate in lower resolutions.
                         && max_rate > 119)
                     {
                         // see https://github.com/libsdl-org/SDL/pull/8933/files for more details
