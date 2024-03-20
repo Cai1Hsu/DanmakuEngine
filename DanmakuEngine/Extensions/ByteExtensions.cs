@@ -11,4 +11,6 @@ public static unsafe class ByteExtensions
     public static string ToString(byte* bytes)
         => Marshal.PtrToStringUTF8((IntPtr)bytes) ?? string.Empty;
 
+    public static char* ToCharPtr(this string str)
+        => (char*)Marshal.StringToHGlobalAnsi(str);
 }
