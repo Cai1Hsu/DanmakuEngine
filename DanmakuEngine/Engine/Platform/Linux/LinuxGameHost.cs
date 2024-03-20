@@ -1,6 +1,168 @@
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using DanmakuEngine.Engine.Platform.Linux.X11;
+using DanmakuEngine.Logging;
+using Silk.NET.SDL;
+
 namespace DanmakuEngine.Engine.Platform.Linux;
 
-public class LinuxGameHost : DesktopGameHost
+public unsafe partial class LinuxGameHost : DesktopGameHost
 {
+    [SupportedOSPlatform("linux")]
+    protected override IList<DisplayMode> GetDisplayModes(int display_index)
+    {
+        ArgumentOutOfRangeException
+            .ThrowIfNegative(display_index, nameof(display_index));
 
+        var sdl = SDL.Api;
+
+        var display_count = sdl.GetNumVideoDisplays();
+
+        ArgumentOutOfRangeException
+            .ThrowIfGreaterThanOrEqual(display_index, display_count, nameof(display_index));
+
+        var name = SDL.Api.GetDisplayNameS(0);
+
+        // SDL requires all windows and all display modes use the same format
+        // so we just copy the first display mode's format
+        // see https://github.com/libsdl-org/SDL/blob/SDL2/src/video/x11/SDL_x11modes.c#L662-L667
+        DisplayMode mode = default;
+        sdl.GetDisplayMode(display_index, 0, ref mode);
+
+        return getDisplayModes(display_index == 0 ? null : name, mode.Format);
+    }
+
+    private IList<DisplayMode> getDisplayModes(string? display_name, uint format)
+    {
+        // in SDL2, they don't check if the DisplayMode we passed, 
+        // so we can directly send our correct data without having to hack the SDL2's memory
+        /* in SDL2/SDL_video.c:
+            int SDL_SetWindowDisplayMode(SDL_Window *window, const SDL_DisplayMode *mode)
+            {
+                CHECK_WINDOW_MAGIC(window, -1);
+
+                if (mode) {
+                    window->fullscreen_mode = *mode;
+                }
+                // other code
+            }
+        */
+
+        // as for driverdata, it's basically a pointer to <DisplayModeData> which contains the modeID.
+
+        IList<DisplayMode> modes = [];
+
+        using (var display = new X11Display(display_name))
+        using (var screen = new X11Screen(display))
+        {
+            for (var i = 0; i < screen.Resources->noutput; i++)
+            {
+                var output_info = Xrandr.XRRGetOutputInfo(display, screen.Resources, screen.Resources->outputs[i]);
+                if (output_info != null)
+                {
+                    if (output_info->connection == 1)
+                        continue;
+
+                    for (int j = 0; j < screen.Resources->nmode; j++)
+                    {
+                        var mode = new DisplayMode
+                        {
+                            Format = format,
+                            Driverdata = (DisplayModeData*)Marshal.AllocHGlobal(sizeof(DisplayModeData))
+                        };
+
+                        if (!setXRandRModeInfo(display, screen, output_info->crtc,
+                            output_info->modes[j], ref mode))
+                        {
+                            Marshal.FreeHGlobal((IntPtr)mode.Driverdata);
+                        }
+
+                        modes.Add(mode);
+
+                        Logger.Debug($"XRandR mode {j + 1}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+                    }
+                }
+                Xrandr.XRRFreeOutputInfo(output_info);
+            }
+        }
+
+        return modes;
+    }
+
+    private static bool setXRandRModeInfo(X11Display display, X11Screen screen, ulong crtc,
+                                  ulong modeID, ref DisplayMode mode)
+    {
+        for (int i = 0; i < screen.Resources->nmode; i++)
+        {
+            XRRModeInfo* info = &screen.Resources->modes[i];
+
+            if (info->id != modeID)
+                continue;
+
+            ushort rotation = 0;
+            int scale_w = 0x10000, scale_h = 0x10000;
+
+            XRRCrtcInfo* crtcinfo = Xrandr.XRRGetCrtcInfo(display, screen.Resources, crtc);
+            if (crtcinfo != null)
+            {
+                rotation = crtcinfo->rotation;
+                Xrandr.XRRFreeCrtcInfo(crtcinfo);
+            }
+
+            XRRCrtcTransformAttributes* attr;
+            if (Xrandr.XRRGetCrtcTransform(display, crtc, &attr) != 0 && attr != null)
+            {
+                scale_w = attr->currentTransform.matrix[0][0];
+                scale_h = attr->currentTransform.matrix[1][1];
+                Xlib.XFree(attr);
+            }
+
+            if ((rotation & (XRANDR_ROTATION_LEFT | XRANDR_ROTATION_RIGHT)) != 0)
+            {
+                mode.W = (int)((info->height * scale_w + 0xffff) >> 16);
+                mode.H = (int)((info->width * scale_h + 0xffff) >> 16);
+            }
+            else
+            {
+                mode.W = (int)((info->width * scale_w + 0xffff) >> 16);
+                mode.H = (int)((info->height * scale_h + 0xffff) >> 16);
+            }
+
+            mode.RefreshRate = (int)Math.Round(calculateXRandRRefreshRate(info));
+            ((DisplayModeData*)mode.Driverdata)->xrandr_mode = modeID;
+        }
+
+        return false;
+    }
+
+#pragma warning disable IDE1006
+    private const int RR_Interlace = 0x00000010;
+    private const int RR_DoubleScan = 0x00000020;
+
+    private const int XRANDR_ROTATION_LEFT = 1 << 1;
+    private const int XRANDR_ROTATION_RIGHT = 1 << 3;
+#pragma warning restore IDE1006
+
+    private static float calculateXRandRRefreshRate(XRRModeInfo* info)
+    {
+        double vTotal = info->vTotal;
+
+        if ((info->modeFlags & RR_DoubleScan) != 0)
+        {
+            /* doublescan doubles the number of lines */
+            vTotal *= 2;
+        }
+
+        if ((info->modeFlags & RR_Interlace) != 0)
+        {
+            /* interlace splits the frame into two fields */
+            /* the field rate is what is typically reported by monitors */
+            vTotal /= 2;
+        }
+
+        if (info->hTotal == 0 || vTotal == 0)
+            return 0.0f;
+
+        return (float)(100 * (long)info->dotClock / (info->hTotal * vTotal) / 100.0f);
+    }
 }
