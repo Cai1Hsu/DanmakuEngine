@@ -9,6 +9,8 @@ using DanmakuEngine.Bindables;
 using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine.Platform;
+using DanmakuEngine.Engine.Platform.Environments;
+using DanmakuEngine.Engine.Platform.Environments.Execution;
 using DanmakuEngine.Engine.Platform.Windows;
 using DanmakuEngine.Engine.Sleeping;
 using DanmakuEngine.Engine.Threading;
@@ -345,13 +347,28 @@ public partial class GameHost : Time, IDisposable
             ConfigManager.LoadFromArguments(argProvider);
         }
 
+        DependencyContainer.AutoInject(Logger.GetLogger());
+
         doFrontToBackPass = ConfigManager.DebugMode;
         clearOnRender = ConfigManager.ClearScreen;
         DebugFpsHz = ConfigManager.FpsUpdateFrequency;
 
         MultiThreaded.Value = !ConfigManager.Singlethreaded;
 
-        DependencyContainer.AutoInject(Logger.GetLogger());
+        var envExecutionMode = Env.Get<ExecutionModeEnv, ExecutionMode>();
+
+        if (envExecutionMode is not null)
+        {
+            MultiThreaded.Value = envExecutionMode is ExecutionMode.MultiThreaded;
+
+            Logger.
+#if DEBUG
+            Warn
+#else
+            Debug
+#endif
+            ($"Overrided execution mode to {envExecutionMode} by environment");
+        }
     }
 
     private void SetupSdl()
