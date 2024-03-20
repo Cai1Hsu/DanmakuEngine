@@ -79,9 +79,6 @@ public class HeadlessGameHost : GameHost
             Console.CancelKeyPress += (_, _) => isRunning = false;
         }
 
-        // Start the update thread
-        threadRunner.Start();
-
         do
         {
             threadRunner.RunMainLoop();
