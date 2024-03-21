@@ -1,38 +1,71 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using DanmakuEngine.Engine.Platform.Linux.X11;
+using DanmakuEngine.Engine.SDLNative;
+using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
-using Silk.NET.SDL;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using SDL_DisplayMode = Silk.NET.SDL.DisplayMode;
+using SDL_Window = DanmakuEngine.Engine.SDLNative.SDL_Window;
 
 namespace DanmakuEngine.Engine.Platform.Linux;
 
 public unsafe partial class LinuxGameHost : DesktopGameHost
 {
+    /// <summary>
+    /// Free memory allocated on unmanaged side
+    /// </summary>
     [SupportedOSPlatform("linux")]
-    protected override IList<DisplayMode> GetDisplayModes(int display_index)
+    protected override void PostConfigureDisplayMode()
+    {
+        // Should not do this now, as the memory is presented to SDL2
+        // so we should let SDL2 free the memory
+
+        // modes.Where(m => m.Driverdata != null)
+        //      .ForEach(m => Marshal.FreeHGlobal((IntPtr)m.Driverdata));
+
+        // Check the XID to see if we have applied the correct mode
+#if DEBUG
+        var sdl = SDL.Api;
+        SDL_DisplayMode applied = new();
+        sdl.GetWindowDisplayMode(window.Window, &applied);
+
+        Logger.Debug($"Applied display mode: {applied.W}x{applied.H}@{applied.RefreshRate}Hz, XID:{((SDL_DisplayModeData*)applied.Driverdata)->xrandr_mode}");
+#endif
+    }
+
+    [SupportedOSPlatform("linux")]
+    protected override IList<SDL_DisplayMode> GetDisplayModes(int displayIndex)
     {
         ArgumentOutOfRangeException
-            .ThrowIfNegative(display_index, nameof(display_index));
+            .ThrowIfNegative(displayIndex, nameof(displayIndex));
 
         var sdl = SDL.Api;
 
         var display_count = sdl.GetNumVideoDisplays();
 
         ArgumentOutOfRangeException
-            .ThrowIfGreaterThanOrEqual(display_index, display_count, nameof(display_index));
-
-        var name = SDL.Api.GetDisplayNameS(0);
+            .ThrowIfGreaterThanOrEqual(displayIndex, display_count, nameof(displayIndex));
 
         // SDL requires all windows and all display modes use the same format
         // so we just copy the first display mode's format
         // see https://github.com/libsdl-org/SDL/blob/SDL2/src/video/x11/SDL_x11modes.c#L662-L667
-        DisplayMode mode = default;
-        sdl.GetDisplayMode(display_index, 0, ref mode);
+        SDL_DisplayMode mode = default;
+        SDL.Api.GetDisplayMode(displayIndex, 0, ref mode);
 
-        return getDisplayModes(display_index == 0 ? null : name, mode.Format);
+        var modes = getDisplayModes(displayIndex, mode.Format);
+
+        var magic = ((SDL_Window*)window.Window)->magic;
+
+        SDL_Hack.FixSdlDisplayModes(magic, displayIndex, modes);
+
+#if DEBUG
+        base.GetDisplayModes(displayIndex);
+#endif
+        return modes;
     }
 
-    private IList<DisplayMode> getDisplayModes(string? display_name, uint format)
+    private IList<SDL_DisplayMode> getDisplayModes(int displayIndex, uint format)
     {
         // in SDL2, they don't check if the DisplayMode we passed, 
         // so we can directly send our correct data without having to hack the SDL2's memory
@@ -50,9 +83,9 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
         // as for driverdata, it's basically a pointer to <DisplayModeData> which contains the modeID.
 
-        IList<DisplayMode> modes = [];
+        IList<SDL_DisplayMode> modes = [];
 
-        using (var display = new X11Display(display_name))
+        using (var display = new X11Display(displayIndex == 0 ? null : SDL.Api.GetDisplayNameS(displayIndex)))
         using (var screen = new X11Screen(display))
         {
             for (var i = 0; i < screen.Resources->noutput; i++)
@@ -65,21 +98,24 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
                     for (int j = 0; j < screen.Resources->nmode; j++)
                     {
-                        var mode = new DisplayMode
+                        var mode = new SDL_DisplayMode
                         {
                             Format = format,
-                            Driverdata = (DisplayModeData*)Marshal.AllocHGlobal(sizeof(DisplayModeData))
+                            Driverdata = (SDL_DisplayModeData*)Marshal.AllocHGlobal(sizeof(SDL_DisplayModeData)),
                         };
 
                         if (!setXRandRModeInfo(display, screen, output_info->crtc,
                             output_info->modes[j], ref mode))
                         {
                             Marshal.FreeHGlobal((IntPtr)mode.Driverdata);
+                            continue;
                         }
 
                         modes.Add(mode);
 
-                        Logger.Debug($"XRandR mode {j + 1}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+                        var XID = output_info->modes[j];
+
+                        Logger.Debug($"XRandR mode {XID}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
                     }
                 }
                 Xrandr.XRRFreeOutputInfo(output_info);
@@ -90,7 +126,7 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
     }
 
     private static bool setXRandRModeInfo(X11Display display, X11Screen screen, ulong crtc,
-                                  ulong modeID, ref DisplayMode mode)
+                                  ulong modeID, ref SDL_DisplayMode mode)
     {
         for (int i = 0; i < screen.Resources->nmode; i++)
         {
@@ -129,7 +165,10 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
             }
 
             mode.RefreshRate = (int)Math.Round(calculateXRandRRefreshRate(info));
-            ((DisplayModeData*)mode.Driverdata)->xrandr_mode = modeID;
+
+            ((SDL_DisplayModeData*)mode.Driverdata)->xrandr_mode = modeID;
+
+            return true;
         }
 
         return false;
