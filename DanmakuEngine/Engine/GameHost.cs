@@ -12,6 +12,7 @@ using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Engine.Platform.Environments;
 using DanmakuEngine.Engine.Platform.Environments.Execution;
 using DanmakuEngine.Engine.Platform.Windows;
+using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Engine.Sleeping;
 using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Engine.Windowing;
@@ -593,14 +594,14 @@ public unsafe partial class GameHost
         ArgumentOutOfRangeException
             .ThrowIfGreaterThanOrEqual(display_index, display_count, nameof(display_index));
 
-        int nums = SDL.Api.GetNumDisplayModes(0);
+        int nums = SDL.Api.GetNumDisplayModes(display_index);
         IList<DisplayMode> modes = [];
 
         for (int i = 0; i < nums; i++)
         {
             DisplayMode mode = new();
 
-            if (SDL.Api.GetDisplayMode(0, i, ref mode) >= 0)
+            if (SDL.Api.GetDisplayMode(display_index, i, ref mode) >= 0)
             {
                 modes.Add(mode);
 
@@ -660,7 +661,7 @@ public unsafe partial class GameHost
 
         var matcheds = modes.Where(m => m.W == expected.W
                                     && m.H == expected.H)
-                           .OrderBy(m => Math.Abs(m.RefreshRate - expected.RefreshRate));
+                            .OrderBy(m => Math.Abs(m.RefreshRate - expected.RefreshRate));
 
         DisplayMode closest = default;
 
@@ -676,8 +677,15 @@ public unsafe partial class GameHost
             _sdl.GetClosestDisplayMode(0, expected, &closest);
         }
 
-        _sdl.SetWindowDisplayMode(window.Window, closest);
+        Logger.Debug($"Selected display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, XID: {((SDL_DisplayModeData*)closest.Driverdata)->xrandr_mode}");
 
-        Logger.Debug($"Display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, fullscreen: {ConfigManager.FullScreen}");
+        SDL_Hack.SetWindowDisplayMode((SDL_Window*)window.Window, &closest, true);
+
+        PostConfigureDisplayMode(modes);
+    }
+
+    protected virtual void PostConfigureDisplayMode(IList<DisplayMode> modes)
+    {
+        // Do nothing
     }
 }
