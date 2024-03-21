@@ -677,8 +677,6 @@ public unsafe partial class GameHost
             _sdl.GetClosestDisplayMode(0, expected, &closest);
         }
 
-        Logger.Debug($"Selected display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, XID: {((SDL_DisplayModeData*)closest.Driverdata)->xrandr_mode}");
-
         _sdl.SetWindowDisplayMode(window.Window, &closest);
 
         PostConfigureDisplayMode();
