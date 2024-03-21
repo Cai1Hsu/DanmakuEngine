@@ -10,7 +10,7 @@ using SDL_WindowFlags = Silk.NET.SDL.WindowFlags;
 
 namespace DanmakuEngine.Engine.SDLNative;
 
-public static unsafe partial class SDL_Hack
+internal static unsafe partial class SDL_Hack
 {
     private static SDL_VideoDevice* getVideoDevice(void* p_magic)
     {

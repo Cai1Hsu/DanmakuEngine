@@ -115,7 +115,9 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
                         var XID = output_info->modes[j];
 
+#if DEBUG
                         Logger.Debug($"XRandR mode {XID}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+#endif
                     }
                 }
                 Xrandr.XRRFreeOutputInfo(output_info);
@@ -166,8 +168,9 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
             mode.RefreshRate = (int)Math.Round(calculateXRandRRefreshRate(info));
 
+#pragma warning disable CA1416
             ((SDL_DisplayModeData*)mode.Driverdata)->xrandr_mode = modeID;
-
+#pragma warning restore CA1416
             return true;
         }
 

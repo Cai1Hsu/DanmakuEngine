@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct XRROutputInfo
+internal unsafe struct XRROutputInfo
 {
     public ulong timestamp;
 

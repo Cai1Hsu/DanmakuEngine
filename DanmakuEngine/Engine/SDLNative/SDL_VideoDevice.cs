@@ -7,7 +7,7 @@ namespace DanmakuEngine.Engine.SDLNative;
 /// Don't use this unless you know what you're doing.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SDL_VideoDevice
+internal unsafe struct SDL_VideoDevice
 {
     public int num_displays;
     public SDL_VideoDisplay* displays;

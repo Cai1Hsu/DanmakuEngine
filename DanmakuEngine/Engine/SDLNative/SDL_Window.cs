@@ -9,7 +9,7 @@ namespace DanmakuEngine.Engine.SDLNative;
 /// Do not change the value of this struct unless you know what you're doing.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SDL_Window
+internal unsafe struct SDL_Window
 {
     public readonly void* magic;
     public uint id;

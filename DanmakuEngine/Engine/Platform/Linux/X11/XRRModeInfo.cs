@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct XRRModeInfo
+internal unsafe struct XRRModeInfo
 {
     public ulong id;
     public uint width;

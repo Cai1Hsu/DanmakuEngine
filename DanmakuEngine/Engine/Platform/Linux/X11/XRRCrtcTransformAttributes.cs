@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct XRRCrtcTransformAttributes
+internal unsafe struct XRRCrtcTransformAttributes
 {
     public XTransform pendingTransform;
     public char* pendingFilter;

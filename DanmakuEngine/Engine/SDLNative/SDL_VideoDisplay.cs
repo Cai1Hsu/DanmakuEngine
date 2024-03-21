@@ -5,8 +5,12 @@ using SDL_DisplayOrientation = Silk.NET.SDL.DisplayOrientation;
 
 namespace DanmakuEngine.Engine.SDLNative;
 
+/// <summary>
+/// SDL's internal structure for video display.
+/// Do not use this unless you know what you are doing.
+/// </summary>
 [StructLayout(LayoutKind.Sequential)]
-public unsafe struct SDL_VideoDisplay
+internal unsafe struct SDL_VideoDisplay
 {
     public char* name;
     public int max_display_modes;

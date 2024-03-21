@@ -1,6 +1,6 @@
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
-public unsafe class X11Screen : IDisposable
+internal unsafe class X11Screen : IDisposable
 {
     private readonly XRRScreenResources* _resources;
 

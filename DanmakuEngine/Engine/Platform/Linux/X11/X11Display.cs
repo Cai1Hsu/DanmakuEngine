@@ -3,7 +3,7 @@ using DanmakuEngine.Extensions;
 
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
-public class X11Display : IDisposable
+internal class X11Display : IDisposable
 {
     private readonly IntPtr _display;
 

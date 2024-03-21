@@ -5,7 +5,7 @@ using Vortice.Mathematics;
 namespace DanmakuEngine.Engine.Platform.Linux.X11;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct XTransform
+internal struct XTransform
 {
     public Matrix3X3<int> matrix;
 }
