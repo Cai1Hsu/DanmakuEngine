@@ -4,7 +4,6 @@ using DanmakuEngine.Engine.Platform.Linux.X11;
 using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
-using Silk.NET.SDL;
 
 using SDL_DisplayMode = Silk.NET.SDL.DisplayMode;
 
@@ -99,7 +98,7 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
                         modes.Add(mode);
 
-                        Logger.Debug($"XRandR mode {(int)((SDL_DisplayModeData*)mode.Driverdata)->xrandr_mode}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+                        Logger.Debug($"XRandR mode {j + 1}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
                     }
                 }
                 Xrandr.XRRFreeOutputInfo(output_info);
