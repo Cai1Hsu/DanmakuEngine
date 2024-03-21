@@ -115,9 +115,9 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
                         var XID = output_info->modes[j];
 
-// #if DEBUG
-//                         Logger.Debug($"XRandR mode {XID}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
-// #endif
+                        // #if DEBUG
+                        //                         Logger.Debug($"XRandR mode {XID}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+                        // #endif
                     }
                 }
                 Xrandr.XRRFreeOutputInfo(output_info);
