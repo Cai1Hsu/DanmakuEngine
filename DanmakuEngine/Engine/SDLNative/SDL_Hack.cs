@@ -1,75 +1,120 @@
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
-using Veldrid.Sdl2;
+
+using SDL_DisplayMode = Silk.NET.SDL.DisplayMode;
+using SDL_WindowFlags = Silk.NET.SDL.WindowFlags;
+using SDL_FullscreenMode = Veldrid.Sdl2.SDL_FullscreenMode;
 
 namespace DanmakuEngine.Engine.SDLNative;
 
 public static unsafe partial class SDL_Hack
 {
-    public static bool SetWindowDisplayMode(SDL_Window* window, DisplayMode* mode, bool force = false)
+    private static SDL_VideoDevice* getVideoDevice(void* p_magic)
     {
-        var sdl = SDL.Api;
+        SDL_VideoDevice device = default;
 
-        sdl.SetWindowDisplayMode((Window*)window, mode);
+        int offset = (int)((nint)(&device.window_magic) - (nint)(&device));
 
-        if (!force)
-            return true;
+        // var offset = Marshal.OffsetOf<SDL_VideoDevice>("window_magic");
 
-        if (!RuntimeInfo.IsLinux)
-            return true;
+        var p_device = (SDL_VideoDevice*)(((IntPtr)p_magic) - offset);
 
-        DisplayMode applied = default;
-        sdl.GetWindowDisplayMode((Window*)window, &applied);
+        var ndisplays = p_device->num_displays;
 
-        // On Linux, we have to do some hacking to ensure the XID is updated
-        var target_xid = ((SDL_DisplayModeData*)mode->Driverdata)->xrandr_mode;
-        if (((SDL_DisplayModeData*)applied.Driverdata)->xrandr_mode == target_xid)
-            return true;
+        // Make sure we pointed to the correct memory. 10 displays should be enough for everyone
+        // Although this is not a gurantee
+        Debug.Assert(ndisplays < 10);
 
-        ((SDL_DisplayModeData*)window->fullscreen_mode.Driverdata)->xrandr_mode = target_xid;
+        return p_device;
+    }
 
-        // SDL_GetWindowDisplayMode()
-        /*
-            int SDL_GetWindowDisplayMode(SDL_Window *window, SDL_DisplayMode *mode)
-            {
-                // assign the current display mode to the window and do some checking
+    internal static void FixSdlDisplayModes(void* p_magic, int displayIndex, IList<SDL_DisplayMode> corrected)
+    {
+        var p_device = getVideoDevice(p_magic);
 
-                // if in desktop size mode, just return the size of the desktop
-                if ((window->flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == SDL_WINDOW_FULLSCREEN_DESKTOP) {
-                    fullscreen_mode = display->desktop_mode;
-                } else if (!SDL_GetClosestDisplayModeForDisplay(SDL_GetDisplayForWindow(window),
-                                                                &fullscreen_mode,
-                                                                &fullscreen_mode)) {
-                    SDL_zerop(mode);
-                    return SDL_SetError("Couldn't find display mode match");
-                }
-                *mode = fullscreen_mode;
-            }
-        */
+        var p_display = &p_device->displays[displayIndex];
 
-        // SDL ingores our changes and uses SDL_GetClosestDisplayModeForDisplay() to get the display mode
-        // However if the user added a custom mode, it's XID is always in the last position
-        // This means SDL still uses the old mode(incorrect one).
+        int nmodes = corrected.Count;
 
-        // Check that if the window is fullscreen
-        // if so, we have to toggle it off and on again to trigger the change
+        SDL_DisplayMode* modes = p_display->display_modes;
 
-        if ((sdl.GetWindowFlags((Window*)window)
-            & (uint)SDL_WindowFlags.Fullscreen) == (uint)SDL_WindowFlags.Fullscreen)
+        // Since some display modes were discared due to the incorrectly calculated refresh rate
+        // we have to realloc the display modes and sort them again
+
+        // step1: realloc the display modes
+        // enlarge display->display_modes by 32 * k
+        if (nmodes > p_display->max_display_modes)
         {
-            sdl.SetWindowFullscreen((Window*)window, (uint)SDL_FullscreenMode.Windowed);
-            sdl.SetWindowFullscreen((Window*)window, (uint)SDL_FullscreenMode.Fullscreen);
+            // find the k
+            int k = 1;
+            while (nmodes > p_display->max_display_modes + 32 * k)
+                k++;
+
+            var new_count = p_display->max_display_modes + 32 * k;
+
+            // realloc the modes
+            modes = (SDL_DisplayMode*)Marshal.ReAllocHGlobal((IntPtr)modes,
+                                    new_count * sizeof(SDL_DisplayMode));
+
+            p_display->display_modes = modes;
+            p_display->max_display_modes += 32 * k;
         }
 
-        // Let's check that if our hack worked
-        sdl.GetWindowDisplayMode((Window*)window, &applied);
+        // step2: copy and sort the display modes
+        var copy = corrected.ToList();
+        copy.Sort(cmpmodes);
 
-        var applied_XID = ((SDL_DisplayModeData*)applied.Driverdata)->xrandr_mode;
+        // step3: replace the display modes
+        for (int i = 0; i < nmodes; i++)
+            p_display->display_modes[i] = copy[i];
 
-        Logger.Debug($"[SDL_Hack]Applied display mode: {applied.W}x{applied.H}@{applied.RefreshRate} XID: {applied_XID} Target XID: {target_xid}");
+        // step4: change the number of display modes
+        p_display->num_display_modes = nmodes;
+    }
 
-        return applied_XID == target_xid;
+    private static unsafe int cmpmodes(SDL_DisplayMode A, SDL_DisplayMode B)
+    {
+        // FIXME: The user-defined display mode always goes last
+
+        SDL_DisplayMode* a = &A, b = &B;
+
+        if (a == b)
+        {
+            return 0;
+        }
+        else if (a->W != b->W)
+        {
+            return b->W - a->W;
+        }
+        else if (a->H != b->H)
+        {
+            return b->H - a->H;
+        }
+        else if (SDL_BITSPERPIXEL(a->Format) != SDL_BITSPERPIXEL(b->Format))
+        {
+            return (int)(SDL_BITSPERPIXEL(b->Format) - SDL_BITSPERPIXEL(a->Format));
+        }
+        else if (SDL_PIXELLAYOUT(a->Format) != SDL_PIXELLAYOUT(b->Format))
+        {
+            return (int)(SDL_PIXELLAYOUT(b->Format) - SDL_PIXELLAYOUT(a->Format));
+        }
+        else if (a->RefreshRate != b->RefreshRate)
+        {
+            return b->RefreshRate - a->RefreshRate;
+        }
+        else if (a->Driverdata != b->Driverdata)
+        {
+            // Not sure if we should compare the address directly
+            // but it's definitely better than nothing
+            return (int)((nint)b->Driverdata - (nint)a->Driverdata);
+        }
+        return 0;
+
+        static uint SDL_PIXELLAYOUT(uint X) => ((X) >> 16) & 0x0F;
+        static uint SDL_BITSPERPIXEL(uint X) => ((X) >> 8) & 0xFF;
     }
 }

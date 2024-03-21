@@ -678,13 +678,13 @@ public unsafe partial class GameHost
         }
 
         Logger.Debug($"Selected display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, XID: {((SDL_DisplayModeData*)closest.Driverdata)->xrandr_mode}");
-#pragma warning disable CS8500
-        SDL_Hack.SetWindowDisplayMode((SDL_Window*)window.Window, &closest, true);
-#pragma warning restore CS8500
-        PostConfigureDisplayMode(modes);
+
+        _sdl.SetWindowDisplayMode(window.Window, &closest);
+
+        PostConfigureDisplayMode();
     }
 
-    protected virtual void PostConfigureDisplayMode(IList<DisplayMode> modes)
+    protected virtual void PostConfigureDisplayMode()
     {
         // Do nothing
     }

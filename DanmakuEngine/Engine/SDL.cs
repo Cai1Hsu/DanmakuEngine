@@ -26,4 +26,11 @@ public static class SDL
             }
         }
     }
+
+    public static void Quit()
+    {
+        _sdl?.Quit();
+
+        _sdl = null;
+    }
 }
