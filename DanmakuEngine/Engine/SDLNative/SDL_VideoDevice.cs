@@ -10,8 +10,8 @@ namespace DanmakuEngine.Engine.SDLNative;
 public unsafe struct SDL_VideoDevice
 {
     public int num_displays;
-    public SDL_VideoDisplay *displays;
-    public SDL_Window *windows;
-    public SDL_Window *grabbed_window;
+    public SDL_VideoDisplay* displays;
+    public SDL_Window* windows;
+    public SDL_Window* grabbed_window;
     public byte window_magic;
 }

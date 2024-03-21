@@ -4,10 +4,9 @@ using System.Runtime.Versioning;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
-
 using SDL_DisplayMode = Silk.NET.SDL.DisplayMode;
-using SDL_WindowFlags = Silk.NET.SDL.WindowFlags;
 using SDL_FullscreenMode = Veldrid.Sdl2.SDL_FullscreenMode;
+using SDL_WindowFlags = Silk.NET.SDL.WindowFlags;
 
 namespace DanmakuEngine.Engine.SDLNative;
 
