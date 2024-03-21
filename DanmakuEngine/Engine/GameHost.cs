@@ -12,6 +12,7 @@ using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Engine.Platform.Environments;
 using DanmakuEngine.Engine.Platform.Environments.Execution;
 using DanmakuEngine.Engine.Platform.Windows;
+using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Engine.Sleeping;
 using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Engine.Windowing;
@@ -583,9 +584,42 @@ public partial class GameHost : Time, IDisposable
 // This is splited to do some unsafe job
 public unsafe partial class GameHost
 {
-    private void SetDisplayMode()
+    protected virtual IList<DisplayMode> GetDisplayModes(int display_index)
     {
-        var window_size = window.Size;
+        ArgumentOutOfRangeException
+            .ThrowIfNegative(display_index, nameof(display_index));
+
+        var display_count = _sdl.GetNumVideoDisplays();
+
+        ArgumentOutOfRangeException
+            .ThrowIfGreaterThanOrEqual(display_index, display_count, nameof(display_index));
+
+        int nums = SDL.Api.GetNumDisplayModes(display_index);
+        IList<DisplayMode> modes = [];
+
+        for (int i = 0; i < nums; i++)
+        {
+            DisplayMode mode = new();
+
+            if (SDL.Api.GetDisplayMode(display_index, i, ref mode) >= 0)
+            {
+                modes.Add(mode);
+
+#if DEBUG
+                Logger.Debug($"Display mode({i + 1}/{nums}): {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
+#endif
+            }
+#if DEBUG
+            else
+                Logger.Warn($"Failed to fetch display mode({i + 1}/{nums}): {SDL.Api.GetErrorS()}");
+#endif
+        }
+
+        return modes;
+    }
+
+    private IList<DisplayMode> GetDisplayModes()
+    {
 
         var displays = _sdl.GetNumVideoDisplays();
 
@@ -594,7 +628,7 @@ public unsafe partial class GameHost
             Logger.Warn($"No avaliable monitor found.");
             Logger.Warn($"SDL Error:{_sdl.GetErrorS()}");
 
-            return;
+            return [];
         }
 
         if (displays > 1)
@@ -603,117 +637,55 @@ public unsafe partial class GameHost
             Logger.Warn($"Multi monitors are not supported, using main monitor({main_name}).");
         }
 
-        // check if main monitor is already for use.
-        var main_monitor = new DisplayMode();
-        if (_sdl.GetDesktopDisplayMode(0, ref main_monitor) >= 0)
-        {
-            if (main_monitor.W == window_size.X
-             && main_monitor.H == window_size.Y)
-            {
-                _sdl.SetWindowDisplayMode(window.Window, main_monitor);
+        return GetDisplayModes(0);
+    }
 
-                var current = new DisplayMode();
-                _sdl.GetWindowDisplayMode(window.Window, ref current);
+    private void SetDisplayMode()
+    {
+        var modes = GetDisplayModes();
 
-                Logger.Debug($"Main monitor size matched, using current display mode({current.W}x{current.H}@{current.RefreshRate}Hz).");
+        if (modes.Count == 0)
+            return;
 
-                return;
-            }
-        }
+        // Hope that no one get a display with refresh rate higher than 1000Hz
+        int refresh_rate = 1000;
 
-        List<DisplayMode> modes = fetchModes();
-
-        var refresh_rate = -1;
-
-        if (displays < 0)
-        {
-            refresh_rate = Math.Max(refresh_rate, 60);
-
-            Logger.Warn($"Failed to retrieve main monitor refresh rate. Using {refresh_rate}Hz as fallback");
-        }
-        else
-        {
-            int max_rate = modes.Max(m => m.RefreshRate);
-
-            // TODO
-            // determine whether the refresh_rate in config manageer is passed with arguments.
-            // This is not a good way to check it, but it is the only way before we refactoring argument handling.
-            if (Environment.CommandLine.Contains("-refresh"))
-            {
-                refresh_rate = Math.Min(ConfigManager.RefreshRate, max_rate);
-            }
-            else
-            {
-                refresh_rate = max_rate;
-            }
-        }
+        if (Environment.CommandLine.Contains(" -refresh "))
+            refresh_rate = ConfigManager.RefreshRate;
 
         Debug.Assert(refresh_rate > 0);
 
-        DisplayMode expected = new(w: window_size.X,
-                                   h: window_size.Y,
+        DisplayMode expected = new(w: window.Size.X,
+                                   h: window.Size.Y,
                                    refreshRate: refresh_rate);
 
-        DisplayMode closest = new DisplayMode();
+        var matcheds = modes.Where(m => m.W == expected.W
+                                    && m.H == expected.H)
+                            .OrderBy(m => Math.Abs(m.RefreshRate - expected.RefreshRate));
 
-        _sdl.GetClosestDisplayMode(0, in expected, ref closest);
+        DisplayMode closest = default;
 
-        _sdl.SetWindowDisplayMode(window.Window, closest);
-
-        Logger.Debug($"Display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, fullscreen: {ConfigManager.FullScreen}");
-
-        static List<DisplayMode> fetchModes()
+        if (matcheds.Any())
         {
-            StackValue<DisplayMode> first_mode = stackalloc DisplayMode[1];
-            SDL.Api.GetDisplayMode(0, 0, first_mode);
-
-            // The max refresh rate of the native display mode.
-            int max_rate = first_mode.Value.RefreshRate;
-
-            int nums = SDL.Api.GetNumDisplayModes(0);
-            List<DisplayMode> modes = Enumerable.Repeat<DisplayMode>(new(), nums).ToList();
-
-            for (int i = 0; i < nums; i++)
-            {
-                DisplayMode mode = new();
-
-                // Refreshrate is handled incorrectly in SDL.
-                // When calculating the refresh rate, it is not divided by 2 if the mode is interlaced and not multiplied by 2 if the mode is double.
-                // This was fixed in SDL3 by me, but was not backported to SDL2.
-                // So we are going to do some hacky workaround here.
-                if (SDL.Api.GetDisplayMode(0, i, ref mode) >= 0)
-                {
-                    // Ignore meaningless values due to overflow
-                    if (mode.W > first_mode.Value.W || mode.H > first_mode.Value.H)
-                        continue;
-
-                    // TODO: Fetch display modes directly from XRandR
-                    // Hacky workaround to fix refresh rate calculation
-                    if (RuntimeInfo.IsLinux // only X11 is affected
-                                            // This prevents our workaround from being applied to displays with a 60hz native resolution but has higher refresh rate in lower resolutions.
-                        && max_rate > 119)
-                    {
-                        // see https://github.com/libsdl-org/SDL/pull/8933/files for more details
-                        if (mode.RefreshRate > max_rate
-                            || (mode.RefreshRate > 100 && mode.RefreshRate < 118))
-                        {
-                            mode.RefreshRate /= 2;
-                        }
-                    }
-
-                    modes.Add(mode);
-
-#if DEBUG
-                    Logger.Debug($"Display mode({i + 1}/{nums}): {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
-#endif
-                }
-#if DEBUG
-                else
-                    Logger.Warn($"Failed to fetch display mode({i + 1}/{nums}): {SDL.Api.GetErrorS()}");
-#endif
-            }
-
-            return modes;
+            closest = matcheds.First();
         }
+        else
+        {
+            Logger.Warn($"No avaliable display mode found for target size {expected.W}x{expected.H}. Using closest mode.");
+
+            // TODO: currently only support primary display
+            _sdl.GetClosestDisplayMode(0, expected, &closest);
+        }
+
+        Logger.Debug($"Selected display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, XID: {((SDL_DisplayModeData*)closest.Driverdata)->xrandr_mode}");
+
+        _sdl.SetWindowDisplayMode(window.Window, &closest);
+
+        PostConfigureDisplayMode();
+    }
+
+    protected virtual void PostConfigureDisplayMode()
+    {
+        // Do nothing
     }
 }
