@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using DanmakuEngine.Engine.Platform.Environments;
+using DanmakuEngine.Engine.Platform.Environments.Xdg;
 using DanmakuEngine.Engine.Platform.Linux.X11;
 using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Extensions;
@@ -7,67 +9,76 @@ using DanmakuEngine.Logging;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using SDL_DisplayMode = Silk.NET.SDL.DisplayMode;
 using SDL_Window = DanmakuEngine.Engine.SDLNative.SDL_Window;
+using WMType = Silk.NET.SDL.SysWMType;
 
 namespace DanmakuEngine.Engine.Platform.Linux;
 
 public unsafe partial class LinuxGameHost : DesktopGameHost
 {
+    private LinuxGraphicsPlatform? _graphicsPlatform;
+
     /// <summary>
-    /// Free memory allocated on unmanaged side
+    /// The graphics platform that the game is running on.
     /// </summary>
-    [SupportedOSPlatform("linux")]
-    protected override void PostConfigureDisplayMode()
+    public LinuxGraphicsPlatform GraphicsPlatform
     {
-        // Should not do this now, as the memory is presented to SDL2
-        // so we should let SDL2 free the memory
+        get
+        {
+            if (!_graphicsPlatform.HasValue)
+                _graphicsPlatform = Env.Get<XdgSessionTypeEnv, LinuxGraphicsPlatform>()!;
 
-        // modes.Where(m => m.Driverdata != null)
-        //      .ForEach(m => Marshal.FreeHGlobal((IntPtr)m.Driverdata));
-
-        // Check the XID to see if we have applied the correct mode
-#if DEBUG
-        var sdl = SDL.Api;
-        SDL_DisplayMode applied = new();
-        sdl.GetWindowDisplayMode(window.Window, &applied);
-
-        Logger.Debug($"Applied display mode: {applied.W}x{applied.H}@{applied.RefreshRate}Hz, XID:{((SDL_DisplayModeData*)applied.Driverdata)->xrandr_mode}");
-#endif
+            return _graphicsPlatform.Value;
+        }
     }
 
     [SupportedOSPlatform("linux")]
     protected override IList<SDL_DisplayMode> GetDisplayModes(int displayIndex)
     {
-        ArgumentOutOfRangeException
-            .ThrowIfNegative(displayIndex, nameof(displayIndex));
+        switch (window.WMInfo.Subsystem)
+        {
+            // Even if you are running on wayland, SDL2 will still return X11 if SDL_VIDEODRIVER was not set to wayland
+            case WMType.Wayland:
+                return base.GetDisplayModes(displayIndex);
 
-        var sdl = SDL.Api;
+            default:
+            {
+                if (GraphicsPlatform is LinuxGraphicsPlatform.Wayland)
+                    goto case WMType.Wayland;
 
-        var display_count = sdl.GetNumVideoDisplays();
+                ArgumentOutOfRangeException
+                    .ThrowIfNegative(displayIndex, nameof(displayIndex));
 
-        ArgumentOutOfRangeException
-            .ThrowIfGreaterThanOrEqual(displayIndex, display_count, nameof(displayIndex));
+                var sdl = SDL.Api;
 
-        // SDL requires all windows and all display modes use the same format
-        // so we just copy the first display mode's format
-        // see https://github.com/libsdl-org/SDL/blob/SDL2/src/video/x11/SDL_x11modes.c#L662-L667
-        SDL_DisplayMode mode = default;
-        SDL.Api.GetDisplayMode(displayIndex, 0, ref mode);
+                var display_count = sdl.GetNumVideoDisplays();
 
-        var modes = getDisplayModes(displayIndex, mode.Format);
+                ArgumentOutOfRangeException
+                    .ThrowIfGreaterThanOrEqual(displayIndex, display_count, nameof(displayIndex));
 
-        var magic = ((SDL_Window*)window.Window)->magic;
+                // SDL requires all windows and all display modes use the same format
+                // so we just copy the first display mode's format
+                // see https://github.com/libsdl-org/SDL/blob/SDL2/src/video/x11/SDL_x11modes.c#L662-L667
+                SDL_DisplayMode mode = default;
+                SDL.Api.GetDisplayMode(displayIndex, 0, ref mode);
 
-        SDL_Hack.FixSdlDisplayModes(magic, displayIndex, modes);
+                var modes = getDisplayModesX11(displayIndex, mode.Format);
+
+                var magic = ((SDL_Window*)window.Window)->magic;
+
+                SDL_Hack.FixSdlDisplayModes(magic, displayIndex, modes);
 
 #if DEBUG
-        base.GetDisplayModes(displayIndex);
+                base.GetDisplayModes(displayIndex);
 #endif
-        return modes;
+
+                return modes;
+            }
+        }
     }
 
-    private IList<SDL_DisplayMode> getDisplayModes(int displayIndex, uint format)
+    private IList<SDL_DisplayMode> getDisplayModesX11(int displayIndex, uint format)
     {
-        // in SDL2, they don't check if the DisplayMode we passed, 
+        // in SDL2, they don't check if the DisplayMode we passed,
         // so we can directly send our correct data without having to hack the SDL2's memory
         /* in SDL2/SDL_video.c:
             int SDL_SetWindowDisplayMode(SDL_Window *window, const SDL_DisplayMode *mode)
@@ -112,12 +123,6 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
                         }
 
                         modes.Add(mode);
-
-                        var XID = output_info->modes[j];
-
-                        // #if DEBUG
-                        //                         Logger.Debug($"XRandR mode {XID}: {mode.W}x{mode.H}@{mode.RefreshRate}Hz");
-                        // #endif
                     }
                 }
                 Xrandr.XRRFreeOutputInfo(output_info);

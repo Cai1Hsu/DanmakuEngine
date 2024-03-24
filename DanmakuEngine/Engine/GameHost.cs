@@ -572,7 +572,10 @@ public partial class GameHost : Time, IDisposable
 
         Logger.Debug($"Created game window: {size.X}x{size.Y}");
 
-        SetDisplayMode();
+        if (setDisplayMode(size, out var applied))
+        {
+            size = new Vector2D<int>(applied.W, applied.H);
+        }
 
         // set the default value
         Coordinate.OnResized(size.X, size.Y);
@@ -618,7 +621,7 @@ public unsafe partial class GameHost
         return modes;
     }
 
-    private IList<DisplayMode> GetDisplayModes()
+    private IList<DisplayMode> getDisplayModes()
     {
 
         var displays = _sdl.GetNumVideoDisplays();
@@ -640,12 +643,17 @@ public unsafe partial class GameHost
         return GetDisplayModes(0);
     }
 
-    private void SetDisplayMode()
+    private bool setDisplayMode(Vector2D<int> window_size, out DisplayMode applied_mode)
     {
-        var modes = GetDisplayModes();
+        // The reason why we have to pass the size instead of use window.Size is that
+        // On wayland, when we make the window fullscreen, the window size will be changed
+        // to the display size, which lead to our expected display mode to native display mode
+        applied_mode = default;
+
+        var modes = getDisplayModes();
 
         if (modes.Count == 0)
-            return;
+            return false;
 
         // Hope that no one get a display with refresh rate higher than 1000Hz
         int refresh_rate = 1000;
@@ -655,8 +663,8 @@ public unsafe partial class GameHost
 
         Debug.Assert(refresh_rate > 0);
 
-        DisplayMode expected = new(w: window.Size.X,
-                                   h: window.Size.Y,
+        DisplayMode expected = new(w: window_size.X,
+                                   h: window_size.Y,
                                    refreshRate: refresh_rate);
 
         var matcheds = modes.Where(m => m.W == expected.W
@@ -679,11 +687,12 @@ public unsafe partial class GameHost
 
         _sdl.SetWindowDisplayMode(window.Window, &closest);
 
-        PostConfigureDisplayMode();
-    }
+        applied_mode = window.DisplayMode;
 
-    protected virtual void PostConfigureDisplayMode()
-    {
-        // Do nothing
+#if DEBUG
+        Logger.Debug($"Selected display mode: {closest.W}x{closest.H}@{closest.RefreshRate}Hz, Applied: {applied_mode.W}x{applied_mode.H}@{applied_mode.RefreshRate}Hz");
+#endif
+
+        return true;
     }
 }

@@ -2,7 +2,7 @@ namespace DanmakuEngine.Engine.Platform.Environments;
 
 public static class Env
 {
-    public static string? Get<TEnv>()
+    public static string? GetString<TEnv>()
         where TEnv : IEnvironmentVariable, new()
         => new TEnv().Get();
 

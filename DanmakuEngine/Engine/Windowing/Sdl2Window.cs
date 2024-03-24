@@ -23,16 +23,23 @@ public unsafe class Sdl2Window : IWindow
 
     public IntPtr Handle => (IntPtr)_window;
 
+    private SysWMInfo? _sysWMInfo = null;
+
     public SysWMInfo WMInfo
     {
         get
         {
-            SysWMInfo info = default!;
+            if (!_sysWMInfo.HasValue)
+            {
+                SysWMInfo info = default!;
 
-            _sdl.GetVersion(ref info.Version);
-            _sdl.GetWindowWMInfo(_window, &info);
+                _sdl.GetVersion(ref info.Version);
+                _sdl.GetWindowWMInfo(_window, &info);
 
-            return info;
+                _sysWMInfo = info;
+            }
+
+            return _sysWMInfo.Value;
         }
     }
 
@@ -40,12 +47,12 @@ public unsafe class Sdl2Window : IWindow
     {
         get
         {
-            DisplayMode* mode = stackalloc DisplayMode[1];
+            DisplayMode mode = new();
 
-            if (_sdl.GetWindowDisplayMode(_window, mode) == 0)
+            if (_sdl.GetWindowDisplayMode(_window, &mode) != 0)
                 throw new Exception("Failed to get display mode.");
 
-            return *mode;
+            return mode;
         }
         set
         {
