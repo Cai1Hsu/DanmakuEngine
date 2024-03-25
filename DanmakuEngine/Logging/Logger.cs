@@ -203,7 +203,10 @@ public partial class Logger : IInjectable, IAutoloadable
     {
         instance = new Logger();
 
-        log_directory = Environment.CurrentDirectory;
+        log_directory = Path.Combine(Environment.CurrentDirectory, "logs");
+
+        if (!Directory.Exists(log_directory))
+            Directory.CreateDirectory(log_directory);
 
         // Generate a 4 digit unique id
         // This prevents the log file from being overwritten

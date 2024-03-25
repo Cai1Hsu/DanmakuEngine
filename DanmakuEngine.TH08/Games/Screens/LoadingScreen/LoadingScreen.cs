@@ -1,4 +1,6 @@
-﻿using DanmakuEngine.Games.Screens.MainMenu;
+﻿using DanmakuEngine.Dependency;
+using DanmakuEngine.Engine;
+using DanmakuEngine.Games.Screens.MainMenu;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.TH08.Games;
@@ -7,6 +9,8 @@ namespace DanmakuEngine.Games.Screens.Welcome;
 
 public partial class LoadingScreen : Screen
 {
+    [Inject]
+    private GameHost _host = null!;
     // All of the three methods below run in the `Update` loop
 
     // called by `load` in constructor for screen and manually called for other objects
@@ -44,14 +48,15 @@ public partial class LoadingScreen : Screen
             // If you want to schedule a task that will be executed after a certain delay,
             // you can use `Scheduler.ScheduleTaskDelay` method
 
-            // FIXME: CurrentTime is always 0
             return ScreenClock.ElapsedSeconds > 2;
         });
+
+        // _host.RequestClose();
     }
 
     // This method is called every frame, the first call is after `Start` method
     protected override void Update()
     {
-
+        // Logger.Debug($"Update from ActiveScreen");
     }
 }
