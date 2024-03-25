@@ -1,6 +1,6 @@
-namespace DanmakuEngine.Engine.Platform.Environments.Execution;
+namespace DanmakuEngine.Engine.Platform.Environments.Threading;
 
-public enum ExecutionMode
+public enum ThreadingMode
 {
     SingleThreaded,
     MultiThreaded

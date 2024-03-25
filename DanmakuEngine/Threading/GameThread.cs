@@ -56,7 +56,7 @@ public class GameThread
     /// <summary>
     /// The current dedicated OS thread for this <see cref="GameThread"/>.
     /// A value of <see langword="null"/> does not necessarily mean that this thread is not running;
-    /// in <see cref="ExecutionMode.SingleThread"/> execution mode <see cref="ThreadRunner"/> drives its <see cref="GameThread"/>s
+    /// in <see cref="ThreadingMode.SingleThread"/> threading mode <see cref="ThreadRunner"/> drives its <see cref="GameThread"/>s
     /// manually and sequentially on the main OS thread of the game process.
     /// </summary>
     internal Thread? Thread { get; private set; }

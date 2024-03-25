@@ -1,8 +1,8 @@
-namespace DanmakuEngine.Engine.Platform.Environments.Execution;
+namespace DanmakuEngine.Engine.Platform.Environments.Threading;
 
-public class ExecutionModeEnv : IEnvironmentVariable<ExecutionMode>
+public class ThreadingModeEnv : IEnvironmentVariable<ThreadingMode>
 {
-    private const string env_var = "DE_EXECUTION_MODE";
+    private const string env_var = "DE_THREADING_MODE";
 
     private static readonly IList<string> single_threadeds =
     [
@@ -28,7 +28,7 @@ public class ExecutionModeEnv : IEnvironmentVariable<ExecutionMode>
         "multi-threaded",
     ];
 
-    ExecutionMode? IEnvironmentVariable<ExecutionMode>.Value
+    ThreadingMode? IEnvironmentVariable<ThreadingMode>.Value
     {
         get
         {
@@ -38,10 +38,10 @@ public class ExecutionModeEnv : IEnvironmentVariable<ExecutionMode>
                 return null;
 
             if (single_threadeds.Any(v => v.Equals(value, StringComparison.OrdinalIgnoreCase)))
-                return ExecutionMode.SingleThreaded;
+                return ThreadingMode.SingleThreaded;
 
             if (multi_threadeds.Any(v => v.Equals(value, StringComparison.OrdinalIgnoreCase)))
-                return ExecutionMode.MultiThreaded;
+                return ThreadingMode.MultiThreaded;
 
 #if DEBUG
             throw new NotSupportedException($"Unrecognized value \"{value}\" for environment variable \"{env_var}\"");
