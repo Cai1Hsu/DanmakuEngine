@@ -10,7 +10,7 @@ using DanmakuEngine.Configuration;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Engine.Platform.Environments;
-using DanmakuEngine.Engine.Platform.Environments.Execution;
+using DanmakuEngine.Engine.Platform.Environments.Threading;
 using DanmakuEngine.Engine.Platform.Windows;
 using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Engine.Sleeping;
@@ -356,11 +356,11 @@ public partial class GameHost : Time, IDisposable
 
         MultiThreaded.Value = !ConfigManager.Singlethreaded;
 
-        var envExecutionMode = Env.Get<ExecutionModeEnv, ExecutionMode>();
+        var envThreadingMode = Env.Get<ThreadingModeEnv, ThreadingMode>();
 
-        if (envExecutionMode is not null)
+        if (envThreadingMode is not null)
         {
-            MultiThreaded.Value = envExecutionMode is ExecutionMode.MultiThreaded;
+            MultiThreaded.Value = envThreadingMode is ThreadingMode.MultiThreaded;
 
             Logger.
 #if DEBUG
@@ -368,7 +368,7 @@ public partial class GameHost : Time, IDisposable
 #else
             Debug
 #endif
-            ($"Overrided execution mode to {envExecutionMode} by environment");
+            ($"Overrided threading mode to {envThreadingMode} by environment");
         }
     }
 

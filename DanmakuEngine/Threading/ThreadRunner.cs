@@ -66,7 +66,7 @@ public class ThreadRunner
     public virtual void RunMainLoop()
     {
         // propagate any requested change in execution mode at a safe point in frame execution
-        ensureCorrectExecutionMode();
+        ensureCorrectThreadingMode();
 
         Debug.Assert(runningMultiThreaded.HasValue);
 
@@ -87,7 +87,7 @@ public class ThreadRunner
         ThreadSync.ResetAllForCurrentThread();
     }
 
-    public void Start() => ensureCorrectExecutionMode();
+    public void Start() => ensureCorrectThreadingMode();
 
     public void Suspend()
     {
@@ -126,7 +126,7 @@ public class ThreadRunner
         ThreadSync.ResetAllForCurrentThread();
     }
 
-    private void ensureCorrectExecutionMode()
+    private void ensureCorrectThreadingMode()
     {
         // locking is required as this method may be called from two different threads.
         lock (startStopLock)
@@ -138,7 +138,7 @@ public class ThreadRunner
                 return;
 
             runningMultiThreaded = ThreadSync.MultiThreaded = multithreaded;
-            Logger.Debug($"Execution mode changed to {(runningMultiThreaded.Value ? "Multi-threaded" : "Single-threaded")} mode.");
+            Logger.Debug($"Threading mode changed to {(runningMultiThreaded.Value ? "Multi-threaded" : "Single-threaded")} mode.");
         }
 
         pauseAllThreads();
