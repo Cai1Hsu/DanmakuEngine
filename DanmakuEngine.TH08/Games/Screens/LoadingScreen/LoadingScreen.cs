@@ -57,6 +57,5 @@ public partial class LoadingScreen : Screen
     // This method is called every frame, the first call is after `Start` method
     protected override void Update()
     {
-        // Logger.Debug($"Update from ActiveScreen");
     }
 }
