@@ -21,8 +21,8 @@ internal class Program
         using GameHost host = headless ? new HeadlessGameHost(() => true)
                                   : DesktopGameHost.GetSuitableHost();
 
-        // host.GraphicsBackend = GraphicsBackend.OpenGL;
-        // host.RendererType = GraphicsBinding.Silk;
+        host.GraphicsBackend = GraphicsBackend.OpenGL;
+        host.RendererType = GraphicsBinding.Silk;
 
         host.Run(new TH08Game(), argProvider);
     }

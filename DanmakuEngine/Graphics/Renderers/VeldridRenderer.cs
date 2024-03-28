@@ -226,6 +226,11 @@ public class VeldridRenderer : Renderer
         Initialized = true;
     }
 
+    public override void UnbindCurrent()
+    {
+        // Handled by Veldrid internally
+    }
+
     public override void MakeCurrent()
     {
         _commandList.SetFramebuffer(_device.SwapchainFramebuffer);
@@ -245,7 +250,7 @@ public class VeldridRenderer : Renderer
         // var veldrid_texture = _device.ResourceFactory.CreateTexture(textureDescription);
     }
 
-    public override bool BindTexture(Texture texture)
+    public override void BindTexture(Texture texture)
     {
         // In Veldrid, textures are bound to the pipeline through resource sets, not directly.
         // So, this method should return a ResourceSet, not a bool.
@@ -300,6 +305,11 @@ public class VeldridRenderer : Renderer
         throw new NotImplementedException();
     }
 
+    public override void Viewport(int x, int y, int width, int height)
+    {
+        _commandList.SetViewport(0, new Viewport(x, y, width, height, -1, 1));
+    }
+
     public override void Dispose()
     {
         _commandList.Dispose();
@@ -308,4 +318,5 @@ public class VeldridRenderer : Renderer
 
         _device.Dispose();
     }
+
 }

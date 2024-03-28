@@ -10,13 +10,15 @@ public abstract class Renderer : IRenderer, IDisposable
 
     public abstract void Initialize();
 
+    public abstract void UnbindCurrent();
+
     public abstract void MakeCurrent();
 
     public abstract void SwapBuffers();
 
     public abstract Texture CreateTexture(int width, int height);
 
-    public abstract bool BindTexture(Texture texture);
+    public abstract void BindTexture(Texture texture);
 
     public abstract void BeginFrame();
 
@@ -31,6 +33,8 @@ public abstract class Renderer : IRenderer, IDisposable
     }
 
     protected abstract void WaitForVSyncInternal();
+
+    public abstract void Viewport(int x, int y, int width, int height);
 
     public abstract void ClearScreen();
 

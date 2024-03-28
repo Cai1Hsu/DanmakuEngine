@@ -1,4 +1,6 @@
+using System.Diagnostics;
 using System.Text;
+using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Extensions;
@@ -7,6 +9,8 @@ using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
 using DanmakuEngine.Transformation;
 using DanmakuEngine.Transformation.Functions;
+using ImGuiNET;
+using Sdl2Window = DanmakuEngine.Engine.Windowing.Sdl2Window;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
@@ -166,6 +170,8 @@ public partial class MainScreen : Screen
     // }
 
     // This method is called when the screen(or average object) is starting
+    [Inject]
+    private Sdl2Window _window;
     protected override void Start()
     {
         Logger.Info("Keyboard is handled in this screen.");
@@ -190,7 +196,22 @@ public partial class MainScreen : Screen
 
         //     Logger.Info("exiting");
         // }, 5);
+
+        Debug.Assert(_host is not null, "Host is not injected");
+        Debug.Assert(_window is not null, "Window is not injected");
+
+        // _window.MouseMove += e =>
+        // {
+        //     int x = 0, y = 0;
+        //     var relative = SDL.Api.GetRelativeMouseMode();
+        //     var relativeState = SDL.Api.GetRelativeMouseState(ref x, ref y);
+
+        //     Logger.Info($"Mouse moved to {e.X}({x}), {e.Y}({y}), relative mode: {relative}");
+        // };
+        _demoWindow.Register();
     }
+
+    private ImguiDemoWindow _demoWindow = new ImguiDemoWindow();
 
     // This method is called every frame for the screen(and it's children object)
     protected override void Update()

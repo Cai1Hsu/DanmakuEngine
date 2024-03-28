@@ -5,6 +5,9 @@ using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
 using Silk.NET.Maths;
 using Silk.NET.SDL;
+
+using Imgui = DanmakuEngine.DearImgui.Imgui;
+
 namespace DanmakuEngine.Engine.Windowing;
 
 // TODO: This class still not fully decoupled windowing from the engine
@@ -149,6 +152,9 @@ public unsafe class Sdl2Window : IWindow
         exists = false;
     }
 
+    private bool checkImGuiMagic()
+        => Imgui.Initialized && Imgui.WindowMagic == Handle;
+
     public unsafe void PumpEvents()
     {
         Event* e = stackalloc Event[1];
@@ -163,27 +169,57 @@ public unsafe class Sdl2Window : IWindow
 
                 case (uint)EventType.AppTerminating:
                 case (uint)EventType.Quit:
-                    exists = false;
+                    RequestClose();
                     break;
 
                 // we should only handle the event once
                 // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case (uint)EventType.Keydown:
+                {
+                    if (checkImGuiMagic() && Imgui.EatKeyboardEvents(e->Key))
+                        break;
                     if (KeyDown?.Invoke(e->Key) is not true)
                         KeyEvent?.Invoke(e->Key);
-                    break;
+                }
+                break;
 
                 case (uint)EventType.Keyup:
+                {
+                    if (checkImGuiMagic() && Imgui.EatKeyboardEvents(e->Key))
+                        break;
                     if (KeyUp?.Invoke(e->Key) is not true)
                         KeyEvent?.Invoke(e->Key);
+                }
+                break;
+
+                case (uint)EventType.Textinput:
+                    if (!checkImGuiMagic() || !Imgui.EatTextInputEvents(e->Text))
+                        TextInput?.Invoke(e->Text);
+                    break;
+
+                case (uint)EventType.Textediting:
+                    TextEditing?.Invoke(e->Edit);
+                    break;
+
+                case (uint)EventType.Clipboardupdate:
+                    ClipboardUpdate?.Invoke();
+                    break;
+
+                case (uint)EventType.Dropbegin:
+                case (uint)EventType.Dropfile:
+                case (uint)EventType.Dropcomplete:
+                case (uint)EventType.Droptext:
+                    DropEvent?.Invoke(e->Drop);
                     break;
 
                 case (uint)EventType.Mousebuttondown:
-                    MouseButtonDown?.Invoke(e->Button);
+                    if (!checkImGuiMagic() || !Imgui.EatMouseButtonEvents(e->Button))
+                        MouseButtonDown?.Invoke(e->Button);
                     break;
 
                 case (uint)EventType.Mousebuttonup:
-                    MouseButtonUp?.Invoke(e->Button);
+                    if (!checkImGuiMagic() ||!Imgui.EatMouseButtonEvents(e->Button))
+                        MouseButtonUp?.Invoke(e->Button);
                     break;
 
                 case (uint)EventType.Mousemotion:
@@ -191,7 +227,8 @@ public unsafe class Sdl2Window : IWindow
                     break;
 
                 case (uint)EventType.Mousewheel:
-                    MouseScroll?.Invoke(e->Wheel);
+                    if (!checkImGuiMagic() || !Imgui.EatMouseWheelEvents(e->Wheel))
+                        MouseScroll?.Invoke(e->Wheel);
                     break;
 
                 case (uint)EventType.Windowevent:
@@ -336,6 +373,18 @@ public unsafe class Sdl2Window : IWindow
     public event Action<MouseMotionEvent> MouseMove = null!;
 
     public event Action<MouseWheelEvent> MouseScroll = null!;
+
+    public event Action<TextInputEvent> TextInput = null!;
+
+    public event Action<TextEditingEvent> TextEditing = null!;
+
+    /// <summary>
+    /// Must fetch the text yourself
+    /// </summary>
+    public event Action ClipboardUpdate = null!;
+
+    public event Action<DropEvent> DropEvent = null!;
+
 
     #endregion // Input Events
 

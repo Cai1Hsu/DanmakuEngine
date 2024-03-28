@@ -7,6 +7,7 @@ using DanmakuEngine.Allocations;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Bindables;
 using DanmakuEngine.Configuration;
+using DanmakuEngine.DearImgui;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Engine.Platform.Environments;
@@ -200,6 +201,8 @@ public partial class GameHost : Time, IDisposable
         if (_root == null)
             return;
 
+        Imgui.Update();
+
         // if (window.WindowState != WindowState.Minimized)
         //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
         _root.UpdateSubTree();
@@ -215,57 +218,16 @@ public partial class GameHost : Time, IDisposable
 
     protected void Render()
     {
-        // Use Renderer.Clear
-        // gl.Clear((uint)ClearBufferMask.ColorBufferBit | (uint)ClearBufferMask.DepthBufferBit);
-
-        if (doFrontToBackPass)
+        Renderer.BeginFrame();
         {
-            // TODO: Front pass
-            // buffer.Object.DrawOpaqueInteriorSubTree(Renderer, depthValue);
+            Renderer.MakeCurrent();
+            Renderer.ClearScreen();
+
+            Imgui.Render();
         }
+        Renderer.EndFrame();
 
-        // TODO
-        // Do render
-
-        // private Image<Rgba32> fpsText = new Image<Rgba32>(128, 128);
-        // private Font font = SystemFonts.CreateFont("Consolas", 22);
-
-        // gl.BindVertexArray(_vao);
-        // gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)0);
-        // gl.EnableVertexAttribArray(0);
-        // gl.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-        // gl.EnableVertexAttribArray(1);
-
-        // gl.UseProgram(shaderProgram);
-
-        // int textureLocation = gl.GetUniformLocation(shaderProgram, "texture1");
-
-        // gl.Uniform1(textureLocation, 0);
-
-        // uint textureId = gl.GenTexture();
-
-        // gl.ActiveTexture(TextureUnit.Texture0);
-        // gl.BindTexture(GLEnum.Texture2D, textureId);
-
-        // fpsText.ProcessPixelRows(accessor =>
-        // {
-        //     for (int y = 0; y < fpsText.Height; y++)
-        //     {
-        //         fixed (void* data = accessor.GetRowSpan(y))
-        //         {
-        //             gl.TexSubImage2D(GLEnum.Texture2D, 0, 0, y, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-
-        //             // gl.TexImage2D(GLEnum.Texture2D, 0, (int)InternalFormat.Rgba, (uint)accessor.Width, 1, PixelFormat.Rgba, PixelType.UnsignedByte, data);
-        //         }
-        //     }
-        // });
-
-        // gl.Enable(EnableCap.Texture2D);
-
-        // gl.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, (void*)0);
-
-        // Renderer.SwapBuffers();
-        // _sdl.GLSwapWindow(window);
+        Renderer.SwapBuffers();
     }
 
     private int last_debug_fps = -1;
@@ -278,7 +240,7 @@ public partial class GameHost : Time, IDisposable
             if (ConfigManager.HasConsole
              && ConfigManager.DebugMode)
             {
-                Logger.Write($"FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms)          \r", true, false);
+                Logger.Write($"Update FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms), Render Fps:{RenderThread.AverageFramerate:F2}({1000 / RenderThread.AverageFramerate:F2}±{RenderThread.Jitter:F2}ms)          \r", true, false);
                 last_debug_fps = this_debug;
             }
         }
@@ -417,14 +379,20 @@ public partial class GameHost : Time, IDisposable
             _ => throw new PlatformNotSupportedException($"Renderer type {RendererType} is not supported")
         };
 
+        Renderer.VSync = ConfigManager.Vsync;
+
+        window.WindowSizeChanged += (h, w) =>
+        {
+            Renderer.Viewport(0, 0, h, w);
+        };
+
         // Clear the screen
-
-        // FIXME: not work for silk renderer
-
         Renderer.BeginFrame();
         Renderer.MakeCurrent();
+        var window_size = window.Size;
+        Renderer.Viewport(0, 0, window_size.X, window_size.Y);
 
-        Renderer.SetClearColor(0, 0, 0, 1);
+        Renderer.SetClearColor(0.1f, 0.1f, 0.1f, 1);
         Renderer.ClearScreen();
 
         Renderer.EndFrame();
@@ -436,10 +404,6 @@ public partial class GameHost : Time, IDisposable
         if (window is not null)
         {
             window.WindowSizeChanged += Coordinate.OnResized;
-
-            // window.WindowMinimized
-            // window.AppDidenterbackground
-            // window.AppWillenterforeground
         }
 
 #if DEBUG
@@ -458,7 +422,10 @@ public partial class GameHost : Time, IDisposable
         {
             window?.Dispose();
 
+            Imgui.Shutdown();
+
             // TODO: Dispose renderer
+            Renderer?.Dispose();
 
             if (ConfigManager.HasConsole && !ConfigManager.RunningTest)
             {
@@ -467,7 +434,7 @@ public partial class GameHost : Time, IDisposable
                 Console.ResetColor();
             }
 
-            _sdl?.Quit();
+            SDL.Quit();
 
             lock (_instanceLock)
             {
@@ -581,6 +548,8 @@ public partial class GameHost : Time, IDisposable
         Coordinate.OnResized(size.X, size.Y);
 
         SetUpRenderer();
+
+        Imgui.Initialize(window, Renderer);
     }
 }
 

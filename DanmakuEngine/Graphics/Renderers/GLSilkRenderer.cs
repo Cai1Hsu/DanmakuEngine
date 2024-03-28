@@ -104,7 +104,8 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
         _sdl.GLSetAttribute(GLattr.ContextProfileMask, (int)GLprofile.Core);
 
         _sdl.GLSetAttribute(GLattr.ContextMajorVersion, 3);
-        _sdl.GLSetAttribute(GLattr.ContextMinorVersion, 2);
+        // The ImGui requires at least 3.3
+        _sdl.GLSetAttribute(GLattr.ContextMinorVersion, 3);
 
         _sdl.GLSetAttribute(GLattr.RedSize, 8);
         _sdl.GLSetAttribute(GLattr.GreenSize, 8);
@@ -125,6 +126,11 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
         Initialized = true;
     }
 
+    public override void UnbindCurrent()
+    {
+        _glContext.Clear();
+    }
+
     public override void MakeCurrent()
         => _glContext.MakeCurrent();
 
@@ -136,11 +142,9 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
         throw new NotImplementedException();
     }
 
-    public override bool BindTexture(Texture texture)
+    public override void BindTexture(Texture texture)
     {
         _gl.BindTexture(TextureTarget.Texture2D, texture.Handle);
-
-        return true;
     }
 
     public override void BeginFrame()
@@ -160,7 +164,7 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
 
     public override void ClearScreen()
     {
-        _gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+        _gl.Clear((uint)(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit | ClearBufferMask.StencilBufferBit));
     }
 
     public override void SetClearColor(float r, float g, float b, float a)
@@ -173,18 +177,18 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
         throw new NotImplementedException();
     }
 
-    public override void Dispose()
-    {
-        _gl.Dispose();
-        _glContext.Dispose();
-
-        // handled by the context
-        // _sdl.GLDeleteContext((void*)_glContext.Handle);
-    }
-
     public override void ClearScreen(float r, float g, float b, float a)
     {
         SetClearColor(r, g, b, a);
         ClearScreen();
+    }
+
+    public override void Viewport(int x, int y, int width, int height)
+        => _gl.Viewport(x, y, (uint)width, (uint)height);
+
+    public override void Dispose()
+    {
+        _gl.Dispose();
+        _glContext.Dispose();
     }
 }
