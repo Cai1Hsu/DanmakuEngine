@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace DanmakuEngine.Allocations;
 
-public abstract partial class MultiBuffer<T>
+public abstract partial class MultiBuffer<T> : IDisposable
 {
     public event Action<T?>? OnObjectOverwritten;
 
@@ -141,5 +141,20 @@ public abstract partial class MultiBuffer<T>
 
             writeCompletedEvent.Set();
         }
+    }
+
+    private void dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            foreach (var buffer in buffers)
+                buffer.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

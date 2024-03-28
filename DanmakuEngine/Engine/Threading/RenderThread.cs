@@ -1,3 +1,4 @@
+using DanmakuEngine.DearImgui;
 using DanmakuEngine.Graphics.Renderers;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Threading;
@@ -36,6 +37,11 @@ public class RenderThread : GameThread
 
         // In the render thread
         _renderer.MakeCurrent();
+    }
+
+    protected override void OnExit()
+    {
+        Imgui.DisposeGLResources();
     }
 
     public override bool IsCurrent => ThreadSync.IsRenderThread;

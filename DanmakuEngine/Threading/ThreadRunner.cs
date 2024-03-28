@@ -169,4 +169,10 @@ public class ThreadRunner
         foreach (var t in Threads.Reverse())
             t.Pause();
     }
+
+    public void WaitUntilAllThreadsExited()
+    {
+        foreach (var t in Threads)
+            t.WaitForState(ThreadStatus.Zombie);
+    }
 }

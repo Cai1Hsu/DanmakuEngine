@@ -24,6 +24,8 @@ public static partial class Imgui
     {
         _gl = gl;
 
+        _initializedGraphics = true;
+
         _gl.GetInteger(GLEnum.TextureBinding2D, out int lastTexture);
         _gl.GetInteger(GLEnum.ArrayBufferBinding, out int lastArrayBuffer);
         _gl.GetInteger(GLEnum.VertexArrayBinding, out int lastVertexArray);
@@ -196,15 +198,29 @@ public static partial class Imgui
         _gl.VertexAttribPointer(_program.vColorLocation, 4, GLEnum.UnsignedByte, true, (uint)sizeof(ImDrawVert), (void*)16);
     }
 
-    // internal static void
-    private static void disposeGLResources()
-    {
-        _gl.DeleteBuffer(_vertexBuffer);
-        _gl.DeleteBuffer(_indexBuffer);
-        _gl.DeleteVertexArray(_vertexArray);
+    private static volatile bool _initializedGraphics = false;
 
-        _fontTexture.Dispose();
-        _program.Dispose();
+    internal static void DisposeGLResources()
+    {
+        if (_initializedGraphics)
+            return;
+
+        using (var _ = StateObject.GLState())
+        {
+            _gl.BindBuffer(GLEnum.ArrayBuffer, 0);
+            _gl.BindBuffer(GLEnum.ElementArrayBuffer, 0);
+            _gl.BindVertexArray(0);
+
+            _gl.DeleteBuffer(_vertexBuffer);
+            _gl.DeleteBuffer(_indexBuffer);
+            _gl.DeleteVertexArray(_vertexArray);
+
+            _gl.BindTexture(GLEnum.Texture2D, 0);
+            _fontTexture.Dispose();
+
+            _gl.UseProgram(0);
+            _program.Dispose();
+        }
     }
 
 #pragma warning disable

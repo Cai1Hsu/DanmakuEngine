@@ -417,6 +417,8 @@ public partial class GameHost : Time, IDisposable
         {
             // FIXME what the fuck?
             threadRunner?.Stop();
+
+            threadRunner?.WaitUntilAllThreadsExited();
         }
         finally
         {
@@ -522,7 +524,7 @@ public partial class GameHost : Time, IDisposable
         SetupSdl();
 
         // TODO: load form config manager
-        var size = new Vector2D<int>(640, 480);
+        var size = new Vector2D<int>(1920, 1080);
 
         var flag = getWindowFlags(fullScreen: ConfigManager.FullScreen,
                                   exclusive: ConfigManager.Exclusive,

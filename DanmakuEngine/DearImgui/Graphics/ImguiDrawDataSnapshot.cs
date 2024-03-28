@@ -8,7 +8,7 @@ using Vortice.DXGI;
 
 namespace DanmakuEngine.DearImgui.Graphics;
 
-public unsafe class ImguiDrawDataSnapshot
+public unsafe class ImguiDrawDataSnapshot : IDisposable
 {
     private TripleBuffer<ImguiDrawDataSnapshotEntry> _cmdListsBuffer = new();
 
@@ -34,9 +34,6 @@ public unsafe class ImguiDrawDataSnapshot
 
         ImDrawData* newData = (ImDrawData*)ImguiUtils.ImAlloc(sizeof(ImDrawData));
         Debug.Assert(newData != null);
-
-        if (p_src->CmdLists.Data != 0)
-            Debugger.Break();
 
         ImguiDrawDataSnapshotEntry entry = new(src.CmdListsCount);
 
@@ -77,4 +74,9 @@ public unsafe class ImguiDrawDataSnapshot
 
     internal UsageValue<ImguiDrawDataSnapshotEntry>? GetForRead()
         => _cmdListsBuffer.GetForRead();
+
+    public void Dispose()
+    {
+        _cmdListsBuffer.Dispose();
+    }
 }

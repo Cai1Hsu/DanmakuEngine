@@ -122,7 +122,10 @@ public static partial class Imgui
 
         ImGui.DestroyContext(_context);
 
-        disposeGLResources();
+        _drawDataSnapshotBuffer.Dispose();
+
+        // Do not dispose GL resources here. The GL is managed in Render Thread.
+        // disposeGLResources();
         _initialized = false;
     }
 }
