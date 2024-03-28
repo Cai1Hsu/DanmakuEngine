@@ -12,7 +12,7 @@ public interface IRenderer
 
     Texture CreateTexture(int width, int height);
 
-    bool BindTexture(Texture texture);
+    void BindTexture(Texture texture);
 
     void BeginFrame();
 
@@ -23,6 +23,8 @@ public interface IRenderer
     void ClearScreen();
 
     void SetClearColor(float r, float g, float b, float a);
+
+    void Viewport(int x, int y, int width, int height);
 
     Texture[] GetAllTextures();
 }

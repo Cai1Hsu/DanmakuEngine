@@ -26,7 +26,7 @@ public partial class GameHost
 
         if (Renderer is not null)
         {
-            threadRunner.AddThread(RenderThread = new(Render));
+            threadRunner.AddThread(RenderThread = new(Render, Renderer));
         }
     }
 
