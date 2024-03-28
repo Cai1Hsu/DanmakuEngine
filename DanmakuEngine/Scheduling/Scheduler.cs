@@ -135,7 +135,10 @@ public class Scheduler : UpdateOnlyObject
         {
             var task = dequeueTask();
 
-            if (task is not null && task.ShouldRun)
+            if (task is null)
+                continue;
+
+            if (task.ShouldRun)
             {
                 using var t = task;
 
