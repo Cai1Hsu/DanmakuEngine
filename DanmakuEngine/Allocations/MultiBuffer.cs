@@ -6,9 +6,11 @@ namespace DanmakuEngine.Allocations;
 
 public abstract partial class MultiBuffer<T>
 {
+    public event Action<T?>? OnObjectOverwritten;
+
     protected abstract int bufferCount { get; }
 
-    protected virtual UsageValue<T>[] buffers { get; }
+    protected abstract UsageValue<T>[] buffers { get; }
 
     /// <summary>
     /// The freshest buffer index which has finished a write, and is waiting to be read.
@@ -103,6 +105,13 @@ public abstract partial class MultiBuffer<T>
                 // Never write to the same buffer twice in a row.
                 // This would defeat the purpose of having a triple buffer.
                 if (i == lastWriteIndex) continue;
+
+                if (buffers[i].Value is not null)
+                {
+                    var oldObj = buffers[i].Value;
+                    buffers[i].Scheduler.ScheduleTask(
+                        () => OnObjectOverwritten?.Invoke(oldObj));
+                }
 
                 lastWriteIndex = i;
 
