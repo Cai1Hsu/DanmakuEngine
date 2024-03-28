@@ -7,7 +7,7 @@ namespace DanmakuEngine.DearImgui;
 
 public static unsafe class ImguiExtensions
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Swap(this ref ImVector lhs, ref ImVector rhs)
     {
         fixed (void* p_lhs = &lhs)
@@ -30,7 +30,7 @@ public static unsafe class ImguiExtensions
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Reserve<T>(this ref ImVector lhs, int new_capacity)
         where T : struct
     {
@@ -39,7 +39,7 @@ public static unsafe class ImguiExtensions
         Reserve(ref lhs, new_capacity, sizeofT);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    // [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Reserve(this ref ImVector lhs, int new_capacity, int sizeofT)
     {
         Debug.Assert(new_capacity >= 0, $"new_capacity: {new_capacity}");
@@ -53,8 +53,9 @@ public static unsafe class ImguiExtensions
 
             if (lhs.Data != 0)
             {
+                long size = lhs.Size * sizeofT;
                 // memcpy(new_data, Data, (size_t)Size * sizeof(T));
-                Buffer.MemoryCopy((void*)lhs.Data, (void*)new_data, lhs.Size * sizeofT, lhs.Size * sizeofT);
+                Buffer.MemoryCopy((void*)lhs.Data, (void*)new_data, size, size);
                 // IM_FREE(Data);
                 Marshal.FreeHGlobal(lhs.Data);
             }

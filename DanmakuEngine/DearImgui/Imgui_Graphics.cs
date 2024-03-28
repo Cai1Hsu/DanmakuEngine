@@ -73,7 +73,7 @@ public static partial class Imgui
     {
         var drawData = entry.drawData;
 
-        if (drawData.CmdListsCount == 0)
+        if (entry.ListsCount == 0)
             return;
 
         var framebufferWidth = (int)(drawData.DisplaySize.X * drawData.FramebufferScale.X);
@@ -94,9 +94,9 @@ public static partial class Imgui
             Vector2 clipScale = drawData.FramebufferScale;
 
             // Render command lists
-            for (int i = 0; i < drawData.CmdListsCount; i++)
+            for (int i = 0; i < entry.ListsCount; i++)
             {
-                ImDrawListPtr cmdListPtr = drawData.CmdLists[i];
+                ImDrawListPtr cmdListPtr = entry.CopyLists[i];
 
                 // Upload vertex/index buffers
 

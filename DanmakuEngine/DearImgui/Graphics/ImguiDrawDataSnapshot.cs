@@ -32,10 +32,13 @@ public unsafe class ImguiDrawDataSnapshot
         if (!src.Valid)
             return;
 
-        ImDrawData* newData = (ImDrawData*)Marshal.AllocHGlobal(sizeof(ImDrawData));
+        ImDrawData* newData = (ImDrawData*)ImguiUtils.ImAlloc(sizeof(ImDrawData));
+        Debug.Assert(newData != null);
 
         if (p_src->CmdLists.Data != 0)
             Debugger.Break();
+
+        ImguiDrawDataSnapshotEntry entry = new(src.CmdListsCount);
 
         // Snap using swap
         ImVector backup_draw_list = new();
@@ -44,15 +47,14 @@ public unsafe class ImguiDrawDataSnapshot
         *newData = *p_src;
         backup_draw_list.Swap(ref p_src->CmdLists);
 
-        ImguiDrawDataSnapshotEntry entry = new(p_src->CmdListsCount);
-
         for (var i = 0; i < p_src->CmdListsCount; i++)
         {
             ImDrawList* src_list = src.CmdLists[i].NativePtr;
 
             entry.SrcLists[i] = src_list;
 
-            entry.CopyLists[i] = entry._copyListsValue + i * sizeof(ImDrawList);
+            // Don't know why can't we simply alloc a contiguous memory block for the whole list
+            entry.CopyLists[i] = ImguiUtils.ImAlloc<ImDrawList>();
             entry.CopyLists[i]->_Data = src_list->_Data;
 
             Debug.Assert(entry.SrcLists[i] == src_list);
