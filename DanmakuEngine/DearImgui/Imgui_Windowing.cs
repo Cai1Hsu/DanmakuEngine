@@ -1,7 +1,7 @@
-using ImGuiNET;
 using System.Numerics;
-using Silk.NET.Maths;
 using DanmakuEngine.Arguments;
+using ImGuiNET;
+using Silk.NET.Maths;
 
 namespace DanmakuEngine.DearImgui;
 

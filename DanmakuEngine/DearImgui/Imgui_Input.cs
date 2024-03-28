@@ -1,19 +1,16 @@
 using System.Numerics;
-using ImGuiNET;
-
-using SDL_MouseButtonEvent = Silk.NET.SDL.MouseButtonEvent;
-using SDL_MouseMotionEvent = Silk.NET.SDL.MouseMotionEvent;
-using SDL_MouseWheelEvent = Silk.NET.SDL.MouseWheelEvent;
-
-using SDL_KeyboardEvent = Silk.NET.SDL.KeyboardEvent;
-using SDL_TextInputEvent = Silk.NET.SDL.TextInputEvent;
-using SDL_TextEditingEvent = Silk.NET.SDL.TextEditingEvent;
-
-using SDL_Keymod = Silk.NET.SDL.Keymod;
-using SDL_KeyCode = Silk.NET.SDL.KeyCode;
 using System.Runtime.InteropServices;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
+using ImGuiNET;
+using SDL_KeyboardEvent = Silk.NET.SDL.KeyboardEvent;
+using SDL_KeyCode = Silk.NET.SDL.KeyCode;
+using SDL_Keymod = Silk.NET.SDL.Keymod;
+using SDL_MouseButtonEvent = Silk.NET.SDL.MouseButtonEvent;
+using SDL_MouseMotionEvent = Silk.NET.SDL.MouseMotionEvent;
+using SDL_MouseWheelEvent = Silk.NET.SDL.MouseWheelEvent;
+using SDL_TextEditingEvent = Silk.NET.SDL.TextEditingEvent;
+using SDL_TextInputEvent = Silk.NET.SDL.TextInputEvent;
 
 namespace DanmakuEngine.DearImgui;
 

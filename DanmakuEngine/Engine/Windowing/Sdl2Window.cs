@@ -218,7 +218,7 @@ public unsafe class Sdl2Window : IWindow
                     break;
 
                 case (uint)EventType.Mousebuttonup:
-                    if (!checkImGuiMagic() ||!Imgui.EatMouseButtonEvents(e->Button))
+                    if (!checkImGuiMagic() || !Imgui.EatMouseButtonEvents(e->Button))
                         MouseButtonUp?.Invoke(e->Button);
                     break;
 

@@ -1,11 +1,10 @@
-using ImGuiNET;
-using DanmakuEngine.DearImgui.Graphics;
-using Silk.NET.OpenGL;
-
 using System.Diagnostics;
-using DanmakuEngine.Logging;
-using System.Runtime.CompilerServices;
 using System.Numerics;
+using System.Runtime.CompilerServices;
+using DanmakuEngine.DearImgui.Graphics;
+using DanmakuEngine.Logging;
+using ImGuiNET;
+using Silk.NET.OpenGL;
 
 namespace DanmakuEngine.DearImgui;
 
