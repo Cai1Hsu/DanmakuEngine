@@ -30,10 +30,13 @@ internal unsafe class ImguiDrawDataSnapshotEntry : IDisposable
 
         for (var i = 0; i < ListsCount; i++)
         {
-            Marshal.FreeHGlobal((nint)CopyLists[i]);
+            ImguiUtils.ImFree(CopyLists[i]->CmdBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]->VtxBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]->IdxBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]);
         }
-        Marshal.FreeHGlobal((nint)SrcLists);
-        Marshal.FreeHGlobal((nint)CopyLists);
-        Marshal.FreeHGlobal((nint)drawData.NativePtr);
+        ImguiUtils.ImFree((nint)SrcLists);
+        ImguiUtils.ImFree((nint)CopyLists);
+        ImguiUtils.ImFree((nint)drawData.NativePtr);
     }
 }

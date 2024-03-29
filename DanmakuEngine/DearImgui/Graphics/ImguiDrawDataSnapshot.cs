@@ -3,8 +3,6 @@ using System.Runtime.InteropServices;
 using DanmakuEngine.Allocations;
 using DanmakuEngine.Logging;
 using ImGuiNET;
-using Silk.NET.SDL;
-using Vortice.DXGI;
 
 namespace DanmakuEngine.DearImgui.Graphics;
 

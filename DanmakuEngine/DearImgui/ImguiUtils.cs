@@ -17,4 +17,11 @@ public static unsafe class ImguiUtils
         Unsafe.InitBlockUnaligned(ptr, 0, (uint)size);
         return ptr;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static void ImFree(void* ptr)
+        => ImFree((nint)ptr);
+
+    internal static void ImFree(nint address)
+        => Marshal.FreeHGlobal(address);
 }

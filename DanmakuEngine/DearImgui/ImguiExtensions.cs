@@ -57,7 +57,7 @@ public static unsafe class ImguiExtensions
                 // memcpy(new_data, Data, (size_t)Size * sizeof(T));
                 Buffer.MemoryCopy((void*)lhs.Data, (void*)new_data, size, size);
                 // IM_FREE(Data);
-                Marshal.FreeHGlobal(lhs.Data);
+                ImguiUtils.ImFree(lhs.Data);
             }
 
             ImguiVector* _lhs = (ImguiVector*)p_lhs;
