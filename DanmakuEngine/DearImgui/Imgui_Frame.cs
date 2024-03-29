@@ -29,7 +29,6 @@ public static partial class Imgui
         OnUpdate?.Invoke();
 
         ImGui.Render();
-        ImGui.UpdatePlatformWindows();
 
         _drawDataSnapshotBuffer.WriteNewFrame(ImGui.GetDrawData());
     }

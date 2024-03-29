@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using DanmakuEngine.DearImgui;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
@@ -171,7 +172,7 @@ public partial class MainScreen : Screen
 
     // This method is called when the screen(or average object) is starting
     [Inject]
-    private Sdl2Window _window;
+    private Sdl2Window _window = null!;
     protected override void Start()
     {
         Logger.Info("Keyboard is handled in this screen.");
@@ -208,10 +209,21 @@ public partial class MainScreen : Screen
 
         //     Logger.Info($"Mouse moved to {e.X}({x}), {e.Y}({y}), relative mode: {relative}");
         // };
+        _demoWindow.OnUpdate += delegate
+        {
+            ImGui.Text("Hello, world!");
+            ImGui.Text($"Application average {1000.0f / ImGui.GetIO().Framerate:F2} ms/frame ({ImGui.GetIO().Framerate:F2} FPS)");
+
+            if (ImGui.Button("Close Window"))
+                _window.RequestClose();
+
+            if (ImGui.Button("Exit Game"))
+                _host.RequestClose();
+        };
         _demoWindow.Register();
     }
 
-    private ImguiDemoWindow _demoWindow = new ImguiDemoWindow();
+    private ImguiWindow _demoWindow = new ImguiWindow("Debug");
 
     // This method is called every frame for the screen(and it's children object)
     protected override void Update()

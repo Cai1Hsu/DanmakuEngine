@@ -2,7 +2,7 @@ using ImGuiNET;
 
 namespace DanmakuEngine.DearImgui;
 
-internal readonly struct ImguiContextState : IDisposable
+internal readonly ref struct ImguiContextState
 {
     private readonly nint _newContext;
     private readonly nint _oldContext;

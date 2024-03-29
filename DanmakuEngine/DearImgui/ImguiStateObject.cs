@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using DanmakuEngine.DearImgui.Graphics;
 using Silk.NET.OpenGL;
 
@@ -13,9 +14,11 @@ internal class ImguiStateObject(nint context, GL gl)
     private readonly nint _context = context;
     private readonly GL _gl = gl;
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal ImguiGLState GLState()
         => new ImguiGLState(_gl);
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal ImguiContextState ContextState()
         => new ImguiContextState(_context);
 }

@@ -204,6 +204,7 @@ public static partial class Imgui
     {
         if (_initializedGraphics)
             return;
+        _initializedGraphics = false;
 
         using (var _ = StateObject.GLState())
         {

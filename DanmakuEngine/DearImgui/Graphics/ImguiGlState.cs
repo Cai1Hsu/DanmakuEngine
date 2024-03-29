@@ -11,7 +11,7 @@ namespace DanmakuEngine.DearImgui.Graphics;
 /// Do your opeations in a using block to ensure the state is restored.
 /// </summary>
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ImguiGLState : IDisposable
+internal unsafe ref struct ImguiGLState
 {
     private bool _disposed = false;
     private readonly GL _gl;
