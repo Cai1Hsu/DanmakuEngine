@@ -174,7 +174,7 @@ public static partial class Imgui
                             out var fontData))
                             continue;
 
-                        return (info,  fontData);
+                        return (info, fontData);
                     }
                 }
             }
@@ -185,9 +185,9 @@ public static partial class Imgui
 
     private static ImguiFontInfo[] ZH_FONT_FALLBACKS =
     [
+        new(@"微软雅黑", 1.0f, 0, ImguiLocale.ZH),
         new(@"Microsoft YaHei UI Light", 1.0f, 1, ImguiLocale.ZH),
         new(@"Microsoft YaHei Light", 1.0f, 0, ImguiLocale.ZH),
-        new(@"微软雅黑", 1.0f, 0, ImguiLocale.ZH),
         new(@"Microsoft YaHei", 1.0f, 0, ImguiLocale.ZH),
         new(@"黑体", 0.9f, 0, ImguiLocale.ZH),
         new(@"SimHei", 0.9f, 0, ImguiLocale.ZH),
@@ -200,12 +200,10 @@ public static partial class Imgui
     private static ImguiFontInfo[] JA_FONT_FALLBACKS =
     [
         new(@"Meiryo UI", 1.0f, 0, ImguiLocale.JA),
-        new(@"Yu Gothic UI", 1.0f, 0, ImguiLocale.JA),
         new(@"MS UI Gothic", 0.85f, 0, ImguiLocale.JA),
+        new(@"Yu Gothic UI", 1.0f, 0, ImguiLocale.JA),
         new(@"MS Mincho", 0.85f, 0, ImguiLocale.JA),
-        new(@"Meiryo UI", 1.0f, 0, ImguiLocale.JA),
         new(@"Meiryo", 1.0f, 0, ImguiLocale.JA),
-        new(@"メイリオ", 1.0f, 0, ImguiLocale.JA),
         new(@"Noto Sans CJK JP", 1.0f, 0, ImguiLocale.JA),
     ];
 

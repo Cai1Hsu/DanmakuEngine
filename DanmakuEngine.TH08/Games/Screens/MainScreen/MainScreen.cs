@@ -214,10 +214,47 @@ public partial class MainScreen : Screen
 
             if (ImGui.Button("Exit Game"))
                 _host.RequestClose();
+
+            ImGui.Text(_string_with_cjk);
         };
         _debugWindow.Register();
         _demoWindow.Register();
     }
+
+    private const string _string_with_cjk = @"CJK character test
+楽園の素敵な巫女
+博麗霊夢（はくれいれいむ）
+Reimu Hakurei
+
+種族：人間
+能力：主に空を飛ぶ程度の能力
+
+
+毎度お馴染みの巫女さん。幻想郷の境にある博麗神社の巫女さん。
+博麗神社自体は、幻想郷と人間界の両方に位置する。
+
+何者に対しても平等に見る性格は、妖怪の様な普段畏れられている者
+からも好かれる。逆にいうと、誰に対しても仲間として見ない。周り
+に沢山人間や妖怪が居たり、一緒に行動を行っても、常に自分一人で
+ある。実は冷たい人間なのかも知れない。
+
+普通的黑魔术师
+雾雨魔理沙
+Marisa Kirisame
+
+种族：人类
+能力：使用魔法程度的能力
+
+居住在幻想乡，有点普通的魔法使。有收集癖。
+住在几乎不会有人类到访的魔法森林中，一边研究魔法，
+一边自由地生活着。
+
+虽然魔法使给人的印像总是室内（足不出户），但她却是经常出门。
+魔理沙在研究魔法的时候，觉得没有人比较好，但除
+此以外，她则是一个很喜欢热闹的人。
+因为森林不会吸引人来，所以正好。不过，这并非是为了不
+想让人见到研究中途的东西，才隐藏起来的（魔理沙语）
+";
 
     private ImguiDemoWindow _demoWindow = new ImguiDemoWindow();
     private ImguiWindow _debugWindow = new ImguiWindow("Debug");
