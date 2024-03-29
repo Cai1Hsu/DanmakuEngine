@@ -91,7 +91,7 @@ public static partial class Imgui
         _io.SetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(set_clipboard_text_fn_delegate);
         _io.GetClipboardTextFn = Marshal.GetFunctionPointerForDelegate(get_clipboard_text_fn_delegate);
 
-        _io.Fonts.AddFontDefault();
+        loadFonts();
 
         _io.BackendFlags |= ImGuiBackendFlags.RendererHasVtxOffset;
 

@@ -7,6 +7,8 @@ public static class SDL
 {
     private static Sdl? _sdl = null;
 
+    public static bool IsInitialized => _sdl is not null;
+
     public static Sdl Api
     {
         get
