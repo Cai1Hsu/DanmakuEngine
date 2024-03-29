@@ -73,7 +73,6 @@ public class Texture : IDisposable
             }
         });
 
-        // TODO:Setparameters
         SetParameters(mipmap);
 
         this.Width = img.Width;

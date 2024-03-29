@@ -149,7 +149,6 @@ public class TestRNG
 
         for (int i = 0; i < count; i++)
         {
-            // FIXME!!!!
             ints[rng.Next(max_value)]++;
         }
 

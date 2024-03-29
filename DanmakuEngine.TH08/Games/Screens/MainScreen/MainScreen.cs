@@ -201,17 +201,12 @@ public partial class MainScreen : Screen
         Debug.Assert(_host is not null, "Host is not injected");
         Debug.Assert(_window is not null, "Window is not injected");
 
-        // _window.MouseMove += e =>
-        // {
-        //     int x = 0, y = 0;
-        //     var relative = SDL.Api.GetRelativeMouseMode();
-        //     var relativeState = SDL.Api.GetRelativeMouseState(ref x, ref y);
-
-        //     Logger.Info($"Mouse moved to {e.X}({x}), {e.Y}({y}), relative mode: {relative}");
-        // };
-        _demoWindow.OnUpdate += delegate
+        _debugWindow.OnUpdate += delegate
         {
             ImGui.Text("Hello, world!");
+            // Imgui's framerate is actually our UpdateThread's framerate
+            // We generate vertices in UpdateThread and cache them using TripleBuffer
+            // Then we render the latest frame in RenderThread
             ImGui.Text($"Application average {1000.0f / ImGui.GetIO().Framerate:F2} ms/frame ({ImGui.GetIO().Framerate:F2} FPS)");
 
             if (ImGui.Button("Close Window"))
@@ -220,10 +215,12 @@ public partial class MainScreen : Screen
             if (ImGui.Button("Exit Game"))
                 _host.RequestClose();
         };
+        _debugWindow.Register();
         _demoWindow.Register();
     }
 
-    private ImguiWindow _demoWindow = new ImguiWindow("Debug");
+    private ImguiDemoWindow _demoWindow = new ImguiDemoWindow();
+    private ImguiWindow _debugWindow = new ImguiWindow("Debug");
 
     // This method is called every frame for the screen(and it's children object)
     protected override void Update()

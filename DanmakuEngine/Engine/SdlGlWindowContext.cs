@@ -47,10 +47,6 @@ public sealed unsafe class SdlGlWindowContext : IGLContext, IDisposable
 
         ArgumentNullException.ThrowIfNull(_window = window);
 
-        // Assert that the window is a valid SDL window.
-        // TODO: investigate if this is necessary.
-        // _sdl.CreateWindowFrom(_window);
-
         _context = _sdl.GLCreateContext(window);
 
         if (_context == null)

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using DanmakuEngine.Allocations;
 using DanmakuEngine.Logging;
@@ -70,6 +71,7 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
             usage.Value = entry;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal UsageValue<ImguiDrawDataSnapshotEntry>? GetForRead()
         => _cmdListsBuffer.GetForRead();
 
