@@ -77,8 +77,6 @@ internal static unsafe partial class SDL_Hack
 
     private static unsafe int cmpmodes(SDL_DisplayMode A, SDL_DisplayMode B)
     {
-        // FIXME: The user-defined display mode always goes last
-
         SDL_DisplayMode* a = &A, b = &B;
 
         if (a == b)

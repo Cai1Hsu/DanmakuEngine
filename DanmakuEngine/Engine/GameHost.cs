@@ -429,7 +429,6 @@ public partial class GameHost : Time, IDisposable
     {
         try
         {
-            // FIXME what the fuck?
             threadRunner?.Stop();
 
             threadRunner?.WaitUntilAllThreadsExited();
@@ -440,7 +439,6 @@ public partial class GameHost : Time, IDisposable
 
             Imgui.Shutdown();
 
-            // TODO: Dispose renderer
             Renderer?.Dispose();
 
             if (ConfigManager.HasConsole && !ConfigManager.RunningTest)

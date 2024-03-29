@@ -98,9 +98,6 @@ public class TestArguments
     [Test]
     public void TestArgumentProviderFind()
     {
-        // FIXME
-        // pass "-help" crashed host process??????
-        // Seems caused by the operation of "-help"
         using (var argParser = new ArgumentParser(argTemplate, new string[] { "-help" }, false/*remove this will lead to hotst crash*/))
         using (var argProvider = argParser.CreateProvider())
         {
