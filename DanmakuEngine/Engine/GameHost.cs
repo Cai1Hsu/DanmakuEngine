@@ -240,7 +240,7 @@ public partial class GameHost : Time, IDisposable
             if (ConfigManager.HasConsole
              && ConfigManager.DebugMode)
             {
-                Logger.Write($"Update FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms), Render Fps:{RenderThread.AverageFramerate:F2}({1000 / RenderThread.AverageFramerate:F2}±{RenderThread.Jitter:F2}ms)          \r", true, false);
+                Logger.Write($"Update FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms), Render FPS:{RenderThread.AverageFramerate:F2}({1000 / RenderThread.AverageFramerate:F2}±{RenderThread.Jitter:F2}ms)          \r", true, false);
                 last_debug_fps = this_debug;
             }
         }
@@ -273,7 +273,19 @@ public partial class GameHost : Time, IDisposable
             {
                 Console.CancelKeyPress += (_, e) =>
                 {
-                    RequestClose();
+                    if (lastCancelPress is not null &&
+                        EngineTimer.Elapsed.TotalSeconds - lastCancelPress < 1)
+                    {
+                        Logger.Warn("Exiting...");
+                    }
+                    else
+                    {
+                        RequestClose();
+
+                        e.Cancel = true;
+                        lastCancelPress = EngineTimer.Elapsed.TotalSeconds;
+                        Logger.Warn("Press Ctrl+C again to force exit.");
+                    }
 
                     Console.ResetColor();
                     Console.CursorVisible = true;
@@ -283,6 +295,8 @@ public partial class GameHost : Time, IDisposable
             }
         }
     }
+
+    private static double? lastCancelPress = null;
 
     private void SetUpDependency()
     {
@@ -524,7 +538,7 @@ public partial class GameHost : Time, IDisposable
         SetupSdl();
 
         // TODO: load form config manager
-        var size = new Vector2D<int>(1920, 1080);
+        var size = new Vector2D<int>(2560, 1600);
 
         var flag = getWindowFlags(fullScreen: ConfigManager.FullScreen,
                                   exclusive: ConfigManager.Exclusive,
