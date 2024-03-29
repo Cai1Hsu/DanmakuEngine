@@ -43,16 +43,16 @@ public static partial class Imgui
         else
         {
             Logger.Debug($"Selected {loadableLists.Count()} available fonts in the fallback list.");
-            foreach (var (info, path) in loadableLists)
-                Logger.Debug($"    {info.Name} at {path}");
+            foreach (var (info, _) in loadableLists)
+                Logger.Debug($"    {info.Name}");
         }
 
         using (var _ = StateObject.ContextState())
         {
             bool first = true;
-            foreach (var (info, path) in loadableLists)
+            foreach (var (info, data) in loadableLists)
             {
-                createOrMergeFont(info, path, first);
+                createOrMergeFont(info, data, first);
                 first = false;
             }
 
@@ -61,6 +61,8 @@ public static partial class Imgui
                 ImGuiNative.ImFontAtlas_Build(_io.Fonts);
             }
         }
+
+        recreateFontDeviceTexture();
     }
 
     private static float getDpiScale()
@@ -78,7 +80,7 @@ public static partial class Imgui
         }
     }
 
-    private static void createOrMergeFont(ImguiFontInfo info, string path, bool first)
+    private static void createOrMergeFont(ImguiFontInfo info, ImguiFontRawData data, bool first)
     {
         var fontSize = DefaultFontSize * info.Scale;
 
@@ -97,14 +99,19 @@ public static partial class Imgui
 
             try
             {
-                _io.Fonts.AddFontFromFileTTF(
-                    path, fontSize, configPtr, getGlyphRange(info.Locale));
-
-                Logger.Debug($"Loaded font {info.Name} at {fontSize}pt from {path}");
+                var rawData = data.RawData;
+                var dataSize = rawData.Length;
+                fixed (byte* ptr = rawData)
+                {
+                    _io.Fonts.AddFontFromMemoryTTF(
+                        (nint)ptr, dataSize, fontSize, configPtr, getGlyphRange(info.Locale));
+                }
+                Logger.Debug($"Added ImGui font {info.Name} at {fontSize}pt");
             }
             finally
             {
                 ImGuiNative.ImFontConfig_destroy(p_config);
+                data.Dispose();
             }
         }
     }
@@ -120,36 +127,36 @@ public static partial class Imgui
         };
     }
 
-    private static IEnumerable<(ImguiFontInfo, string)> getLoadableFonts(ImguiLocale locale)
+    private static IEnumerable<(ImguiFontInfo, ImguiFontRawData)> getLoadableFonts(ImguiLocale locale)
     {
-        IList<(ImguiFontInfo, string)> fonts = [];
+        IList<(ImguiFontInfo, ImguiFontRawData)> fonts = [];
 
         switch (locale)
         {
             case ImguiLocale.ZH:
-                fonts.Add(tryGetFontPathForLocale(ZH_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(JA_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(EN_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(ZH_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(JA_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(EN_FONT_FALLBACKS));
                 break;
             case ImguiLocale.JA:
-                fonts.Add(tryGetFontPathForLocale(JA_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(ZH_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(EN_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(JA_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(ZH_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(EN_FONT_FALLBACKS));
                 break;
             case ImguiLocale.EN:
-                fonts.Add(tryGetFontPathForLocale(EN_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(JA_FONT_FALLBACKS));
-                fonts.Add(tryGetFontPathForLocale(ZH_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(EN_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(JA_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(ZH_FONT_FALLBACKS));
                 break;
             default:
-                fonts.Add(tryGetFontPathForLocale(EN_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(EN_FONT_FALLBACKS));
                 break;
         }
 
         return fonts.Where(static f => f.Item1 is not null && f.Item2 is not null);
     }
 
-    private static (ImguiFontInfo, string) tryGetFontPathForLocale(
+    private static (ImguiFontInfo, ImguiFontRawData) tryGetFontsRawData(
         IEnumerable<ImguiFontInfo> fontInfos)
     {
         foreach (var info in fontInfos)
@@ -160,19 +167,14 @@ public static partial class Imgui
                 if (family.Value.TryGetPaths(out var paths)
                     && paths is not null)
                 {
+                    var name = family.Value.Name;
                     foreach (var path in paths)
                     {
-                        try
-                        {
-                            if (File.Exists(path))
-                            {
-                                return (info, path);
-                            }
-                        }
-                        catch
-                        {
+                        if (!ImguiFontRawData.TryLoadRawData(name, path,
+                            out var fontData))
                             continue;
-                        }
+
+                        return (info,  fontData);
                     }
                 }
             }
@@ -197,8 +199,8 @@ public static partial class Imgui
 
     private static ImguiFontInfo[] JA_FONT_FALLBACKS =
     [
-        new(@"Yu Gothic UI", 1.0f, 0, ImguiLocale.JA),
         new(@"Meiryo UI", 1.0f, 0, ImguiLocale.JA),
+        new(@"Yu Gothic UI", 1.0f, 0, ImguiLocale.JA),
         new(@"MS UI Gothic", 0.85f, 0, ImguiLocale.JA),
         new(@"MS Mincho", 0.85f, 0, ImguiLocale.JA),
         new(@"Meiryo UI", 1.0f, 0, ImguiLocale.JA),

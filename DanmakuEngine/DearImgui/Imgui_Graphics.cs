@@ -44,6 +44,9 @@ public static partial class Imgui
 
     private static void recreateFontDeviceTexture()
     {
+        if (!_initializedGraphics)
+            return;
+
         // Load as RGBA 32-bit (75% of the memory is wasted, but default font is so small)
         // because it is more likely to be compatible with user's existing shaders.
         // If your ImTextureId represent a higher-level concept than just a GL texture id,
