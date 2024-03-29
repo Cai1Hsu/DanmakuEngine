@@ -95,6 +95,8 @@ public static partial class Imgui
                 MergeMode = !first,
                 FontNo = info.Index,
                 RasterizerMultiply = 1.25f,
+                // The data is managed by us and is going to be disposed just after the font is added
+                FontDataOwnedByAtlas = false,
             };
 
             try
