@@ -1,9 +1,5 @@
-using System.Collections.Concurrent;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using DanmakuEngine.Allocations;
-using DanmakuEngine.Logging;
 using ImGuiNET;
 
 namespace DanmakuEngine.DearImgui.Graphics;
@@ -12,7 +8,6 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
 {
     private TripleBuffer<ImguiDrawDataSnapshotBuffer> _cmdListsBuffer = new();
     private bool requestedGC = false;
-    private ConcurrentDictionary<int, bool> GCStatus = new();
 
     internal ImguiDrawDataSnapshot()
     {
