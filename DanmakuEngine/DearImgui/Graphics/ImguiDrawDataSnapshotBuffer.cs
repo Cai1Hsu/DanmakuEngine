@@ -18,72 +18,42 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
 
     public ImguiDrawDataSnapshotBuffer(int count)
     {
-        this.ListsCapacity = count;
         this.ListsCount = count;
-        this.SrcLists = (ImDrawList**)ImguiUtils.ImAlloc(sizeof(ImDrawList*) * ListsCount);
-        this.CopyLists = (ImDrawList**)ImguiUtils.ImAlloc(sizeof(ImDrawList*) * ListsCount);
+        this.ListsCapacity = count;
         this._drawData = ImguiUtils.ImAlloc<ImDrawData>();
-    }
 
-    private void disposeAllResevedData()
-    {
-        for (int i = 0; i < ListsCapacity; i++)
-        {
-            ImguiUtils.ImFree(CopyLists[i]->CmdBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->VtxBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->IdxBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]);
-        }
-    }
-
-    private void disposeOverritenData()
-    {
-        // These should be freed by ImGui
-        // but we took their ownership in order to supprot multithread rendering.
-        // So we must free them.
-        for (int i = 0; i < ListsCount; i++)
-        {
-            ImguiUtils.ImFree(CopyLists[i]->CmdBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->VtxBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->IdxBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]);
-        }
+        reallocLists();
     }
 
     internal void PreTakeSnapShot(ImDrawDataPtr src)
     {
         var newCount = src.CmdListsCount;
 
-        if (newCount > ListsCapacity)
+        // Some times there are transient heavy scenes that allocates a lot of memory
+        // We want to free these memory to prevent too much memory from being wasted.
+        var doGC = (ListsCapacity > newCount * 2)
+                 && _gcTimer.ElapsedMilliseconds > 1000;
+
+        if (newCount > ListsCapacity || doGC)
         {
-            disposeOverritenData();
+            disposeCopyListsData();
 
             ListsCount = newCount;
 
-            // enlarge the lists
+            // enlarge or shrink the lists
             reallocLists();
-        }
-        else
-        {
-            // Some times there are transient heavy scenes that allocates a lot of memory
-            // We want to free these memory to prevent too much memory from being wasted.
-            if (ListsCapacity > ListsCount * 2  // Only do this when we allocated too much.
-                && _gcTimer.ElapsedMilliseconds > 1000)
-            {
-                disposeAllResevedData();
 
-                ListsCount = newCount;
-                // shrink the lists
-                reallocLists();
+            if (doGC)
+            {
+                // Did GC in `reallocLists()`
                 _gcTimer.Restart();
 
                 Logger.Debug($"Did ImguiDrawDataSnapshotBuffer GC");
             }
-            else
-            {
-                disposeOverritenData();
-                ListsCount = newCount;
-            }
+        }
+        else
+        {
+            ListsCount = newCount;
         }
     }
 
@@ -92,6 +62,9 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
         SrcLists = (ImDrawList**)ImguiUtils.ImRealloc((nint)SrcLists, sizeof(ImDrawList*) * ListsCount);
         CopyLists = (ImDrawList**)ImguiUtils.ImRealloc((nint)CopyLists, sizeof(ImDrawList*) * ListsCount);
         ListsCapacity = ListsCount;
+
+        for (int i = 0; i < ListsCapacity; i++)
+            CopyLists[i] = ImguiUtils.ImAlloc<ImDrawList>();
     }
 
     internal void SnapDrawData(ImDrawDataPtr src)
@@ -111,9 +84,6 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
 
             SrcLists[i] = src_list;
 
-            // TODO
-            // Since the CopyLists is managed by us, we should try to avoid frequent alloc and free operations
-            CopyLists[i] = ImguiUtils.ImAlloc<ImDrawList>();
             CopyLists[i]->_Data = src_list->_Data;
 
             Debug.Assert(SrcLists[i] == src_list);
@@ -126,6 +96,17 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
         *&_drawData->CmdLists.Data = (nint)CopyLists;
     }
 
+    private void disposeCopyListsData()
+    {
+        for (int i = 0; i < ListsCapacity; i++)
+        {
+            ImguiUtils.ImFree(CopyLists[i]->CmdBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]->VtxBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]->IdxBuffer.Data);
+            ImguiUtils.ImFree(CopyLists[i]);
+        }
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -133,7 +114,7 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
 
         _disposed = true;
 
-        disposeAllResevedData();
+        disposeCopyListsData();
 
         ImguiUtils.ImFree(SrcLists);
         ImguiUtils.ImFree(CopyLists);

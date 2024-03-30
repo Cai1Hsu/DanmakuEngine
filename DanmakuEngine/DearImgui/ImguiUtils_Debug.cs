@@ -10,7 +10,7 @@ public static partial class ImguiUtils
     private static long reallocCount = 0;
 
     public static long AllocCount => allcatedCount;
-    public static long FreeCount => freedCount - reallocCount;
+    public static long FreeCount => freedCount;
     public static long ReallocCount => reallocCount;
 
     public enum AllocCallsite
