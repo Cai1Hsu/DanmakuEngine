@@ -106,8 +106,8 @@ public abstract partial class MultiBuffer<T> : IDisposable
                 // This would defeat the purpose of having a triple buffer.
                 if (i == lastWriteIndex) continue;
 
-                if (OnObjectOverwritten is not null 
-                    &&buffers[i].Value is not null)
+                if (OnObjectOverwritten is not null
+                    && buffers[i].Value is not null)
                 {
                     var oldObj = buffers[i].Value;
                     buffers[i].Scheduler.ScheduleTask(

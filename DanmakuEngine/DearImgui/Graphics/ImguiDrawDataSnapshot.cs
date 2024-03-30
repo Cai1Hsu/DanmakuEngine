@@ -24,7 +24,7 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
         {
             if (usage.Value is null)
             {
-                usage.Value = new(src.CmdListsCount); 
+                usage.Value = new(src.CmdListsCount);
             }
             else
             {
