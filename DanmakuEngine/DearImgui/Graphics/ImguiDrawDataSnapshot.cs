@@ -59,9 +59,11 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
             entry.SrcLists[i]->VtxBuffer.Swap(ref entry.CopyLists[i]->VtxBuffer);
             entry.SrcLists[i]->IdxBuffer.Swap(ref entry.CopyLists[i]->IdxBuffer);
 
-            entry.SrcLists[i]->CmdBuffer.Reserve<ImDrawCmd>(entry.CopyLists[i]->CmdBuffer.Capacity);
-            entry.SrcLists[i]->VtxBuffer.Reserve<ImDrawVert>(entry.CopyLists[i]->VtxBuffer.Capacity);
-            entry.SrcLists[i]->IdxBuffer.Reserve<ushort>(entry.CopyLists[i]->IdxBuffer.Capacity);
+            // TODO: Reserve memory for the copied lists and avoid alloc every frame
+            // Currently we don't need to reserve memory for the copied lists as we alloc every frame.
+            // entry.SrcLists[i]->CmdBuffer.Reserve<ImDrawCmd>(entry.CopyLists[i]->CmdBuffer.Capacity);
+            // entry.SrcLists[i]->VtxBuffer.Reserve<ImDrawVert>(entry.CopyLists[i]->VtxBuffer.Capacity);
+            // entry.SrcLists[i]->IdxBuffer.Reserve<ushort>(entry.CopyLists[i]->IdxBuffer.Capacity);
         }
 
         *&newData->CmdLists.Data = (nint)entry.CopyLists;
