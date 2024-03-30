@@ -13,6 +13,7 @@ public static partial class Imgui
     public static float DefaultFontSize { get; set; } = 20.0f;
     private static float _dpiScale = 1.0f;
     public static bool ScaleByDpi { get; set; } = false;
+    public static bool UseLowerSampleH = true;
 
     private static void loadFonts()
     {
@@ -99,6 +100,9 @@ public static partial class Imgui
                 FontDataOwnedByAtlas = false,
             };
 
+            if (UseLowerSampleH)
+                configPtr.OversampleH = 2;
+
             try
             {
                 var rawData = data.RawData;
@@ -136,8 +140,8 @@ public static partial class Imgui
         switch (locale)
         {
             case ImguiLocale.ZH:
-                fonts.Add(tryGetFontsRawData(ZH_FONT_FALLBACKS));
                 fonts.Add(tryGetFontsRawData(JA_FONT_FALLBACKS));
+                fonts.Add(tryGetFontsRawData(ZH_FONT_FALLBACKS));
                 fonts.Add(tryGetFontsRawData(EN_FONT_FALLBACKS));
                 break;
             case ImguiLocale.JA:
@@ -188,7 +192,7 @@ public static partial class Imgui
     private static ImguiFontInfo[] ZH_FONT_FALLBACKS =
     [
         new(@"微软雅黑", 1.0f, 0, ImguiLocale.ZH),
-        new(@"Microsoft YaHei UI Light", 1.0f, 1, ImguiLocale.ZH),
+        new(@"Microsoft YaHei UI Light", 0.88f, 1, ImguiLocale.ZH),
         new(@"Microsoft YaHei Light", 1.0f, 0, ImguiLocale.ZH),
         new(@"Microsoft YaHei", 1.0f, 0, ImguiLocale.ZH),
         new(@"黑体", 0.9f, 0, ImguiLocale.ZH),
