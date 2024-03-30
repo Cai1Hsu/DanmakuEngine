@@ -36,9 +36,10 @@ public class ScreenStack : CompositeDrawable
 
         lock (_lock)
         {
-            last =
-            _screens.Pop();
+            last = _screens.Pop();
+            last.OnScreenLeaving();
             _screens.Push(screen);
+            screen.OnScreenEntering();
         }
 
         updateAnotherFrame = true;
@@ -59,6 +60,7 @@ public class ScreenStack : CompositeDrawable
         lock (_lock)
         {
             _screens.Push(screen);
+            screen.OnScreenEntering();
         }
 
         updateAnotherFrame = true;
@@ -81,6 +83,7 @@ public class ScreenStack : CompositeDrawable
     public Screen Pop()
     {
         var screen = _screens.Pop();
+        screen.OnScreenLeaving();
 
         if (ConfigManager.HasConsole)
             Logger.Debug($"ScreenStack: Popped {screen.GetType().Name}, current depth: {_screens.Count}");
