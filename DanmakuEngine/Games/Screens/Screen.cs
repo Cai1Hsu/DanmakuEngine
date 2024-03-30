@@ -76,4 +76,12 @@ public partial class Screen : CompositeDrawable
 
         keyboardHandler?.RegisterKeys();
     }
+
+    public virtual void OnScreenLeaving()
+    {
+    }
+
+    public virtual void OnScreenEntering()
+    {
+    }
 }
