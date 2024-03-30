@@ -220,7 +220,6 @@ public partial class GameHost : Time, IDisposable
     {
         Renderer.BeginFrame();
         {
-            Renderer.MakeCurrent();
             Renderer.ClearScreen();
 
             Imgui.Render();
