@@ -202,13 +202,19 @@ public partial class MainScreen : Screen
         Debug.Assert(_host is not null, "Host is not injected");
         Debug.Assert(_window is not null, "Window is not injected");
 
+        var _mainThread = _host.MainThread;
+        var _updateThread = _host.UpdateThread;
+        var _renderThread = _host.RenderThread;
         _debugWindow.OnUpdate += delegate
         {
             ImGui.Text("Hello, world!");
             // Imgui's framerate is actually our UpdateThread's framerate
             // We generate vertices in UpdateThread and cache them using TripleBuffer
             // Then we render the latest frame in RenderThread
-            ImGui.Text($"Application average {1000.0f / ImGui.GetIO().Framerate:F2} ms/frame ({ImGui.GetIO().Framerate:F2} FPS)");
+            ImGui.Text(@"Framerate:");
+            ImGui.Text($"    Main: {_mainThread.AverageFramerate:F2}({1000 / _mainThread.AverageFramerate:F2}±{_mainThread.Jitter:F2}ms)");
+            ImGui.Text($"    Update: {_updateThread.AverageFramerate:F2}({1000 / _updateThread.AverageFramerate:F2}±{_updateThread.Jitter:F2}ms)");
+            ImGui.Text($"    Render: {_renderThread.AverageFramerate:F2}({1000 / _renderThread.AverageFramerate:F2}±{_renderThread.Jitter:F2}ms)");
 
             if (ImGui.Button("Close Window"))
                 _window.RequestClose();
@@ -231,12 +237,14 @@ public partial class MainScreen : Screen
             foreach (var (_, record) in records)
                 allocated += record.Size;
 
-            ImGui.Text($"Alloc count: {ImguiUtils.AllocCount}, {ImguiUtils.AllocCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
-            ImGui.Text($"Free Count: {ImguiUtils.FreeCount}, {ImguiUtils.FreeCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
-            ImGui.Text($"Realloc Count: {ImguiUtils.ReallocCount}, {ImguiUtils.ReallocCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
+            ImGui.Text($"Alloc count: {ImguiUtils.AllocCount}");
+            ImGui.Text($"Free Count: {ImguiUtils.FreeCount}");
+            ImGui.Text($"Realloc Count: {ImguiUtils.ReallocCount}");
 
             ImGui.Text($"{records.Count} records");
             ImGui.Text($"Total Allocated {allocated} bytes");
+
+            ImGui.Separator();
 
             foreach (var (address, record) in records)
             {
@@ -244,12 +252,10 @@ public partial class MainScreen : Screen
             }
         };
         _allocViewer.Register();
-        _stopwatch.Start();
 #endif
     }
 
 #if DEBUG
-    private Stopwatch _stopwatch = new Stopwatch();
     private ImguiWindow _allocViewer = new ImguiWindow("Imgui Alloc Viewer");
 #endif
 
