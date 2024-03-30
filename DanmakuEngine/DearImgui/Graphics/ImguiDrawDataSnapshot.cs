@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -10,8 +11,8 @@ namespace DanmakuEngine.DearImgui.Graphics;
 public unsafe class ImguiDrawDataSnapshot : IDisposable
 {
     private TripleBuffer<ImguiDrawDataSnapshotBuffer> _cmdListsBuffer = new();
-    private int _remainedGCBuffers = 0;
     private bool requestedGC = false;
+    private ConcurrentDictionary<int, bool> GCStatus = new();
 
     internal ImguiDrawDataSnapshot()
     {
@@ -25,6 +26,20 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
         if (!src.Valid)
             return;
 
+        if (requestedGC)
+        {
+            requestedGC = false;
+
+            if (_cmdListsBuffer.GetUsingTypes().All(
+                static ut => ut is UsingType.Avaliable))
+            {
+                _cmdListsBuffer.ExecuteOnAllBuffers(static (b, _) =>
+                {
+                    b?.DoGC(true, true);
+                });
+            }
+        }
+
         using (var usage = _cmdListsBuffer.GetForWrite())
         {
             var cmdListsCount = src.CmdListsCount;
@@ -33,18 +48,6 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
                 usage.Value = new(cmdListsCount, usage.Index);
             else
                 usage.Value.PreTakeSnapShot(cmdListsCount);
-
-            if (requestedGC)
-            {
-                _remainedGCBuffers = _cmdListsBuffer.Count;
-                requestedGC = false;
-            }
-
-            if (_remainedGCBuffers > 0)
-            {
-                usage.Value.DoGC(true, true);
-                --_remainedGCBuffers;
-            }
 
             usage.Value.SnapDrawData(src);
         }

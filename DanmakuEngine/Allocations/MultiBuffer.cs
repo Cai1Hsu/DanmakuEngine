@@ -161,6 +161,28 @@ public abstract partial class MultiBuffer<T> : IDisposable
         }
     }
 
+    public IEnumerable<UsingType> GetUsingTypes()
+    {
+        lock (buffers)
+        {
+            return buffers.Select(b => b.UsingType).ToArray();
+        }
+    }
+
+    public void ExecuteOnAllBuffers(Action<T?, int> action)
+    {
+        lock (buffers)
+        {
+            if (!GetUsingTypes().All(ut => ut == UsingType.Avaliable))
+                throw new InvalidOperationException("All buffers must be available to execute an action on all buffers.");
+
+            foreach (var b in buffers)
+            {
+                action(b.Value!, b.Index);
+            }
+        }
+    }
+
     public void Dispose()
     {
         dispose(disposing: true);
