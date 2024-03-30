@@ -7,6 +7,7 @@ namespace DanmakuEngine.DearImgui.Graphics;
 
 internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
 {
+    private int _bufferIndex;
     private int ListsCapacity;
     internal int ListsCount;
     internal ImDrawList** SrcLists;
@@ -16,10 +17,11 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
     private bool _disposed = false;
     internal ImDrawDataPtr DrawData => new(_drawData);
 
-    public ImguiDrawDataSnapshotBuffer(int count)
+    public ImguiDrawDataSnapshotBuffer(int listsCount, int bufferIndex)
     {
-        this.ListsCount = count;
-        this.ListsCapacity = count;
+        this._bufferIndex = bufferIndex;
+        this.ListsCount = listsCount;
+        this.ListsCapacity = listsCount;
         this._drawData = ImguiUtils.ImAlloc<ImDrawData>();
 
         reallocLists();
@@ -36,7 +38,7 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
 
         _gcTimer.Restart();
 
-        Logger.Debug($"Did ImguiDrawDataSnapshotBuffer GC");
+        Logger.Debug($"Did ImguiDrawDataSnapshotBuffer GC, index: {_bufferIndex}");
     }
 
     internal void PreTakeSnapShot(int newCount)

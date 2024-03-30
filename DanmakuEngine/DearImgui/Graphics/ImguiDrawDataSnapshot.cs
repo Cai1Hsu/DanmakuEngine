@@ -30,7 +30,7 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
             var cmdListsCount = src.CmdListsCount;
 
             if (usage.Value is null)
-                usage.Value = new(cmdListsCount);
+                usage.Value = new(cmdListsCount, usage.Index);
             else
                 usage.Value.PreTakeSnapShot(cmdListsCount);
 
