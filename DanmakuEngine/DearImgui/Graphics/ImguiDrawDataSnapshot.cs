@@ -22,14 +22,12 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
 
         using (var usage = _cmdListsBuffer.GetForWrite())
         {
+            var cmdListsCount = src.CmdListsCount;
+
             if (usage.Value is null)
-            {
-                usage.Value = new(src.CmdListsCount);
-            }
+                usage.Value = new(cmdListsCount);
             else
-            {
-                usage.Value.PreTakeSnapShot(src);
-            }
+                usage.Value.PreTakeSnapShot(cmdListsCount);
 
             usage.Value.SnapDrawData(src);
         }

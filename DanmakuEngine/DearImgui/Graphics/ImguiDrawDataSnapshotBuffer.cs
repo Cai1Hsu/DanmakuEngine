@@ -25,10 +25,8 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
         reallocLists();
     }
 
-    internal void PreTakeSnapShot(ImDrawDataPtr src)
+    internal void PreTakeSnapShot(int newCount)
     {
-        var newCount = src.CmdListsCount;
-
         // Some times there are transient heavy scenes that allocates a lot of memory
         // We want to free these memory to prevent too much memory from being wasted.
         var doGC = (ListsCapacity > newCount * 2)
@@ -83,7 +81,6 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
             ImDrawList* src_list = src.CmdLists[i].NativePtr;
 
             SrcLists[i] = src_list;
-
             CopyLists[i]->_Data = src_list->_Data;
 
             Debug.Assert(SrcLists[i] == src_list);
