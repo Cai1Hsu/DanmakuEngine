@@ -25,6 +25,20 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
         reallocLists();
     }
 
+    internal void DoGC(bool freeprevious = false, bool realloclists = true)
+    {
+        if (freeprevious)
+            disposeCopyListsData();
+
+        // Where we actually do the GC
+        if (realloclists)
+            reallocLists();
+
+        _gcTimer.Restart();
+
+        Logger.Debug($"Did ImguiDrawDataSnapshotBuffer GC");
+    }
+
     internal void PreTakeSnapShot(int newCount)
     {
         // Some times there are transient heavy scenes that allocates a lot of memory
@@ -42,12 +56,8 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
             reallocLists();
 
             if (doGC)
-            {
-                // Did GC in `reallocLists()`
-                _gcTimer.Restart();
-
-                Logger.Debug($"Did ImguiDrawDataSnapshotBuffer GC");
-            }
+                // we've done GC, just to reset the timer.
+                DoGC(freeprevious: false, realloclists: false);
         }
         else
         {
@@ -96,12 +106,7 @@ internal unsafe class ImguiDrawDataSnapshotBuffer : IDisposable
     private void disposeCopyListsData()
     {
         for (int i = 0; i < ListsCapacity; i++)
-        {
-            ImguiUtils.ImFree(CopyLists[i]->CmdBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->VtxBuffer.Data);
-            ImguiUtils.ImFree(CopyLists[i]->IdxBuffer.Data);
             ImguiUtils.ImFree(CopyLists[i]);
-        }
     }
 
     public void Dispose()

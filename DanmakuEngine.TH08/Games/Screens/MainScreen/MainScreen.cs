@@ -222,7 +222,7 @@ public partial class MainScreen : Screen
             if (ImGui.Button("Exit Game"))
                 _host.RequestClose();
 
-            ImGui.Text(_string_with_cjk);
+            ImGui.Text(string_with_cjk);
         };
         _debugWindow.Register();
         _demoWindow.Register();
@@ -236,6 +236,9 @@ public partial class MainScreen : Screen
 
             foreach (var (_, record) in records)
                 allocated += record.Size;
+
+            if (ImGui.Button("Force GC"))
+                Imgui.ForceCollectSnapshots();
 
             ImGui.Text($"Alloc count: {ImguiUtils.AllocCount}");
             ImGui.Text($"Free Count: {ImguiUtils.FreeCount}");
@@ -259,7 +262,7 @@ public partial class MainScreen : Screen
     private ImguiWindow _allocViewer = new ImguiWindow("Imgui Alloc Viewer");
 #endif
 
-    private const string _string_with_cjk = @"CJK character test
+    private const string string_with_cjk = @"CJK character test
 楽園の素敵な巫女
 博麗霊夢（はくれいれいむ）
 Reimu Hakurei

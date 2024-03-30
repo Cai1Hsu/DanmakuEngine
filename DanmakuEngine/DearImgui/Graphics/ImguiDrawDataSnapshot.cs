@@ -10,10 +10,15 @@ namespace DanmakuEngine.DearImgui.Graphics;
 public unsafe class ImguiDrawDataSnapshot : IDisposable
 {
     private TripleBuffer<ImguiDrawDataSnapshotBuffer> _cmdListsBuffer = new();
+    private int _remainedGCBuffers = 0;
+    private bool requestedGC = false;
 
     internal ImguiDrawDataSnapshot()
     {
     }
+
+    internal void ForceGC()
+        => requestedGC = true;
 
     internal void WriteNewFrame(ImDrawDataPtr src)
     {
@@ -28,6 +33,18 @@ public unsafe class ImguiDrawDataSnapshot : IDisposable
                 usage.Value = new(cmdListsCount);
             else
                 usage.Value.PreTakeSnapShot(cmdListsCount);
+
+            if (requestedGC)
+            {
+                _remainedGCBuffers = _cmdListsBuffer.Count;
+                requestedGC = false;
+            }
+
+            if (_remainedGCBuffers > 0)
+            {
+                usage.Value.DoGC(true, true);
+                --_remainedGCBuffers;
+            }
 
             usage.Value.SnapDrawData(src);
         }

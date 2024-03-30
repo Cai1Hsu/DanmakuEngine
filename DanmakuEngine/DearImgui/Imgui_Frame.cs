@@ -12,6 +12,11 @@ public static partial class Imgui
 {
     private static ImguiDrawDataSnapshot _drawDataSnapshotBuffer = new();
 
+    public static void ForceCollectSnapshots()
+    {
+        _drawDataSnapshotBuffer.ForceGC();
+    }
+
     internal static void Update()
     {
         if (!_initialized)

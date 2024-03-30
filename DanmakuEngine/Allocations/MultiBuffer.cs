@@ -6,6 +6,8 @@ namespace DanmakuEngine.Allocations;
 
 public abstract partial class MultiBuffer<T> : IDisposable
 {
+    public int Count => bufferCount;
+
     public event Action<T?>? OnObjectOverwritten;
 
     protected abstract int bufferCount { get; }
