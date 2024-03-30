@@ -74,9 +74,9 @@ public static partial class Imgui
     private static void warn(string message)
         => Logger.Warn(message);
 
-    private static unsafe void drawImGui(ImguiDrawDataSnapshotEntry entry)
+    private static unsafe void drawImGui(ImguiDrawDataSnapshotBuffer entry)
     {
-        var drawData = entry.drawData;
+        var drawData = entry.DrawData;
 
         if (entry.ListsCount == 0)
             return;

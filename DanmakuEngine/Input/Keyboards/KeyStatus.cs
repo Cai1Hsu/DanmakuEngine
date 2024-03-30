@@ -86,16 +86,10 @@ public class KeyStatus
 
         if (e.Type == (uint)EventType.Keydown)
         {
-            // This may lead to assertion failure if u have two keyboards
-            // but we leave it here for preventing other bugs such as failing to detect key up
-            Debug.Assert(!IsDown.Value);
-
             IsDown.Value = true;
         }
         else if (e.Type == (uint)EventType.Keyup)
         {
-            Debug.Assert(IsDown.Value);
-
             IsDown.Value = false;
 
             Mod = Keymod.None;

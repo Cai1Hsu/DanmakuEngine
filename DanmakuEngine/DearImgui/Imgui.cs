@@ -124,6 +124,15 @@ public static partial class Imgui
 
         _drawDataSnapshotBuffer.Dispose();
 
+#if DEBUG
+        Logger.Debug($"Remained {ImguiUtils.AllocRecords.Sum(a => a.Value.Size)} bytes unreleased for ImGui");
+        foreach (var (_, record) in ImguiUtils.AllocRecords)
+        {
+            ImguiUtils.ExactCallsites.TryGetValue(record.Address, out var caller);
+            Logger.Warn($"[Memory Leak Detected] Address: {record.Address:X}, size {record.Size}, callsite {record.Callsite}({caller})");
+        }
+#endif
+
         // Do not dispose GL resources here. The GL is managed in Render Thread.
         // disposeGLResources();
         _initialized = false;
