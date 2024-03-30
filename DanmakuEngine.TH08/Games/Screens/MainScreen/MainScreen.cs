@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Text;
 using DanmakuEngine.DearImgui;
 using DanmakuEngine.DearImgui.Windowing;
@@ -219,7 +220,38 @@ public partial class MainScreen : Screen
         };
         _debugWindow.Register();
         _demoWindow.Register();
+
+#if DEBUG
+        _allocViewer.OnUpdate += delegate
+        {
+            var records = ImguiUtils.AllocRecords;
+
+            long allocated = 0;
+
+            foreach (var (_, record) in records)
+                allocated += record.Size;
+
+            ImGui.Text($"Alloc count: {ImguiUtils.AllocCount}, {ImguiUtils.AllocCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
+            ImGui.Text($"Free Count: {ImguiUtils.FreeCount}, {ImguiUtils.FreeCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
+            ImGui.Text($"Realloc Count: {ImguiUtils.ReallocCount}, {ImguiUtils.ReallocCount / _stopwatch.ElapsedMilliseconds:F2} ops/ms");
+
+            ImGui.Text($"{records.Count} records");
+            ImGui.Text($"Total Allocated {allocated} bytes");
+
+            foreach (var (address, record) in records)
+            {
+                ImGui.Text($"Address {address:X}, CallSite: {record.Callsite}, Size {record.Size}");
+            }
+        };
+        _allocViewer.Register();
+        _stopwatch.Start();
+#endif
     }
+
+#if DEBUG
+    private Stopwatch _stopwatch = new Stopwatch();
+    private ImguiWindow _allocViewer = new ImguiWindow("Imgui Alloc Viewer");
+#endif
 
     private const string _string_with_cjk = @"CJK character test
 楽園の素敵な巫女
