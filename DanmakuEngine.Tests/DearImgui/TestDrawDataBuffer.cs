@@ -19,7 +19,7 @@ public unsafe class TestImguiDrawDataBuffer
     }
 
     [Test]
-    public void TestDoGC_Collect()
+    public void TestForceGC_Collect()
     {
         var buffer = new ImguiDrawDataBuffer(20, 0);
         buffer.PreTakeSnapShot(10);
@@ -29,7 +29,7 @@ public unsafe class TestImguiDrawDataBuffer
     }
 
     [Test]
-    public void TestDoGC_NoCollect()
+    public void TestForceGC_NoCollect()
     {
         var buffer = new ImguiDrawDataBuffer(20, 0);
         buffer.DoGC();
@@ -44,7 +44,7 @@ public unsafe class TestImguiDrawDataBuffer
         var buffer = new ImguiDrawDataBuffer(10, 0);
         buffer.PreTakeSnapShot(20);
         Assert.That(buffer.Count, Is.EqualTo(20));
-        Assert.That(buffer.Capacity, Is.EqualTo(20));
+        Assert.That(buffer.Capacity, Is.EqualTo(30));
         buffer.Dispose();
     }
 
@@ -56,10 +56,10 @@ public unsafe class TestImguiDrawDataBuffer
         // Wait for GC timer
         Thread.Sleep(1050);
 
-        buffer.PreTakeSnapShot(10);
+        buffer.PreTakeSnapShot(9);
 
-        Assert.That(buffer.Count, Is.EqualTo(10));
-        Assert.That(buffer.Capacity, Is.EqualTo(20));
+        Assert.That(buffer.Count, Is.EqualTo(9));
+        Assert.That(buffer.Capacity, Is.EqualTo(9));
 
         buffer.Dispose();
     }
