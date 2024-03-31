@@ -7,40 +7,40 @@ namespace DanmakuEngine.DearImgui.Graphics;
 /// <summary>
 /// Represent a buffer that stores the ImDrawData and its ImDrawList(s)
 /// </summary>
-internal unsafe class ImguiDrawDataBuffer : IDisposable
+public unsafe class ImguiDrawDataBuffer : IDisposable
 {
     private readonly Stopwatch _gcTimer = Stopwatch.StartNew();
     private readonly ImDrawData* _drawData;
     private int _bufferIndex;
-    private int _capacity;
-    internal int Count { get; private set; }
-    internal ImDrawList** Lists { get; private set; }
+    public int Capacity { get; private set; }
+    public int Count { get; private set; }
+    public ImDrawList** Lists { get; private set; }
     private bool _disposed = false;
 
-    internal int BufferIndex => _bufferIndex;
-    internal ImDrawDataPtr DrawData => new(_drawData);
+    public int BufferIndex => _bufferIndex;
+    public ImDrawDataPtr DrawData => new(_drawData);
 
     public ImguiDrawDataBuffer(int listsCount, int bufferIndex)
     {
         this._bufferIndex = bufferIndex;
 
         this.Count = listsCount;
-        this._capacity = listsCount;
+        this.Capacity = listsCount;
         this._drawData = ImguiUtils.ImAlloc<ImDrawData>();
 
-        if (_capacity == 0)
+        if (Capacity == 0)
             return;
 
-        this.Lists = (ImDrawList**)ImguiUtils.ImAlloc<nint>(_capacity);
+        this.Lists = (ImDrawList**)ImguiUtils.ImAlloc<nint>(Capacity);
     }
 
-    internal void DoGC()
+    public void DoGC()
     {
         // There is no need to do GC.
-        if (Count == _capacity)
+        if (Count == Capacity)
             return;
 
-        for (int i = Count; i < _capacity; i++)
+        for (int i = Count; i < Capacity; i++)
             ImguiUtils.ImFree(Lists[i]);
 
         reallocLists(Count);
@@ -50,19 +50,19 @@ internal unsafe class ImguiDrawDataBuffer : IDisposable
         Logger.Debug($"Did ImguiDrawDataBuffer GC, index: {_bufferIndex}");
     }
 
-    internal void PreTakeSnapShot(int newCount)
+    public void PreTakeSnapShot(int newCount)
     {
         // enlarge the lists
-        if (newCount > _capacity)
+        if (newCount > Capacity)
         {
             // disposeCopyListsData();
             reallocLists(newCount);
 
             // Alloc for new lists
-            for (int i = Count; i < _capacity; i++)
+            for (int i = Count; i < Capacity; i++)
                 Lists[i] = ImguiUtils.ImAlloc<ImDrawList>();
         }
-        else if ((_capacity > newCount * 2)
+        else if ((Capacity > newCount * 2)
                  && _gcTimer.ElapsedMilliseconds > 1000)
         {
             Count = newCount;
@@ -80,10 +80,10 @@ internal unsafe class ImguiDrawDataBuffer : IDisposable
     private void reallocLists(int newCapacity)
     {
         Lists = (ImDrawList**)ImguiUtils.ImRealloc<nint>((nint)Lists, newCapacity);
-        _capacity = newCapacity;
+        Capacity = newCapacity;
     }
 
-    internal void SnapDrawData(ImDrawDataPtr src)
+    public void SnapDrawData(ImDrawDataPtr src)
     {
         ImDrawData* p_src = src.NativePtr;
 
@@ -118,7 +118,7 @@ internal unsafe class ImguiDrawDataBuffer : IDisposable
 
         _disposed = true;
 
-        for (int i = 0; i < _capacity; i++)
+        for (int i = 0; i < Capacity; i++)
             ImguiUtils.ImFree(Lists[i]);
 
         ImguiUtils.ImFree(Lists);
