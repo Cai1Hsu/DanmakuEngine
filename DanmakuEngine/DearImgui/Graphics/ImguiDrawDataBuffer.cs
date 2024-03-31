@@ -59,7 +59,16 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
         {
             var oldCapacity = Capacity;
 
-            reallocLists(newCount);
+            // Make newCapacity a little bigger than newCount
+            // 1.33f is not a common factor, but our case is different from Vector<T> and List<T>
+            // Often we don't have too many draw lists, usually less than 10, but larger than 2
+            // By using 1.33f, only when newCount >= 4 triggers redundancies.
+            // If we use 1.5f for count less than 10, the GC may be triggered too frequently.
+            // When the newCount is bigger, we use 1.5f to reduce the frequency of reallocation.
+            // It's also less often to trigger GC as the newCount grows since it's hader to drop half of the capacity.
+            var newCapacity = newCount < 10 ? newCount * 1.33f : newCount * 1.5f;
+
+            reallocLists((int)newCapacity);
 
             // Alloc for new lists
             for (int i = oldCapacity; i < Capacity; i++)
