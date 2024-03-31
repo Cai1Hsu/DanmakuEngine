@@ -10,11 +10,12 @@ namespace DanmakuEngine.DearImgui;
 
 public static partial class Imgui
 {
-    private static ImguiDrawDataSnapshot _drawDataSnapshotBuffer = new();
+    private static TripleBuffer<ImguiDrawDataBuffer> _drawDataBuffers = new();
+    private static bool requestedGC = false;
 
     public static void ForceCollectSnapshots()
     {
-        _drawDataSnapshotBuffer.ForceGC();
+        requestedGC = true;
     }
 
     internal static void Update()
@@ -35,7 +36,43 @@ public static partial class Imgui
 
         ImGui.Render();
 
-        _drawDataSnapshotBuffer.WriteNewFrame(ImGui.GetDrawData());
+        bufferNewFrame(ImGui.GetDrawData());
+    }
+
+    private static void bufferNewFrame(ImDrawDataPtr src)
+    {
+        if (requestedGC)
+        {
+            requestedGC = false;
+
+            if (_drawDataBuffers.GetUsingTypes().All(
+                static ut => ut is UsingType.Avaliable))
+            {
+                _drawDataBuffers.ExecuteOnAllBuffers(static (b, _) =>
+                {
+                    b?.DoGC();
+                });
+            }
+            else
+            {
+                Logger.Warn("Some buffers were not avaliable for GC");
+            }
+        }
+
+        if (!src.Valid)
+            return;
+
+        using (var usage = _drawDataBuffers.GetForWrite())
+        {
+            var cmdListsCount = src.CmdListsCount;
+
+            if (usage.Value is null)
+                usage.Value = new(cmdListsCount, usage.Index);
+            else
+                usage.Value.PreTakeSnapShot(cmdListsCount);
+
+            usage.Value.SnapDrawData(src);
+        }
     }
 
     internal static void Render()
@@ -43,15 +80,12 @@ public static partial class Imgui
         if (!_initialized)
             return;
 
-        var buffer = _drawDataSnapshotBuffer.GetForRead();
+        using var buffer = _drawDataBuffers.GetForRead();
 
-        if (buffer != null)
+        if (buffer != null
+            && buffer.Value is not null)
         {
-            using (buffer)
-            {
-                if (buffer.Value is not null)
-                    drawImGui(buffer.Value);
-            }
+            drawImGui(buffer.Value);
         }
     }
 }

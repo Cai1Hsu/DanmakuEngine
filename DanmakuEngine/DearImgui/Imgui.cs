@@ -122,7 +122,7 @@ public static partial class Imgui
 
         ImGui.DestroyContext(_context);
 
-        _drawDataSnapshotBuffer.Dispose();
+        _drawDataBuffers.Dispose();
 
 #if DEBUG
         Logger.Debug($"Remained {ImguiUtils.AllocRecords.Sum(a => a.Value.Size)} bytes unreleased for ImGui");

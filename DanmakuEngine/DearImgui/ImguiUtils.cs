@@ -50,9 +50,33 @@ public static unsafe partial class ImguiUtils
 #if !DEBUG
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-    internal static void ImRealloc<T>(nint address, int count = 1)
+    internal static void ImReallocInit<T>(nint address, int count = 1)
         where T : unmanaged
-        => ImRealloc(address, count * sizeof(T));
+        => ImReallocInit(address, count * sizeof(T));
+
+#if !DEBUG
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+    internal static void* ImReallocInit(nint address, int size)
+    {
+        var ptr = (void*)Marshal.ReAllocHGlobal(address, size);
+        Unsafe.InitBlockUnaligned(ptr, 0, (uint)size);
+
+#if DEBUG
+        RemoveRecord(address);
+        AddRecord(new((nint)ptr, (uint)size, AllocCallsite.Realloc));
+        ++reallocCount;
+#endif
+
+        return ptr;
+    }
+
+#if !DEBUG
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+    internal static T* ImRealloc<T>(nint address, int count = 1)
+        where T : unmanaged
+        => (T*)ImRealloc(address, count * sizeof(T));
 
 #if !DEBUG
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -60,14 +84,11 @@ public static unsafe partial class ImguiUtils
     internal static void* ImRealloc(nint address, int size)
     {
         var ptr = (void*)Marshal.ReAllocHGlobal(address, size);
-        Unsafe.InitBlockUnaligned(ptr, 0, (uint)size);
-
 #if DEBUG
-        AddRecord(new((nint)ptr, (uint)size, AllocCallsite.Realloc));
         RemoveRecord(address);
+        AddRecord(new((nint)ptr, (uint)size, AllocCallsite.Realloc));
         ++reallocCount;
 #endif
-
         return ptr;
     }
 }

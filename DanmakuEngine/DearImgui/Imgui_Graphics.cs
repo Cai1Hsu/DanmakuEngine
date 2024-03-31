@@ -74,11 +74,11 @@ public static partial class Imgui
     private static void warn(string message)
         => Logger.Warn(message);
 
-    private static unsafe void drawImGui(ImguiDrawDataSnapshotBuffer entry)
+    private static unsafe void drawImGui(ImguiDrawDataBuffer buffer)
     {
-        var drawData = entry.DrawData;
+        var drawData = buffer.DrawData;
 
-        if (entry.ListsCount == 0)
+        if (buffer.Count == 0)
             return;
 
         var framebufferWidth = (int)(drawData.DisplaySize.X * drawData.FramebufferScale.X);
@@ -99,9 +99,9 @@ public static partial class Imgui
             Vector2 clipScale = drawData.FramebufferScale;
 
             // Render command lists
-            for (int i = 0; i < entry.ListsCount; i++)
+            for (int i = 0; i < buffer.Count; i++)
             {
-                ImDrawListPtr cmdListPtr = entry.CopyLists[i];
+                ImDrawListPtr cmdListPtr = buffer.Lists[i];
 
                 // Upload vertex/index buffers
 
