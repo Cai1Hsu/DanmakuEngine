@@ -36,6 +36,10 @@ internal unsafe class ImguiDrawDataBuffer : IDisposable
 
     internal void DoGC()
     {
+        // There is no need to do GC.
+        if (Count == _capacity)
+            return;
+
         for (int i = Count; i < _capacity; i++)
             ImguiUtils.ImFree(Lists[i]);
 
