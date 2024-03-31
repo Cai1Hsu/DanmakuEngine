@@ -47,34 +47,31 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
 
         _gcTimer.Restart();
 
-        Logger.Debug($"Did ImguiDrawDataBuffer GC, index: {_bufferIndex}");
+        Logger.Debug($"[ImguiDrawDataBuffer {_bufferIndex}] Did GC");
     }
 
     public void PreTakeSnapShot(int newCount)
     {
+        Count = newCount;
+
         // enlarge the lists
         if (newCount > Capacity)
         {
-            // disposeCopyListsData();
+            var oldCapacity = Capacity;
+
             reallocLists(newCount);
 
             // Alloc for new lists
-            for (int i = Count; i < Capacity; i++)
+            for (int i = oldCapacity; i < Capacity; i++)
                 Lists[i] = ImguiUtils.ImAlloc<ImDrawList>();
         }
         else if ((Capacity > newCount * 2)
                  && _gcTimer.ElapsedMilliseconds > 1000)
         {
-            Count = newCount;
-
             // Some times there are transient heavy scenes that allocates a lot of memory
             // We want to free these memory to prevent too much memory from being wasted.
             DoGC();
-
-            return;
         }
-
-        Count = newCount;
     }
 
     private void reallocLists(int newCapacity)
@@ -95,6 +92,9 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
             *_drawData = *p_src;
         }
         backup_draw_list.Swap(ref p_src->CmdLists);
+
+        Debug.Assert(p_src->CmdListsCount <= Capacity);
+        Debug.Assert(p_src->CmdListsCount == Count);
 
         // step2: Swap the CmdLists(and ownership)
         for (var i = 0; i < p_src->CmdListsCount; i++)
