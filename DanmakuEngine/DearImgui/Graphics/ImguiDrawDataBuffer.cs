@@ -19,6 +19,7 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
 
     public int BufferIndex => _bufferIndex;
     public ImDrawDataPtr DrawData => new(_drawData);
+    public virtual bool QueuedForGC => _gcTimer.ElapsedMilliseconds > 1000;
 
     public ImguiDrawDataBuffer(int listsCount, int bufferIndex)
     {
@@ -74,8 +75,7 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
             for (int i = oldCapacity; i < Capacity; i++)
                 Lists[i] = ImguiUtils.ImAlloc<ImDrawList>();
         }
-        else if ((Capacity > newCount * 2)
-                 && _gcTimer.ElapsedMilliseconds > 1000)
+        else if ((Capacity > newCount * 2) && QueuedForGC)
         {
             // Some times there are transient heavy scenes that allocates a lot of memory
             // We want to free these memory to prevent too much memory from being wasted.
