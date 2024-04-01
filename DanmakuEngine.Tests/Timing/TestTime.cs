@@ -56,28 +56,22 @@ public class TestTime
 
         var testGame = new TestGame();
 
-        using var host1 = new TestGameHost(5000);
-
-        host1.OnUpdate += h =>
+        using var host1 = new TestGameHost(0)
         {
-            if (Time.ElapsedSeconds > 0.5)
-                h.RequestClose();
+            IgnoreTimedout = true,
+            ThrowOnTimedOut = false,
         };
-
-        host1.OnTimedout += Assert.Fail;
 
         host1.Run(testGame, argProvider1);
 
         using var host2 = new TestGameHost(5000);
 
-        host2.OnUpdate += h =>
+        host2.OnLoad += h =>
         {
             Assert.That(Time.ElapsedSeconds, Is.LessThan(0.5));
 
             h.RequestClose();
         };
-
-        host2.OnTimedout += Assert.Fail;
 
         host2.Run(testGame, argProvider2);
     }

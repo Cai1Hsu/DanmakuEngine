@@ -15,7 +15,7 @@ public partial class GameHost
 
     protected ThreadRunner threadRunner = null!;
 
-    public void RegisterThreads()
+    public virtual void RegisterThreads()
     {
         threadRunner = window is not null ? new ThreadRunner(MainThread = new(window.PumpEvents))
                                           : new ThreadRunner(MainThread = new(() => { /* Run like the wind */ }));

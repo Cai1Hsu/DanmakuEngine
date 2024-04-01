@@ -33,7 +33,7 @@ public class TestFixedAcceleratedMovement
 
         var game = new TestGame();
 
-        var host = new TestGameHost(500)
+        var host = new TestGameHost(100)
         {
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
@@ -110,10 +110,11 @@ public class TestFixedAcceleratedMovement
         var clock = new Clock();
 
         var game = new TestGame();
-        var host = new TestGameHost(1000)
+        var host = new TestGameHost(100)
         {
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
+            BypassThrottle = true,
         };
 
         var movement = new FixedAcceleratedMovementD(0, acceleration);
@@ -157,18 +158,21 @@ public class TestFixedAcceleratedMovement
 
         var rng = new Random();
 
+        bool assertPass = true;
+
         do
         {
             var random_delta = rng.NextDouble() * 100;
-            clock.SetDeltaTime(random_delta);
-            clock.AccomulateTime();
+            clock.Update(random_delta);
 
             movement.UpdateSubTree();
 
             var expected = 0.5 * acceleration * (clock.ElapsedSeconds * clock.ElapsedSeconds);
 
-            Assert.That(movement.Value.Value, Is.EqualTo(expected).Within(1E-6));
+            assertPass &= Math.Abs(movement.Value.Value - expected) < 1E-6;
         } while (count_frame++ < 1E6);
+
+        Assert.That(assertPass, Is.True);
     }
 
     private class TestClock : IClock
@@ -179,21 +183,14 @@ public class TestFixedAcceleratedMovement
 
         public double DeltaTime => updateDelta;
 
-        // We dont use this here
-        public double RenderDelta => 0;
-
         public double ElapsedSeconds
             => currentTime;
 
         public bool IsPaused => false;
 
-        public void SetDeltaTime(double delta)
+        public void Update(double delta)
         {
             updateDelta = delta;
-        }
-
-        public void AccomulateTime()
-        {
             currentTime += updateDelta;
         }
     }

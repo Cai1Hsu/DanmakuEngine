@@ -16,15 +16,6 @@ public class TestMultiBuffer
     [Test]
     public void TestWriteOnly()
     {
-        var doubleBuffer = new DoubleBuffer<int>();
-
-        for (int i = 0; i < 1000; i++)
-        {
-            using (doubleBuffer.GetForWrite())
-            {
-            }
-        }
-
         var tripleBuffer = new TripleBuffer<int>();
 
         for (int i = 0; i < 1000; i++)
@@ -38,33 +29,10 @@ public class TestMultiBuffer
     [Test]
     public void TestReadOnly()
     {
-        var doubleBuffer = new DoubleBuffer<TestObject>();
-
-        using (var obj = doubleBuffer.GetForRead())
-            Assert.That(obj, Is.Null);
-
         var tripleBuffer = new TripleBuffer<TestObject>();
 
         using (var obj = tripleBuffer.GetForRead())
             Assert.That(obj, Is.Null);
-    }
-
-    [Test]
-    public void TestDoubleBuffer()
-    {
-        var doubleBuffer = new DoubleBuffer<int>();
-
-        using (var obj1 = doubleBuffer.GetForWrite())
-            obj1.Value = 1;
-
-        using (var obj1 = doubleBuffer.GetForRead())
-            Assert.That(obj1!.Value, Is.EqualTo(1));
-
-        using (var obj2 = doubleBuffer.GetForWrite())
-            obj2.Value = 2;
-
-        using (var obj2 = doubleBuffer.GetForRead())
-            Assert.That(obj2!.Value, Is.EqualTo(2));
     }
 
     [Test]

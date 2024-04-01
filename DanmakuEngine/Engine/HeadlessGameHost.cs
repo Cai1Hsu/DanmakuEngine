@@ -23,6 +23,7 @@ public class HeadlessGameHost : GameHost
     public bool ThrowOnTimedOut = true;
 
     public bool IgnoreTimedout = false;
+    public bool BypassThrottle { get; set; } = false;
 
     private double timeout = 0;
 
@@ -65,6 +66,16 @@ public class HeadlessGameHost : GameHost
 
             OnUpdate?.Invoke(this);
         };
+    }
+
+    public override void RegisterThreads()
+    {
+        base.RegisterThreads();
+
+        foreach (var t in threadRunner.Threads)
+        {
+            t.Executor.Throttling = !BypassThrottle;
+        }
     }
 
     public override void RequestClose()

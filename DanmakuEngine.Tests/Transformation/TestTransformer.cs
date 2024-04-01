@@ -30,7 +30,7 @@ public class TestTransformer
     [Test]
     public void TestWithOnUpdate()
     {
-        var host = new TestGameHost(1500)
+        var host = new TestGameHost(150)
         {
             IgnoreTimedout = true,
             ThrowOnTimedOut = false,
@@ -42,20 +42,13 @@ public class TestTransformer
         Transformer transformer;
 
         var t = new TransformSequence(
-            transformer = new Transformer(1000, new LinearIn(), p => value = p)
+            transformer = new Transformer(100, new LinearIn(), p => value = p)
         );
 
         host.OnUpdate += h =>
         {
-            t.Update(Time.Clock.DeltaTime * 1000);
-            expected += Time.Clock.DeltaTime;
-
-            if (expected > 1)
-            {
-                h.RequestClose();
-
-                return;
-            }
+            t.Update(Time.UpdateDelta);
+            expected += Time.UpdateDelta / 100;
 
             Assert.That(transformer.Value, Is.EqualTo(expected).Within(1E-6));
         };
@@ -78,7 +71,7 @@ public class TestTransformer
 
         host.OnUpdate += _ =>
         {
-            t.Update(Time.Clock.DeltaTime * 1000);
+            t.Update(Time.UpdateDelta * 1000);
 
             Assert.That(bindable.Value, Is.EqualTo(t.Value));
         };

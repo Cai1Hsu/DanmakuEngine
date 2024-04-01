@@ -30,16 +30,13 @@ public class TestClock
 
         var game = new TestGame();
 
-        using var host = new TestGameHost(5000);
+        using var host = new TestGameHost(100);
 
         host.OnUpdate += h =>
         {
             Assert.That(clock.ElapsedSeconds, Is.EqualTo(Time.ElapsedSeconds));
 
             Assert.That(clock.DeltaTime, Is.EqualTo(Time.UpdateDelta));
-
-            if (Time.ElapsedSeconds > 0.5)
-                h.RequestClose();
         };
 
         host.OnLoad += _ =>
@@ -313,7 +310,7 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            if (Time.ElapsedSeconds > 0.5)
+            if (Time.ElapsedSeconds > 0.2)
             {
                 var current_time = clock.ElapsedSeconds;
 
@@ -329,15 +326,6 @@ public class TestClock
 
         host.Run(game, defaultProvider);
     }
-
-    // [Test]
-    // public void TestTheWorldManyTimes()
-    // {
-    //     for (int i = 0; i < 100; i++)
-    //     {
-    //         TestTheWorld();
-    //     }
-    // }
 
     [Test]
     public void TestTheWorld()
