@@ -19,7 +19,7 @@ public unsafe class ImguiDrawDataBuffer : IDisposable
 
     public int BufferIndex => _bufferIndex;
     public ImDrawDataPtr DrawData => new(_drawData);
-    public virtual bool QueuedForGC => _gcTimer.ElapsedMilliseconds > 1000;
+    protected virtual bool QueuedForGC => _gcTimer.ElapsedMilliseconds > 1000;
 
     public ImguiDrawDataBuffer(int listsCount, int bufferIndex)
     {

@@ -2,6 +2,7 @@ using System.Diagnostics;
 using DanmakuEngine.DearImgui.Graphics;
 using ImGuiNET;
 using Moq;
+using Moq.Protected;
 
 public unsafe class TestImguiDrawDataBuffer
 {
@@ -54,7 +55,7 @@ public unsafe class TestImguiDrawDataBuffer
     public void TestPreTakeSnapShot_Collect()
     {
         var stub = new Mock<ImguiDrawDataBuffer>(20, 0);
-        stub.Setup(b => b.QueuedForGC).Returns(true);
+        stub.Protected().Setup<bool>("QueuedForGC").Returns(true);
 
         var buffer = stub.Object;
 
@@ -70,7 +71,7 @@ public unsafe class TestImguiDrawDataBuffer
     public void TestPreTakeSnapShot_NotCollectTimeNotSatisified()
     {
         var stub = new Mock<ImguiDrawDataBuffer>(20, 0);
-        stub.Setup(b => b.QueuedForGC).Returns(false);
+        stub.Protected().Setup<bool>("QueuedForGC").Returns(false);
 
         var buffer = stub.Object;
 
