@@ -53,10 +53,10 @@ public unsafe class TestImguiDrawDataBuffer
     [Test]
     public void TestPreTakeSnapShot_Collect()
     {
-        var mock = new Mock<ImguiDrawDataBuffer>(20, 0);
-        mock.Setup(b => b.QueuedForGC).Returns(true);
+        var stub = new Mock<ImguiDrawDataBuffer>(20, 0);
+        stub.Setup(b => b.QueuedForGC).Returns(true);
 
-        var buffer = mock.Object;
+        var buffer = stub.Object;
 
         buffer.PreTakeSnapShot(9);
 
@@ -69,10 +69,10 @@ public unsafe class TestImguiDrawDataBuffer
     [Test]
     public void TestPreTakeSnapShot_NotCollectTimeNotSatisified()
     {
-        var mock = new Mock<ImguiDrawDataBuffer>(20, 0);
-        mock.Setup(b => b.QueuedForGC).Returns(false);
+        var stub = new Mock<ImguiDrawDataBuffer>(20, 0);
+        stub.Setup(b => b.QueuedForGC).Returns(false);
 
-        var buffer = mock.Object;
+        var buffer = stub.Object;
 
         buffer.PreTakeSnapShot(9);
 
