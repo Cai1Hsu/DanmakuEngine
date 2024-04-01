@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using DanmakuEngine.DearImgui.Graphics;
 using ImGuiNET;
+using Moq;
 
 public unsafe class TestImguiDrawDataBuffer
 {
@@ -51,10 +53,10 @@ public unsafe class TestImguiDrawDataBuffer
     [Test]
     public void TestPreTakeSnapShot_Collect()
     {
-        var buffer = new ImguiDrawDataBuffer(20, 0);
+        var mock = new Mock<ImguiDrawDataBuffer>(20, 0);
+        mock.Setup(b => b.QueuedForGC).Returns(true);
 
-        // Wait for GC timer
-        Thread.Sleep(1050);
+        var buffer = mock.Object;
 
         buffer.PreTakeSnapShot(9);
 
@@ -65,7 +67,23 @@ public unsafe class TestImguiDrawDataBuffer
     }
 
     [Test]
-    public void TestPreTakeSnapShot_NotCollect()
+    public void TestPreTakeSnapShot_NotCollectTimeNotSatisified()
+    {
+        var mock = new Mock<ImguiDrawDataBuffer>(20, 0);
+        mock.Setup(b => b.QueuedForGC).Returns(false);
+
+        var buffer = mock.Object;
+
+        buffer.PreTakeSnapShot(9);
+
+        Assert.That(buffer.Count, Is.EqualTo(9));
+        Assert.That(buffer.Capacity, Is.EqualTo(20));
+
+        buffer.Dispose();
+    }
+
+    [Test]
+    public void TestPreTakeSnapShot_NotCollectRateNotSatisfied()
     {
         var buffer = new ImguiDrawDataBuffer(20, 0);
 
@@ -75,5 +93,34 @@ public unsafe class TestImguiDrawDataBuffer
         Assert.That(buffer.Capacity, Is.EqualTo(20));
 
         buffer.Dispose();
+    }
+
+    [Test]
+    public void TestRealloc_EnlargeNotOverrideWhenCountLessThanAllocated()
+    {
+        // This test is to ensure that the old llocated lists are not overridden
+        // when the count is less than the allocated capacity
+        // This used to cause memory leaks so i added this test to ensure that it doesn't happen again
+
+        var buffer = new ImguiDrawDataBuffer(20, 0);
+
+        buffer.PreTakeSnapShot(15); // shrink count while not triggering gc
+
+        Debug.Assert(buffer.Count is 15);
+        Debug.Assert(buffer.Capacity is 20);
+
+        // Record addresses of the first 15 lists
+        IList<nint> _15Lists = new nint[15];
+
+        for (int i = 0; i < 15; i++)
+            _15Lists[i] = (nint)buffer.Lists[i];
+
+        buffer.PreTakeSnapShot(25); // enlarge count
+
+        Debug.Assert(buffer.Count is 25);
+
+        // Assert that our old lists are still there
+        for (int i = 0; i < 15; i++)
+            Assert.That((nint)buffer.Lists[i], Is.EqualTo(_15Lists[i]));
     }
 }
