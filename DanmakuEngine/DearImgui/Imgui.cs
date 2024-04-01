@@ -128,8 +128,7 @@ public static partial class Imgui
         Logger.Debug($"Remained {ImguiUtils.AllocRecords.Sum(a => a.Value.Size)} bytes unreleased for ImGui");
         foreach (var (_, record) in ImguiUtils.AllocRecords)
         {
-            ImguiUtils.ExactCallsites.TryGetValue(record.Address, out var caller);
-            Logger.Warn($"[Memory Leak Detected] Address: {record.Address:X}, size {record.Size}, callsite {record.Callsite}({caller})");
+            Logger.Warn($"[Memory Leak Detected] Address: {record.Address:X}, size {record.Size}, callsite {record.Callsite}");
         }
 #endif
 

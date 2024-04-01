@@ -27,7 +27,6 @@ public static partial class ImguiUtils
     }
 
     public static ConcurrentDictionary<nint, AllocRecord> AllocRecords = new();
-    public static ConcurrentDictionary<nint, string> ExactCallsites = new();
 
     private static void AddRecord(AllocRecord record)
         => AllocRecords.TryAdd(record.Address, record);
