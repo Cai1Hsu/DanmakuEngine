@@ -123,5 +123,7 @@ public unsafe class TestImguiDrawDataBuffer
         // Assert that our old lists are still there
         for (int i = 0; i < 15; i++)
             Assert.That((nint)buffer.Lists[i], Is.EqualTo(_15Lists[i]));
+
+        buffer.Dispose();
     }
 }
