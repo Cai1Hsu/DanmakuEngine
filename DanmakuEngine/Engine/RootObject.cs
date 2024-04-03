@@ -12,22 +12,4 @@ public class RootObject : DrawableContainer
     {
         Debug.Assert(LoadState is Games.LoadState.NotLoaded);
     }
-
-    protected override void update()
-    {
-        // Implementation for FixedUpdate.
-        int count = 0;
-
-        while (Time.FixedElapsedSeconds + Time.FixedUpdateDelta < Time.ElapsedSeconds
-            && count < 5) // never allow FixedUpdate blocks the game logic too heavily
-        {
-            Time.FixedElapsedSeconds += Time.FixedUpdateDelta;
-
-            count++;
-
-            FixedUpdateSubtree();
-        }
-
-        base.update();
-    }
 }

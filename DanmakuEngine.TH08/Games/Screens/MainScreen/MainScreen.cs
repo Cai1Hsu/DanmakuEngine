@@ -216,6 +216,19 @@ public partial class MainScreen : Screen
             ImGui.Text($"    Update: {_updateThread.AverageFramerate:F2}({1000 / _updateThread.AverageFramerate:F2}±{_updateThread.Jitter:F2}ms)");
             ImGui.Text($"    Render: {_renderThread.AverageFramerate:F2}({1000 / _renderThread.AverageFramerate:F2}±{_renderThread.Jitter:F2}ms)");
 
+            ImGui.Separator();
+
+            ImGui.Text(@"Time:");
+            ImGui.Text($"    FixedUpdateCount: {Time.FixedUpdateCount}");
+            ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds * 1000:F2}ms");
+            ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds * 1000:F2}ms");
+            ImGui.Text($"    UpdateDelta: {Time.UpdateDelta * 1000:F2}ms");
+
+            ImGui.Text($"    App time: {Time.AppTimer.GetElapsedMilliseconds():F2}ms");
+            ImGui.Text($"    Engine time: {Time.EngineTimer.GetElapsedMilliseconds():F2}ms");
+
+            ImGui.Separator();
+
             if (ImGui.Button("Close Window"))
                 _window.RequestClose();
 

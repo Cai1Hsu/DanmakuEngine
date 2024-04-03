@@ -28,6 +28,11 @@ public partial class GameHost
         {
             threadRunner.AddThread(RenderThread = new(Render, Renderer));
         }
+
+        foreach (var t in threadRunner.Threads)
+        {
+            t.Executor.CountCooldown = 1.0 / DebugFpsHz;
+        }
     }
 
     public void RunUntilExit()

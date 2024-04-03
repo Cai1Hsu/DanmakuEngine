@@ -21,12 +21,18 @@ public class UpdateThread : GameThread
     {
         base.postRunFrame();
 
-        Time.UpdateDelta = DeltaTime;
-        Time.UpdateDeltaF = (float)DeltaTime;
+        Time.UpdateDeltaNonScaled = DeltaTime;
+        Time.UpdateDeltaNonScaledF = (float)DeltaTime;
 
-        Time.ElapsedSeconds = ElapsedSeconds;
+        Time.ElapsedSecondsNonScaled += DeltaTime;
 
+        var delta = DeltaTime * Time.GlobalTimeScale;
 
+        Time.UpdateDelta = delta;
+        Time.UpdateDeltaF = (float)delta;
+
+        Time.ElapsedSeconds += delta;
     }
+
     public override bool IsCurrent => ThreadSync.IsUpdateThread;
 }

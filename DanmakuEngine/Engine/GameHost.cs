@@ -17,6 +17,7 @@ using DanmakuEngine.Engine.SDLNative;
 using DanmakuEngine.Engine.Sleeping;
 using DanmakuEngine.Engine.Threading;
 using DanmakuEngine.Engine.Windowing;
+using DanmakuEngine.Extensions;
 using DanmakuEngine.Games;
 using DanmakuEngine.Games.Screens;
 using DanmakuEngine.Graphics;
@@ -196,6 +197,7 @@ public partial class GameHost : Time, IDisposable
         Logger.Debug("Everything is ready, let's go!");
     }
 
+    private double lastFixedUpdateElapsedSeconds = 0;
     protected void Update()
     {
         if (_root == null)
@@ -203,13 +205,36 @@ public partial class GameHost : Time, IDisposable
 
         Imgui.Update();
 
-        // if (window.WindowState != WindowState.Minimized)
-        //     Root.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
-        _root.UpdateSubTree();
-        // Root.UpdateSubTreeMasking(Root, Root.ScreenSpaceDrawQuad.AABBFloat);
+        int updateCount = 0;
+        while (MeasuredFixedUpdateElapsedSeconds + FixedUpdateDeltaNonScaled
+            < EngineTimer.GetElapsedSeconds())
+        {
+            // never allow FixedUpdate blocks the game logic too heavily
+            if (updateCount > 5)
+            {
+                // if we are too far behind, just skip the update
+                // And add the floored skipped frames to the count
+                // This ensures the Time.ElapsedSeconds is always correct
+                var skipped = (int)((EngineTimer.GetElapsedSeconds() - MeasuredFixedUpdateElapsedSeconds) / FixedUpdateDeltaNonScaled);
 
-        // using (var buffer = DrawRoots.GetForWrite())
-        //     buffer.Object = Root.GenerateDrawNodeSubtree(buffer.Index, false);
+                FixedUpdateCount += skipped;
+
+                MeasuredFixedUpdateElapsedSeconds += FixedUpdateDeltaNonScaled * skipped;
+
+                break;
+            }
+            updateCount++;
+
+            _root.FixedUpdateSubtree();
+
+            // Must do this before the FixedElapsedSecondsNonScaled is updated
+            MeasuredFixedUpdateElapsedSeconds = FixedElapsedSecondsNonScaled + (EngineTimer.GetElapsedSeconds() - lastFixedUpdateElapsedSeconds);
+            lastFixedUpdateElapsedSeconds = EngineTimer.GetElapsedSeconds();
+
+            FixedUpdateCount++;
+        }
+
+        _root.UpdateSubTree();
     }
 
     // private DrawableContainer DrawRoot = null!;
@@ -227,22 +252,6 @@ public partial class GameHost : Time, IDisposable
         Renderer.EndFrame();
 
         Renderer.SwapBuffers();
-    }
-
-    private int last_debug_fps = -1;
-    protected void DebugTime()
-    {
-        int this_debug = (int)(EngineTimer.ElapsedMilliseconds / (1000 / DebugFpsHz));
-
-        if (this_debug != last_debug_fps)
-        {
-            if (ConfigManager.HasConsole
-             && ConfigManager.DebugMode)
-            {
-                Logger.Write($"Update FPS: {UpdateThread.AverageFramerate:F2}({1000 / UpdateThread.AverageFramerate:F2}±{UpdateThread.Jitter:F2}ms), Render FPS:{RenderThread.AverageFramerate:F2}({1000 / RenderThread.AverageFramerate:F2}±{RenderThread.Jitter:F2}ms)          \r", true, false);
-                last_debug_fps = this_debug;
-            }
-        }
     }
 
     protected virtual void SetUpDebugConsole()
@@ -418,10 +427,6 @@ public partial class GameHost : Time, IDisposable
         {
             window.WindowSizeChanged += Coordinate.OnResized;
         }
-
-#if DEBUG
-        Root.OnUpdate += _ => DebugTime();
-#endif
     }
 
     public void PerformExit()
