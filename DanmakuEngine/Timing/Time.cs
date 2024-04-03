@@ -1,5 +1,7 @@
 using System.Diagnostics;
+using System.Security.Cryptography.X509Certificates;
 using DanmakuEngine.Allocations;
+using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
 
 namespace DanmakuEngine.Timing;
@@ -11,15 +13,33 @@ public class Time
 
     public static readonly StandardClock Clock = new();
 
+    private static long fixedUpdateCount = 0;
     /// <summary>
-    /// Elapsed seconds in the update loop.
+    /// The number of fixed update frames that have passed since the game started.
+    /// </summary>
+    public static long FixedUpdateCount
+    {
+        get => fixedUpdateCount;
+        set
+        {
+            fixedUpdateCount = value;
+            ElapsedSeconds = FixedElapsedSeconds;
+            ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
+        }
+    }
+
+    /// <summary>
+    /// The value of <see cref="FixedUpdateCount"/> * <see cref="FixedUpdateDelta"/>
+    /// </summary>
+    public static double FixedElapsedSeconds => FixedUpdateCount * FixedUpdateDelta;
+    public static double FixedElapsedSecondsNonScaled => FixedUpdateCount * FixedUpdateDeltaNonScaled;
+
+    /// <summary>
+    /// The value of <see cref="FixedUpdateCount"/> + elapsed time since the last fixed update
     /// </summary>
     public static double ElapsedSeconds { get; internal set; }
 
-    /// <summary>
-    /// Elapsed seconds in FixedUpdate loop.
-    /// </summary>
-    public static double FixedElapsedSeconds { get; internal set; }
+    public static double ElapsedSecondsNonScaled { get; internal set; }
 
     /// <summary>
     /// Update delta of the last frame in seconds
@@ -28,11 +48,35 @@ public class Time
 
     public static float UpdateDeltaF { get; internal set; }
 
-    public static double FixedUpdateHz { get; set; } = 60.0;
+    public static double UpdateDeltaNonScaled { get; internal set; }
+    public static double UpdateDeltaNonScaledF { get; internal set; }
 
-    public static double FixedUpdateDelta => 1.0 / FixedUpdateHz;
+    public static double FixedUpdateHz => FixedUpdateHzNonScaled * GlobalTimeScale;
+    public static double FixedUpdateHzNonScaled { get; protected set; } = 60.0;
 
-    public static double FixedUpdateDeltaF => (float)FixedUpdateDelta;
+    public static double FixedUpdateDelta => (1.0 * GlobalTimeScale) / FixedUpdateHz;
+
+    public static float FixedUpdateDeltaF => (float)FixedUpdateDelta;
+
+    public static double FixedUpdateDeltaNonScaled => 1.0 / FixedUpdateHz;
+
+    public static float FixedUpdateDeltaNonScaledF => (float)FixedUpdateDeltaNonScaled;
+
+    private static double _globalTimeScale = 1.0;
+    public static double GlobalTimeScale
+    {
+        get => _globalTimeScale;
+        set
+        {
+            ArgumentOutOfRangeException
+                .ThrowIfNegativeOrZero(value, nameof(GlobalTimeScale));
+
+            ArgumentOutOfRangeException
+                .ThrowIfEqual(value, double.PositiveInfinity, nameof(GlobalTimeScale));
+
+            _globalTimeScale = value;
+        }
+    }
 
     protected double DebugFpsHz = 1;
 }
