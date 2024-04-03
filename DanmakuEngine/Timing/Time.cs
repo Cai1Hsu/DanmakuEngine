@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Security.Cryptography.X509Certificates;
 using DanmakuEngine.Allocations;
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
@@ -27,6 +26,8 @@ public class Time
             ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
         }
     }
+
+    public static double MeasuredFixedUpdateElapsedSeconds { get; internal set; }
 
     /// <summary>
     /// The value of <see cref="FixedUpdateCount"/> * <see cref="FixedUpdateDelta"/>

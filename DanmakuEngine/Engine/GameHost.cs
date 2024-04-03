@@ -197,6 +197,7 @@ public partial class GameHost : Time, IDisposable
         Logger.Debug("Everything is ready, let's go!");
     }
 
+    private double lastFixedUpdateElapsedSeconds = 0;
     protected void Update()
     {
         if (_root == null)
@@ -205,7 +206,7 @@ public partial class GameHost : Time, IDisposable
         Imgui.Update();
 
         int updateCount = 0;
-        while (FixedElapsedSecondsNonScaled + FixedUpdateDeltaNonScaled
+        while (MeasuredFixedUpdateElapsedSeconds + FixedUpdateDeltaNonScaled
             < EngineTimer.GetElapsedSeconds())
         {
             // never allow FixedUpdate blocks the game logic too heavily
@@ -214,14 +215,21 @@ public partial class GameHost : Time, IDisposable
                 // if we are too far behind, just skip the update
                 // And add the floored skipped frames to the count
                 // This ensures the Time.ElapsedSeconds is always correct
-                FixedUpdateCount += (int)
-                    ((EngineTimer.GetElapsedSeconds() - FixedElapsedSecondsNonScaled) / FixedUpdateDeltaNonScaled);
+                var skipped = (int)((EngineTimer.GetElapsedSeconds() - MeasuredFixedUpdateElapsedSeconds) / FixedUpdateDeltaNonScaled);
+
+                FixedUpdateCount += skipped;
+
+                MeasuredFixedUpdateElapsedSeconds += FixedUpdateDeltaNonScaled * skipped;
 
                 break;
             }
             updateCount++;
 
             _root.FixedUpdateSubtree();
+
+            // Must do this before the FixedElapsedSecondsNonScaled is updated
+            MeasuredFixedUpdateElapsedSeconds = FixedElapsedSecondsNonScaled + (EngineTimer.GetElapsedSeconds() - lastFixedUpdateElapsedSeconds);
+            lastFixedUpdateElapsedSeconds = EngineTimer.GetElapsedSeconds();
 
             FixedUpdateCount++;
         }
