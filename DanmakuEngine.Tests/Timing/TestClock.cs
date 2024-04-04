@@ -417,7 +417,6 @@ public class TestClock
         double lastFixedElapsedSeconds = 0;
         double lastElapsedSeconds = 0;
         double lastEngineElapsedSeconds = 0;
-        double lastMeasuredFixedUpdateElapsedSeconds = 0;
 
         Clock clock = new();
 

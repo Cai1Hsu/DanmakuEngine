@@ -59,8 +59,6 @@ public class ThrottledExecutor : FrameExecutor
 
         SleptMilliseconds = sleepAndUpdateCurrent(Math.Max(0, excessFrameTime + accumulatedSleepError));
 
-        // Logger.Log($"Slept {SleptMilliseconds:F4}ms, ExcessFrameTime {excessFrameTime:F4}ms, AccumulatedSleepError {accumulatedSleepError:F4}ms, DeltaTime: {DeltaTime:F4}ms");
-
         accumulatedSleepError += excessFrameTime - SleptMilliseconds;
 
         // Never allow the sleep error to become too negative and induce too many catch-up frames
