@@ -27,13 +27,6 @@ public class UpdateThread : GameThread
     {
         base.postRunFrame();
 
-        var timeSinceLastFixedUpdate = ElapsedSeconds - Time.RealLastFixedUpdateElapsedSeconds;
-        var deltaTime = timeSinceLastFixedUpdate - lastFrameSinceLastFixedUpdate;
-        lastFrameSinceLastFixedUpdate = timeSinceLastFixedUpdate;
-
-        Debug.Assert(lastFrameSinceLastFixedUpdate >= 0);
-        Debug.Assert(timeSinceLastFixedUpdate >= 0, $"timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, ElapsedSeconds: {ElapsedSeconds}, RealLastFixedUpdateElapsedSeconds: {Time.RealLastFixedUpdateElapsedSeconds}");
-
         bool didFixedUpdate = Time.FixedUpdateCount != lastFrameFixedUpdateCount;
 
         // Sometimes the Update ended after the next FixedUpdate should start
@@ -61,10 +54,13 @@ public class UpdateThread : GameThread
         }
         else
         {
+            var timeSinceLastFixedUpdate = ElapsedSeconds - Time.RealLastFixedUpdateElapsedSeconds;
+
             var deltaNonScaled = !didFixedUpdate
-                ? deltaTime
+                ? timeSinceLastFixedUpdate - lastFrameSinceLastFixedUpdate
                 : timeSinceLastFixedUpdate;
 
+            Debug.Assert(timeSinceLastFixedUpdate >= 0, $"timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, ElapsedSeconds: {ElapsedSeconds}, RealLastFixedUpdateElapsedSeconds: {Time.RealLastFixedUpdateElapsedSeconds}");
             Debug.Assert(deltaNonScaled >= 0, $"deltaNonScaled: {deltaNonScaled}, timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, lastFrameSinceLastFixedUpdate: {lastFrameSinceLastFixedUpdate}");
 
             var delta = deltaNonScaled * Time.GlobalTimeScale;
@@ -78,6 +74,10 @@ public class UpdateThread : GameThread
             Time.ElapsedSecondsNonScaled += deltaNonScaled;
             Time.ElapsedSeconds += delta;
         }
+
+        lastFrameSinceLastFixedUpdate = ElapsedSeconds - Time.RealLastFixedUpdateElapsedSeconds;
+
+        Debug.Assert(lastFrameSinceLastFixedUpdate >= 0);
 
         if (Time.LastFixedUpdateSecondsWithErrors + Time.FixedUpdateDeltaNonScaled < ElapsedSeconds)
         {
