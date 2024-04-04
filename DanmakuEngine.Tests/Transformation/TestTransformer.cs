@@ -30,7 +30,7 @@ public class TestTransformer
     [Test]
     public void TestWithOnUpdate()
     {
-        var host = new TestGameHost(150)
+        using var host = new TestGameHost(150)
         {
             IgnoreTimedout = true,
             ThrowOnTimedOut = false,
@@ -59,7 +59,7 @@ public class TestTransformer
     [Test]
     public void TestWithBindable()
     {
-        var host = new TestGameHost(100)
+        using var host = new TestGameHost(100)
         {
             IgnoreTimedout = true,
             ThrowOnTimedOut = false,
