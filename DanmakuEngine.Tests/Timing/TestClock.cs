@@ -121,10 +121,13 @@ public class TestClock
         using var host = new TestGameHost(500);
 
         ManualResetEventSlim tpLock = new(true);
+        ManualResetEventSlim UpdateLock = new(true);
         host.OnUpdate += _ =>
         {
+            UpdateLock.Set();
             // Wait for thread pool work to finish
             tpLock.Wait();
+            UpdateLock.Reset();
         };
 
         host.OnLoad += h =>
@@ -141,6 +144,7 @@ public class TestClock
 
                 await Task.Delay(50);
 
+                UpdateLock.Wait();
                 tpLock.Reset();
                 {
                     Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
@@ -151,6 +155,7 @@ public class TestClock
 
                 await Task.Delay(10);
 
+                UpdateLock.Wait();
                 tpLock.Reset();
                 {
                     Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time).Within(1E-6));
@@ -310,6 +315,7 @@ public class TestClock
     public void TestStepOut()
     {
         ManualResetEventSlim tpLock = new(true);
+        ManualResetEventSlim UpdateLock = new(true);
 
         Clock clock = new();
 
@@ -319,7 +325,9 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
+            UpdateLock.Set();
             tpLock.Wait(1000);
+            UpdateLock.Reset();
         };
 
         host.OnLoad += h =>
@@ -330,13 +338,14 @@ public class TestClock
             {
                 await Task.Delay(120);
 
+                UpdateLock.Wait();
                 tpLock.Reset();
                 {
                     var current_time = clock.ElapsedSeconds;
 
                     clock.StepOut(0.1);
 
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1));
+                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1), $"{clock.DeltaTime}");
                 }
                 tpLock.Set();
 
