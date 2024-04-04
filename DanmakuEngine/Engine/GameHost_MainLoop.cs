@@ -39,9 +39,6 @@ public partial class GameHost
     {
         try
         {
-            // start timer here to prevent jit compiling time from being counted
-            EngineTimer = Stopwatch.StartNew();
-
             threadRunner.Start();
 
             State = EngineState.Running;

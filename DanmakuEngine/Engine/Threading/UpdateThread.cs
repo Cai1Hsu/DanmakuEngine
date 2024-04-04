@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DanmakuEngine.Threading;
 using DanmakuEngine.Timing;
 
@@ -32,6 +33,24 @@ public class UpdateThread : GameThread
         Time.UpdateDeltaF = (float)delta;
 
         Time.ElapsedSeconds += delta;
+    }
+
+    protected override void OnInitialize()
+    {
+        Time.FixedUpdateCount = 0;
+        Time.MeasuredFixedUpdateElapsedSeconds = 0;
+        Time.ElapsedSeconds = 0;
+        Time.ElapsedSecondsNonScaled = 0;
+
+        Time.UpdateDelta = 0;
+        Time.UpdateDeltaF = 0;
+        Time.UpdateDeltaNonScaled = 0;
+        Time.UpdateDeltaNonScaledF = 0;
+
+        Time.GlobalTimeScale = 1.0;
+
+        // start timer here to prevent jit compiling time from being counted
+        Time.EngineTimer = Stopwatch.StartNew();
     }
 
     public override bool IsCurrent => ThreadSync.IsUpdateThread;

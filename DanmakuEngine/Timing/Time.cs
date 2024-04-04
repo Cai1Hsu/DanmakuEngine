@@ -8,7 +8,7 @@ namespace DanmakuEngine.Timing;
 public class Time
 {
     public static Stopwatch AppTimer { get; } = Stopwatch.StartNew();
-    public static Stopwatch EngineTimer { get; protected set; } = null!;
+    public static Stopwatch EngineTimer { get; internal set; } = null!;
 
     public static readonly StandardClock Clock = new();
 
