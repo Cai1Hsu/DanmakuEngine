@@ -28,7 +28,10 @@ public class UpdateThread : GameThread
         base.postRunFrame();
 
         var timeSinceLastFixedUpdate = ElapsedSeconds - Time.RealLastFixedUpdateElapsedSeconds;
+        var deltaTime = timeSinceLastFixedUpdate - lastFrameSinceLastFixedUpdate;
+        lastFrameSinceLastFixedUpdate = timeSinceLastFixedUpdate;
 
+        Debug.Assert(lastFrameSinceLastFixedUpdate >= 0);
         Debug.Assert(timeSinceLastFixedUpdate >= 0, $"timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, ElapsedSeconds: {ElapsedSeconds}, RealLastFixedUpdateElapsedSeconds: {Time.RealLastFixedUpdateElapsedSeconds}");
 
         bool didFixedUpdate = Time.FixedUpdateCount != lastFrameFixedUpdateCount;
@@ -36,7 +39,7 @@ public class UpdateThread : GameThread
         // Sometimes the Update ended after the next FixedUpdate should start
         // When we execute the next FixedUpdate, the ElapsedSeconds will be pull back to the last FixedUpdate
         // We want to fake a time for next frame to keep the time consistent
-        if (ElapsedSeconds >= Time.MeasuredFixedUpdateElapsedSeconds + Time.FixedUpdateDeltaNonScaled)
+        if (ElapsedSeconds >= Time.LastFixedUpdateSecondsWithErrors + Time.FixedUpdateDeltaNonScaled)
         {
             var elapsedTimeNonScaled = (Time.FixedUpdateCount + 1) * Time.FixedUpdateDeltaNonScaled;
             var elapsedTime = (Time.FixedUpdateCount + 1) * Time.FixedUpdateDelta;
@@ -59,7 +62,7 @@ public class UpdateThread : GameThread
         else
         {
             var deltaNonScaled = !didFixedUpdate
-                ? timeSinceLastFixedUpdate - lastFrameSinceLastFixedUpdate
+                ? deltaTime
                 : timeSinceLastFixedUpdate;
 
             Debug.Assert(deltaNonScaled >= 0, $"deltaNonScaled: {deltaNonScaled}, timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, lastFrameSinceLastFixedUpdate: {lastFrameSinceLastFixedUpdate}");
@@ -76,33 +79,36 @@ public class UpdateThread : GameThread
             Time.ElapsedSeconds += delta;
         }
 
-        lastFrameSinceLastFixedUpdate = timeSinceLastFixedUpdate;
-
-        Debug.Assert(lastFrameSinceLastFixedUpdate >= 0);
+        if (Time.LastFixedUpdateSecondsWithErrors + Time.FixedUpdateDeltaNonScaled < ElapsedSeconds)
+        {
+            Time.AccumulatedErrorForFixedUpdate += Time.ExcessFixedFrameTime - (ElapsedSeconds - Time.RealLastFixedUpdateElapsedSeconds);
+            Time.AccumulatedErrorForFixedUpdate = Math.Max(Time.AccumulatedErrorForFixedUpdate, -Time.FixedUpdateDeltaNonScaled);
+        }
 
         lastFrameFixedUpdateCount = Time.FixedUpdateCount;
 
         if (didFixedUpdate)
             fixedUpdateCount++;
 
-        var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcFramerate;
+        var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcTime;
         if (elapsedSinceLastCalcFramerate > 1.0 /* sec */)
         {
             Time.RealFixedUpdateFramerate = fixedUpdateCount / elapsedSinceLastCalcFramerate;
 
-            lastCalcFramerate = ElapsedSeconds;
+            lastCalcTime = ElapsedSeconds;
             fixedUpdateCount = 0;
         }
     }
 
-    private double lastCalcFramerate = 0;
+    private double lastCalcTime = 0;
     private int fixedUpdateCount = 0;
 
     protected override void OnInitialize()
     {
         Time.FixedUpdateCount = 0;
+        Time.ExcessFixedFrameTime = 0;
+        Time.AccumulatedErrorForFixedUpdate = 0;
         Time.RealLastFixedUpdateElapsedSeconds = 0;
-        Time.MeasuredFixedUpdateElapsedSeconds = 0;
         Time.ElapsedSeconds = 0;
         Time.ElapsedSecondsNonScaled = 0;
 

@@ -28,7 +28,10 @@ public class Time
     }
 
     public static double RealLastFixedUpdateElapsedSeconds { get; internal set; }
-    public static double MeasuredFixedUpdateElapsedSeconds { get; internal set; }
+
+    public static double LastFixedUpdateSecondsWithErrors => FixedElapsedSecondsNonScaled + AccumulatedErrorForFixedUpdate;
+    public static double AccumulatedErrorForFixedUpdate { get; internal set; }
+    public static double ExcessFixedFrameTime { get; internal set; }
 
     /// <summary>
     /// The value of <see cref="FixedUpdateCount"/> * <see cref="FixedUpdateDelta"/>

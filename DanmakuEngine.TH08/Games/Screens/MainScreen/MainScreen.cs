@@ -224,6 +224,9 @@ public partial class MainScreen : Screen
             ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds * 1000:F2}ms");
             ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds * 1000:F2}ms");
             ImGui.Text($"    UpdateDelta: {Time.UpdateDelta * 1000:F2}ms");
+            ImGui.Text($"    LastFixedUpdateSecondsWithErrors: {Time.LastFixedUpdateSecondsWithErrors * 1000:F2}ms");
+            ImGui.Text($"    ExcessFixedFrameTime: {Time.ExcessFixedFrameTime * 1000:F2}ms");
+            ImGui.Text($"    AccumulatedErrorForFixedUpdate: {Time.AccumulatedErrorForFixedUpdate * 1000:F2}ms");
 
             ImGui.Text($"    App time: {Time.AppTimer.GetElapsedMilliseconds():F2}ms");
             ImGui.Text($"    Engine time: {Time.EngineTimer.GetElapsedMilliseconds():F2}ms");

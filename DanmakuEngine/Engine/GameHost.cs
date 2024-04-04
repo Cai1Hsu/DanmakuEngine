@@ -197,7 +197,6 @@ public partial class GameHost : Time, IDisposable
         Logger.Debug("Everything is ready, let's go!");
     }
 
-    private double lastFixedUpdateElapsedSeconds = 0;
     protected void Update()
     {
         if (_root == null)
@@ -205,42 +204,40 @@ public partial class GameHost : Time, IDisposable
 
         Imgui.Update();
 
-        int updateCount = 0;
         var engineElapsed = EngineTimer.GetElapsedSeconds();
-        while (MeasuredFixedUpdateElapsedSeconds + FixedUpdateDeltaNonScaled
+        var expectedFixedUpdateCount = (int)((engineElapsed - LastFixedUpdateSecondsWithErrors) / FixedUpdateDeltaNonScaled);
+        int fixedUpdateCount = 0;
+        while (LastFixedUpdateSecondsWithErrors + FixedUpdateDeltaNonScaled
             < engineElapsed)
         {
             // never allow FixedUpdate blocks the game logic too heavily
-            if (updateCount > 5)
+            if (fixedUpdateCount > 5)
             {
                 // if we are too far behind, just skip the update
                 // And add the floored skipped frames to the count
                 // This ensures the Time.ElapsedSeconds is always correct
-                var skipped = (int)((engineElapsed - MeasuredFixedUpdateElapsedSeconds) / FixedUpdateDeltaNonScaled);
+                var skipped = expectedFixedUpdateCount - fixedUpdateCount;
 
                 FixedUpdateCount += skipped;
-
-                MeasuredFixedUpdateElapsedSeconds += FixedUpdateDeltaNonScaled * skipped;
 
                 Logger.Warn($"Skipped {skipped} FixedUpdate frames");
                 break;
             }
-            updateCount++;
+            fixedUpdateCount++;
 
             _root.FixedUpdateSubtree();
 
             engineElapsed = EngineTimer.GetElapsedSeconds();
-            // Must do this before the FixedElapsedSecondsNonScaled is updated
-            MeasuredFixedUpdateElapsedSeconds = FixedElapsedSecondsNonScaled + (engineElapsed - lastFixedUpdateElapsedSeconds);
-            lastFixedUpdateElapsedSeconds = engineElapsed;
 
+            // Must do this before the FixedElapsedSecondsNonScaled is updated
+            ExcessFixedFrameTime = FixedUpdateDeltaNonScaled - (engineElapsed - RealLastFixedUpdateElapsedSeconds);
             RealLastFixedUpdateElapsedSeconds = engineElapsed;
 
             FixedUpdateCount++;
         }
 
-        if (updateCount > 1)
-            Logger.Warn($"FixedUpdate took {updateCount} frames to catch up");
+        if (fixedUpdateCount > 1)
+            Logger.Warn($"FixedUpdate took {fixedUpdateCount} frames to catch up");
 
         _root.UpdateSubTree();
     }
