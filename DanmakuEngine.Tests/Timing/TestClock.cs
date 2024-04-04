@@ -309,6 +309,8 @@ public class TestClock
     [Test]
     public void TestStepOut()
     {
+        ManualResetEventSlim tpLock = new(true);
+
         Clock clock = new();
 
         var game = new TestGame();
@@ -317,19 +319,30 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            if (Time.ElapsedSeconds > 0.2)
-            {
-                var current_time = clock.ElapsedSeconds;
-
-                clock.StepOut(0.1);
-
-                Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1));
-
-                h.RequestClose();
-            }
+            tpLock.Wait();
         };
 
-        host.OnLoad += _ => clock.Start();
+        host.OnLoad += h =>
+        {
+            clock.Start();
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(120);
+
+                tpLock.Reset();
+                {
+                    var current_time = clock.ElapsedSeconds;
+
+                    clock.StepOut(0.1);
+
+                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1));
+                }
+                tpLock.Set();
+
+                h.RequestClose();
+            });
+        };
 
         host.Run(game, defaultProvider);
     }
