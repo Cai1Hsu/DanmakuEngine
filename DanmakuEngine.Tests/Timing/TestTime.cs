@@ -99,4 +99,63 @@ public class TestTime
 
         Assert.That(count_frame, Is.GreaterThan(1));
     }
+
+    [Test]
+    public void TestTimeAlwaysGoForward()
+    {
+        double lastClockElapsedSeconds = 0;
+        double lastFixedElapsedSeconds = 0;
+        double lastElapsedSeconds = 0;
+        double lastEngineElapsedSeconds = 0;
+
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new TestGameHost(100);
+
+        host.OnUpdate += h =>
+        {
+            Assert.That(clock.ElapsedSeconds, Is.GreaterThan(lastClockElapsedSeconds).Within(1E-6));
+            Assert.That(Time.FixedElapsedSeconds, Is.GreaterThanOrEqualTo(lastFixedElapsedSeconds).Within(1E-6));
+            Assert.That(Time.ElapsedSeconds, Is.GreaterThanOrEqualTo(lastElapsedSeconds).Within(1E-6));
+            Assert.That(Time.EngineTimer.Elapsed.TotalSeconds, Is.GreaterThanOrEqualTo(lastEngineElapsedSeconds).Within(1E-6));
+
+            Assert.That(clock.DeltaTime, Is.Not.Negative);
+            Assert.That(Time.UpdateDelta, Is.Not.Negative);
+
+            lastClockElapsedSeconds = clock.ElapsedSeconds;
+            lastFixedElapsedSeconds = Time.FixedElapsedSeconds;
+            lastElapsedSeconds = Time.ElapsedSeconds;
+            lastEngineElapsedSeconds = Time.EngineTimer.Elapsed.TotalSeconds;
+        };
+
+        host.OnLoad += _ => clock.Start();
+
+        host.Run(game, defaultProvider);
+    }
+
+    [Test]
+    public void TestElapsedSecondsConsistentWithDelta()
+    {
+        var game = new TestGame();
+
+        using var host = new TestGameHost(1000)
+        {
+            BypassThrottle = true,
+            IgnoreTimedout = true,
+            ThrowOnTimedOut = false,
+        };
+
+        double accumulatedSeconds = 0;
+
+        host.OnUpdate += h =>
+        {
+            accumulatedSeconds += Time.UpdateDelta;
+            Logger.Debug($"    Accumulated seconds: {accumulatedSeconds * 1000:F2}, Elapsed seconds: {Time.ElapsedSeconds * 1000:F2}");
+            Assert.That(accumulatedSeconds, Is.EqualTo(Time.ElapsedSeconds).Within(1E-6));
+        };
+
+        host.Run(game, defaultProvider);
+    }
 }

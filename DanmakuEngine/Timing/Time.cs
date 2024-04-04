@@ -12,24 +12,15 @@ public class Time
 
     public static readonly StandardClock Clock = new();
 
-    private static long fixedUpdateCount = 0;
     /// <summary>
     /// The number of fixed update frames that have passed since the game started.
     /// </summary>
-    public static long FixedUpdateCount
-    {
-        get => fixedUpdateCount;
-        set
-        {
-            fixedUpdateCount = value;
-            ElapsedSeconds = FixedElapsedSeconds;
-            ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
-        }
-    }
+    public static long FixedUpdateCount { get; internal set; }
 
-    public static double RealLastFixedUpdateElapsedSeconds { get; internal set; }
+    public static double RealFixedUpdateDelta { get; internal set; }
+    public static double RealLastFixedUpdateTime { get; internal set; }
 
-    public static double LastFixedUpdateSecondsWithErrors => FixedElapsedSecondsNonScaled + AccumulatedErrorForFixedUpdate;
+    public static double LastFixedUpdateTimeWithErrors => FixedElapsedSecondsNonScaled + AccumulatedErrorForFixedUpdate;
     public static double AccumulatedErrorForFixedUpdate { get; internal set; }
     public static double ExcessFixedFrameTime { get; internal set; }
 
@@ -69,21 +60,27 @@ public class Time
 
     public static double RealFixedUpdateFramerate = 60.0;
 
-    private static double _globalTimeScale = 1.0;
-    public static double GlobalTimeScale
+    public static double GlobalTimeScale { get; internal set; } = 1.0;
+
+    internal static void ApplyTimeScale()
     {
-        get => _globalTimeScale;
-        set
-        {
-            ArgumentOutOfRangeException
-                .ThrowIfNegativeOrZero(value, nameof(GlobalTimeScale));
+        if (GlobalTimeScale == _requestedTimeScale)
+            return;
 
-            ArgumentOutOfRangeException
-                .ThrowIfEqual(value, double.PositiveInfinity, nameof(GlobalTimeScale));
-
-            _globalTimeScale = value;
-        }
+        GlobalTimeScale = _requestedTimeScale;
     }
+
+    private static double _requestedTimeScale = 1.0;
+    public static void SetGlobalTimeScale(double scale)
+    {
+        ArgumentOutOfRangeException
+            .ThrowIfNegativeOrZero(scale, nameof(scale));
+
+        _requestedTimeScale = scale;
+    }
+
+    public static int QueuedFixedUpdateCount { get; internal set; }
+    public static bool DoFixedUpdate => QueuedFixedUpdateCount > 0;
 
     public double DebugFpsHz { get; protected set; } = 1.0;
 }

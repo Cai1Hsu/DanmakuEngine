@@ -224,9 +224,8 @@ public partial class MainScreen : Screen
             ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds * 1000:F2}ms");
             ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds * 1000:F2}ms");
             ImGui.Text($"    UpdateDelta: {Time.UpdateDelta * 1000:F2}ms");
-            ImGui.Text($"    LastFixedUpdateSecondsWithErrors: {Time.LastFixedUpdateSecondsWithErrors * 1000:F2}ms");
+            ImGui.Text($"    LastFixedUpdateSecondsWithErrors: {Time.LastFixedUpdateTimeWithErrors * 1000:F2}ms");
             ImGui.Text($"    ExcessFixedFrameTime: {Time.ExcessFixedFrameTime * 1000:F2}ms");
-            ImGui.Text($"    AccumulatedErrorForFixedUpdate: {Time.AccumulatedErrorForFixedUpdate * 1000:F2}ms");
 
             ImGui.Text($"    App time: {Time.AppTimer.GetElapsedMilliseconds():F2}ms");
             ImGui.Text($"    Engine time: {Time.EngineTimer.GetElapsedMilliseconds():F2}ms");
@@ -238,6 +237,14 @@ public partial class MainScreen : Screen
 
             if (ImGui.Button("Exit Game"))
                 _host.RequestClose();
+
+            if (ImGui.Button("Block Update"))
+                _blockUpdate = !_blockUpdate;
+
+            if (_blockUpdate)
+                ImGui.Text("Update blocked");
+
+            ImGui.Separator();
 
             ImGui.Text(string_with_cjk);
         };
@@ -322,5 +329,10 @@ Marisa Kirisame
     {
         // foreach (var transformation in transformations)
         //     transformation.Update(clock.DeltaTime * 1000);
+
+        if (_blockUpdate)
+            Thread.Sleep(50);
     }
+
+    private bool _blockUpdate = false;
 }
