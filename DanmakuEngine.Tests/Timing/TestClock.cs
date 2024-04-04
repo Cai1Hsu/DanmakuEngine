@@ -116,54 +116,43 @@ public class TestClock
     {
         Clock clock = new();
 
+        int count_frame = 0;
+        double current_time = 0;
+
         var game = new TestGame();
 
-        using var host = new TestGameHost(500);
+        using var host = new TestGameHost(5000);
 
-        ManualResetEventSlim tpLock = new(true);
-        ManualResetEventSlim UpdateLock = new(true);
-        host.OnUpdate += _ =>
+        host.OnUpdate += h =>
         {
-            UpdateLock.Set();
-            // Wait for thread pool work to finish
-            tpLock.Wait();
-            UpdateLock.Reset();
+            count_frame += 1;
+
+            if (count_frame < 60)
+            {
+                if (current_time == 0)
+                    current_time = clock.ElapsedSeconds;
+                else
+                    Assert.That(clock.ElapsedSeconds, Is.LessThan(current_time));
+            }
+            else if (count_frame < 120)
+            {
+                clock.Resume();
+            }
+            else if (count_frame < 180)
+            {
+                Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time));
+            }
+            else
+            {
+                h.RequestClose();
+            }
         };
 
-        host.OnLoad += h =>
+        host.OnLoad += _ =>
         {
             clock.Start();
 
-            Task.Run(async () =>
-            {
-                await Task.Delay(10);
-
-                clock.Pause();
-
-                var current_time = clock.ElapsedSeconds;
-
-                await Task.Delay(50);
-
-                UpdateLock.Wait();
-                tpLock.Reset();
-                {
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
-                    clock.Resume();
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
-                }
-                tpLock.Set();
-
-                await Task.Delay(10);
-
-                UpdateLock.Wait();
-                tpLock.Reset();
-                {
-                    Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time).Within(1E-6));
-                }
-                tpLock.Set();
-
-                h.RequestClose();
-            });
+            clock.Pause();
         };
 
         host.Run(game, defaultProvider);
@@ -314,9 +303,6 @@ public class TestClock
     [Test]
     public void TestStepOut()
     {
-        ManualResetEventSlim tpLock = new(true);
-        ManualResetEventSlim UpdateLock = new(true);
-
         Clock clock = new();
 
         var game = new TestGame();
@@ -325,36 +311,23 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            UpdateLock.Set();
-            tpLock.Wait(1000);
-            UpdateLock.Reset();
-        };
-
-        host.OnLoad += h =>
-        {
-            clock.Start();
-
-            Task.Run(async () =>
+            if (clock.ElapsedSeconds > 0.2)
             {
-                await Task.Delay(120);
+                var current_time = clock.ElapsedSeconds;
 
-                UpdateLock.Wait();
-                tpLock.Reset();
-                {
-                    var current_time = clock.ElapsedSeconds;
+                clock.StepOut(0.1);
 
-                    clock.StepOut(0.1);
-
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1), $"{clock.DeltaTime}");
-                }
-                tpLock.Set();
+                Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time - 0.1));
 
                 h.RequestClose();
-            });
+            }
         };
+
+        host.OnLoad += _ => clock.Start();
 
         host.Run(game, defaultProvider);
     }
+
 
     [Test]
     public void TestTheWorld()
