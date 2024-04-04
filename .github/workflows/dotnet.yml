@@ -22,9 +22,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         threading: [singlethreaded, multithreaded]
-        configuration: [Release]
-        include:
-          - os: ubuntu-latest
+        configuration: [Release, Debug]
+        exclude:
+          - os: windows-latest
+            configuration: Debug
+          - os: macos-latest
             configuration: Debug
 
     steps:
