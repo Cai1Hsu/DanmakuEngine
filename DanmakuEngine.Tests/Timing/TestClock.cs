@@ -328,7 +328,6 @@ public class TestClock
         host.Run(game, defaultProvider);
     }
 
-
     [Test]
     public void TestTheWorld()
     {
