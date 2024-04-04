@@ -239,6 +239,9 @@ public partial class GameHost : Time, IDisposable
             FixedUpdateCount++;
         }
 
+        if (updateCount > 1)
+            Logger.Warn($"FixedUpdate took {updateCount} frames to catch up");
+
         _root.UpdateSubTree();
     }
 

@@ -64,6 +64,8 @@ public class Time
 
     public static float FixedUpdateDeltaNonScaledF => (float)FixedUpdateDeltaNonScaled;
 
+    public static double RealFixedUpdateFramerate = 60.0;
+
     private static double _globalTimeScale = 1.0;
     public static double GlobalTimeScale
     {
@@ -80,5 +82,5 @@ public class Time
         }
     }
 
-    protected double DebugFpsHz = 1;
+    public double DebugFpsHz { get; protected set; } = 1.0;
 }

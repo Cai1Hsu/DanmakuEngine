@@ -31,6 +31,8 @@ public class UpdateThread : GameThread
 
         Debug.Assert(timeSinceLastFixedUpdate >= 0, $"timeSinceLastFixedUpdate: {timeSinceLastFixedUpdate}, ElapsedSeconds: {ElapsedSeconds}, RealLastFixedUpdateElapsedSeconds: {Time.RealLastFixedUpdateElapsedSeconds}");
 
+        bool didFixedUpdate = Time.FixedUpdateCount != lastFrameFixedUpdateCount;
+
         // Sometimes the Update ended after the next FixedUpdate should start
         // When we execute the next FixedUpdate, the ElapsedSeconds will be pull back to the last FixedUpdate
         // We want to fake a time for next frame to keep the time consistent
@@ -56,7 +58,7 @@ public class UpdateThread : GameThread
         }
         else
         {
-            var deltaNonScaled = (lastFrameFixedUpdateCount == Time.FixedUpdateCount)
+            var deltaNonScaled = !didFixedUpdate
                 ? timeSinceLastFixedUpdate - lastFrameSinceLastFixedUpdate
                 : timeSinceLastFixedUpdate;
 
@@ -79,7 +81,22 @@ public class UpdateThread : GameThread
         Debug.Assert(lastFrameSinceLastFixedUpdate >= 0);
 
         lastFrameFixedUpdateCount = Time.FixedUpdateCount;
+
+        if (didFixedUpdate)
+            fixedUpdateCount++;
+
+        var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcFramerate;
+        if (elapsedSinceLastCalcFramerate > 1.0 /* sec */)
+        {
+            Time.RealFixedUpdateFramerate = fixedUpdateCount / elapsedSinceLastCalcFramerate;
+
+            lastCalcFramerate = ElapsedSeconds;
+            fixedUpdateCount = 0;
+        }
     }
+
+    private double lastCalcFramerate = 0;
+    private int fixedUpdateCount = 0;
 
     protected override void OnInitialize()
     {
