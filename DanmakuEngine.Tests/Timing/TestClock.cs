@@ -396,4 +396,42 @@ public class TestClock
 
         host.Run(game, defaultProvider);
     }
+
+    [Test]
+    public void TestGameFrame()
+    {
+        double lastClockElapsedSeconds = 0;
+        double lastFixedElapsedSeconds = 0;
+        double lastElapsedSeconds = 0;
+        double lastEngineElapsedSeconds = 0;
+        double lastMeasuredFixedUpdateElapsedSeconds = 0;
+
+        Clock clock = new();
+
+        var game = new TestGame();
+
+        using var host = new TestGameHost(100);
+
+        host.OnUpdate += h =>
+        {
+            Assert.That(clock.ElapsedSeconds, Is.GreaterThan(lastClockElapsedSeconds).Within(1E-6));
+            Assert.That(Time.FixedElapsedSeconds, Is.GreaterThanOrEqualTo(lastFixedElapsedSeconds).Within(1E-6));
+            Assert.That(Time.ElapsedSeconds, Is.GreaterThanOrEqualTo(lastElapsedSeconds).Within(1E-6));
+            Assert.That(Time.EngineTimer.Elapsed.TotalSeconds, Is.GreaterThanOrEqualTo(lastEngineElapsedSeconds).Within(1E-6));
+            Assert.That(Time.MeasuredFixedUpdateElapsedSeconds, Is.GreaterThanOrEqualTo(lastMeasuredFixedUpdateElapsedSeconds).Within(1E-6));
+
+            Assert.That(clock.DeltaTime, Is.Not.Negative);
+            Assert.That(Time.UpdateDelta, Is.Not.Negative);
+
+            lastClockElapsedSeconds = clock.ElapsedSeconds;
+            lastFixedElapsedSeconds = Time.FixedElapsedSeconds;
+            lastElapsedSeconds = Time.ElapsedSeconds;
+            lastEngineElapsedSeconds = Time.EngineTimer.Elapsed.TotalSeconds;
+            lastMeasuredFixedUpdateElapsedSeconds = Time.MeasuredFixedUpdateElapsedSeconds;
+        };
+
+        host.OnLoad += _ => clock.Start();
+
+        host.Run(game, defaultProvider);
+    }
 }

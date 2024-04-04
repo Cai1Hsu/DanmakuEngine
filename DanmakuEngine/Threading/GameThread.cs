@@ -382,8 +382,24 @@ public class GameThread
         {
             Logger.Error($"[Thread-{Type}] Unhandled exception: {e.Message}\n{e.StackTrace}");
 
-            // FIXME: Handle exceptions
-            // throw;
+            var handlerList = OnException?.GetInvocationList();
+
+            if (handlerList != null)
+            {
+                foreach (var handler in handlerList)
+                {
+                    if (handler is not Func<Exception, bool> exceptionHandler)
+                        continue;
+
+                    if (exceptionHandler(e))
+                    {
+                        Logger.Debug($"[Thread-{Type}] Exception handled by subscriber.");
+                        return null;
+                    }
+                }
+            }
+
+            throw;
         }
 
         return null;
@@ -416,6 +432,8 @@ public class GameThread
             state.Value = exitState;
         }
     }
+
+    public event Func<Exception, bool>? OnException;
 
     private double? requestedActiveHz = null!;
     private double? requestedInactiveHz = null!;

@@ -27,6 +27,7 @@ public class Time
         }
     }
 
+    public static double RealLastFixedUpdateElapsedSeconds { get; internal set; }
     public static double MeasuredFixedUpdateElapsedSeconds { get; internal set; }
 
     /// <summary>

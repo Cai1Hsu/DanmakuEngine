@@ -57,8 +57,6 @@ public class HeadlessGameHost : GameHost
 
     public override void RegisterEvents()
     {
-        Root.OnStart += _ => OnLoad?.Invoke(this);
-
         Root.OnUpdate += _ =>
         {
             if (SkipFirstFrame && CurrentFrame == 1)
@@ -76,6 +74,8 @@ public class HeadlessGameHost : GameHost
         {
             t.Executor.Throttling = !BypassThrottle;
         }
+
+        UpdateThread.OnLoad += () => this.OnLoad?.Invoke(this);
     }
 
     public override void RequestClose()
