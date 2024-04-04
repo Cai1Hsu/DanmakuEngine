@@ -1,5 +1,6 @@
 using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
+using DanmakuEngine.Graphics;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Tests.Games;
 using DanmakuEngine.Timing;
@@ -115,43 +116,49 @@ public class TestClock
     {
         Clock clock = new();
 
-        int count_frame = 0;
-        double current_time = 0;
-
         var game = new TestGame();
 
-        using var host = new TestGameHost(5000);
+        using var host = new TestGameHost(500);
 
-        host.OnUpdate += h =>
+        ManualResetEventSlim tpLock = new(true);
+        host.OnUpdate += _ =>
         {
-            count_frame += 1;
-
-            if (count_frame < 60)
-            {
-                if (current_time == 0)
-                    current_time = clock.ElapsedSeconds;
-                else
-                    Assert.That(clock.ElapsedSeconds, Is.LessThan(current_time));
-            }
-            else if (count_frame < 120)
-            {
-                clock.Resume();
-            }
-            else if (count_frame < 180)
-            {
-                Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time));
-            }
-            else
-            {
-                h.RequestClose();
-            }
+            // Wait for thread pool work to finish
+            tpLock.Wait();
         };
 
-        host.OnLoad += _ =>
+        host.OnLoad += h =>
         {
             clock.Start();
 
-            clock.Pause();
+            Task.Run(async () =>
+            {
+                await Task.Delay(10);
+
+                clock.Pause();
+
+                var current_time = clock.ElapsedSeconds;
+
+                await Task.Delay(50);
+
+                tpLock.Reset();
+                {
+                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
+                    clock.Resume();
+                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
+                }
+                tpLock.Set();
+
+                await Task.Delay(10);
+
+                tpLock.Reset();
+                {
+                    Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time).Within(1E-6));
+                }
+                tpLock.Set();
+
+                h.RequestClose();
+            });
         };
 
         host.Run(game, defaultProvider);

@@ -33,7 +33,7 @@ public class TestFixedAcceleratedMovement
 
         var game = new TestGame();
 
-        var host = new TestGameHost(100)
+        using var host = new TestGameHost(100)
         {
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
@@ -72,7 +72,7 @@ public class TestFixedAcceleratedMovement
 
         var game = new TestGame();
 
-        var host = new TestGameHost(500);
+        using var host = new TestGameHost(500);
 
         var movement = new FixedAcceleratedMovementD(0, acceleration)
         {
@@ -110,7 +110,7 @@ public class TestFixedAcceleratedMovement
         var clock = new Clock();
 
         var game = new TestGame();
-        var host = new TestGameHost(100)
+        using var host = new TestGameHost(100)
         {
             ThrowOnTimedOut = false,
             IgnoreTimedout = true,
