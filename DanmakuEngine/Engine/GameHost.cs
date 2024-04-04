@@ -270,6 +270,9 @@ public partial class GameHost : Time, IDisposable
                 FixedUpdateCount += skipped;
                 QueuedFixedUpdateCount = 0;
 
+                ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
+                ElapsedSeconds = FixedElapsedSeconds;
+
 #if DEBUG
                 Logger.Warn($"Skipped {skipped} FixedUpdate frames");
 #endif
