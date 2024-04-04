@@ -20,8 +20,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         threading: [singlethreaded, multithreaded]
+        configuration: [Release]
+        include:
+          - os: ubuntu-latest
+            configuration: Debug
 
     steps:
     - uses: actions/checkout@v4
@@ -34,10 +38,10 @@ jobs:
       run: dotnet restore
 
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore --configuration ${{ matrix.configuration }}
 
     - name: Test
-      run: dotnet test --no-build --verbosity normal
+      run: dotnet test --no-build --verbosity normal --configuration ${{ matrix.configuration }}
 
     - name: Upload coverage reports to Codecov
       uses: codecov/codecov-action@v3
@@ -99,10 +103,10 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
 
-    - name: Restore Tools
-      run: |
-        dotnet tool restore
-        dotnet tool install --global JetBrains.ReSharper.GlobalTools
+    # - name: Restore Tools
+    #   run: |
+    #     dotnet tool restore
+    #     dotnet tool install --global JetBrains.ReSharper.GlobalTools
 
     - name: Auto Format
       run: dotnet format --verbosity diagnostic
