@@ -51,6 +51,8 @@ public class ThrottledExecutor : FrameExecutor
         }
     }
 
+    protected virtual double excessFrameTime => (1000.0 / Hz) - (DeltaTime * 1000);
+
     private double accumulatedSleepError;
 
     private void throttle()

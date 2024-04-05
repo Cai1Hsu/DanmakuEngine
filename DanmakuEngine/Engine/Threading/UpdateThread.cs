@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
+using DanmakuEngine.Scheduling;
 using DanmakuEngine.Threading;
 using DanmakuEngine.Timing;
 
@@ -10,7 +11,7 @@ namespace DanmakuEngine.Engine.Threading;
 public class UpdateThread : GameThread
 {
     public UpdateThread(Action task)
-        : base(task, ThreadType.Update)
+        : base(task, ThreadType.Update, new UpdateExecutor(task))
     {
     }
 

@@ -87,8 +87,14 @@ public class GameThread
     public readonly ThreadType Type;
 
     internal GameThread(Action onNewFrame, ThreadType type)
+        : this(onNewFrame, type, new ThrottledExecutor(onNewFrame))
     {
-        Executor = new ThrottledExecutor(onNewFrame);
+    }
+
+    internal GameThread(Action onNewFrame, ThreadType type,
+        ThrottledExecutor executor)
+    {
+        Executor = executor;
 
         Type = type;
 
