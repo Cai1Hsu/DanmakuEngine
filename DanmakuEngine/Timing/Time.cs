@@ -1,7 +1,4 @@
 using System.Diagnostics;
-using DanmakuEngine.Allocations;
-using DanmakuEngine.Arguments;
-using DanmakuEngine.Engine;
 
 namespace DanmakuEngine.Timing;
 
@@ -17,6 +14,7 @@ public class Time
     /// </summary>
     public static long FixedUpdateCount { get; internal set; }
 
+    public static double FixedUpdateJitter { get; internal set; }
     public static double RealFixedUpdateDelta { get; internal set; }
     public static double RealLastFixedUpdateTime { get; internal set; }
 
@@ -58,7 +56,7 @@ public class Time
 
     public static float FixedUpdateDeltaNonScaledF => (float)FixedUpdateDeltaNonScaled;
 
-    public static double RealFixedUpdateFramerate = 60.0;
+    public static double RealFixedUpdateFramerate { get; internal set; } = 60.0;
 
     public static double GlobalTimeScale { get; internal set; } = 1.0;
 

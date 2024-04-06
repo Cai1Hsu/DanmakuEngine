@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
 using DanmakuEngine.DearImgui;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Dependency;
@@ -215,7 +213,8 @@ public partial class MainScreen : Screen
             ImGui.Text($"    Main: {_mainThread.AverageFramerate:F2}({1000 / _mainThread.AverageFramerate:F2}±{_mainThread.Jitter:F2}ms)");
             ImGui.Text($"    Update: {_updateThread.AverageFramerate:F2}({1000 / _updateThread.AverageFramerate:F2}±{_updateThread.Jitter:F2}ms)");
             ImGui.Text($"    Render: {_renderThread.AverageFramerate:F2}({1000 / _renderThread.AverageFramerate:F2}±{_renderThread.Jitter:F2}ms)");
-            ImGui.Text($"    Fixed: {Time.RealFixedUpdateFramerate:F2}");
+
+            ImGui.Text($"    Fixed: {Time.RealFixedUpdateFramerate:F2}({1000 / Time.RealFixedUpdateFramerate:F2}ms±{Time.FixedUpdateJitter:F2}ms)");
 
             ImGui.Separator();
 

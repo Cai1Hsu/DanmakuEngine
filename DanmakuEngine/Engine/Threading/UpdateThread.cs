@@ -1,7 +1,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
-using DanmakuEngine.Extensions;
-using DanmakuEngine.Logging;
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Threading;
 using DanmakuEngine.Timing;
@@ -40,21 +39,29 @@ public class UpdateThread : GameThread
         }
 
         if (didFixedUpdate)
+        {
             periodFixedUpdateCount += fixedUpdateCount;
 
-        var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcTime;
+            _fixedDeltaPool.CurrentAndNext = Time.RealFixedUpdateDelta;
+        }
+
+        var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcFixedDeltaTime;
         if (elapsedSinceLastCalcFramerate > 1.0 /* sec */)
         {
-            Time.RealFixedUpdateFramerate = periodFixedUpdateCount / elapsedSinceLastCalcFramerate;
+            var fixedAvg = _fixedDeltaPool.Average();
+            var stddev = Math.Sqrt(_fixedDeltaPool.Average(v => Math.Pow((v - fixedAvg) * 1000, 2)));
+            Time.RealFixedUpdateFramerate = 1.0 / fixedAvg;
+            Time.FixedUpdateJitter = stddev;
 
-            lastCalcTime = ElapsedSeconds;
+            lastCalcFixedDeltaTime = ElapsedSeconds;
             periodFixedUpdateCount = 0;
         }
 
         lastFrameFixedUpdateCount = Time.FixedUpdateCount;
     }
 
-    private double lastCalcTime = 0;
+    private RingPool<double> _fixedDeltaPool = new(128);
+    private double lastCalcFixedDeltaTime = 0;
     private int periodFixedUpdateCount = 0;
 
     protected override void OnInitialize()
@@ -71,6 +78,10 @@ public class UpdateThread : GameThread
         Time.UpdateDeltaF = 0;
         Time.UpdateDeltaNonScaled = 0;
         Time.UpdateDeltaNonScaledF = 0;
+
+        Time.RealFixedUpdateFramerate = 60.0;
+        Time.RealFixedUpdateDelta = 0;
+        Time.FixedUpdateJitter = 0;
 
         Time.QueuedFixedUpdateCount = 0;
 
