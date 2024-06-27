@@ -4,10 +4,10 @@ namespace DanmakuEngine.Timing;
 
 public class StopwatchClock : Stopwatch, IClock
 {
-    public bool IsPaused => IsRunning;
+    public bool IsPaused => !IsRunning;
 
     public double ElapsedSeconds
-        => IsPaused ? ElapsedTicks / (double)Frequency : 0;
+        => IsPaused ? 0 : ElapsedTicks / (double)Frequency;
 
     public double DeltaTime { get; private set; }
 
