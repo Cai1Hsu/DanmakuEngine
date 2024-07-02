@@ -1,9 +1,9 @@
 using System.Runtime.Versioning;
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Engine.Platform.Environments;
 using DanmakuEngine.Engine.Platform.Environments.Xdg;
 using DanmakuEngine.Engine.Platform.Linux.X11;
 using DanmakuEngine.Engine.SDLNative;
-using DanmakuEngine.Allocations;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
 using OpenTK.Windowing.GraphicsLibraryFramework;
