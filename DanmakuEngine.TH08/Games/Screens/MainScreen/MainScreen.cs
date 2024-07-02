@@ -220,14 +220,14 @@ public partial class MainScreen : Screen
 
             ImGui.Text(@"Time:");
             ImGui.Text($"    FixedUpdateCount: {Time.FixedUpdateCount}");
-            ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds * 1000:F2}ms");
-            ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds * 1000:F2}ms");
+            ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds:F2}s");
+            ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds:F2}s");
             ImGui.Text($"    UpdateDelta: {Time.UpdateDelta * 1000:F2}ms");
             ImGui.Text($"    LastFixedUpdateSecondsWithErrors: {Time.LastFixedUpdateTimeWithErrors * 1000:F2}ms");
             ImGui.Text($"    ExcessFixedFrameTime: {Time.ExcessFixedFrameTime * 1000:F2}ms");
 
-            ImGui.Text($"    App time: {Time.AppTimer.GetElapsedMilliseconds():F2}ms");
-            ImGui.Text($"    Engine time: {Time.EngineTimer.GetElapsedMilliseconds():F2}ms");
+            ImGui.Text($"    App time: {Time.AppTimer.ElapsedSeconds:F2}s");
+            ImGui.Text($"    Engine time: {Time.EngineTimer.ElapsedSeconds:F2}s");
 
             ImGui.Separator();
 

@@ -203,7 +203,7 @@ public partial class GameHost : Time, IDisposable
     {
         bool didFixedUpdate = lastFrameFixedUpdateCount != FixedUpdateCount;
 
-        double currentTime = EngineTimer.GetElapsedSeconds();
+        double currentTime = EngineTimer.ElapsedSeconds;
 
         QueuedFixedUpdateCount = (int)((currentTime - LastFixedUpdateTimeWithErrors) / FixedUpdateDeltaNonScaled);
         if (DoFixedUpdate)
@@ -234,7 +234,7 @@ public partial class GameHost : Time, IDisposable
             Debug.Assert(timeSinceLastFixedUpdate >= 0);
             Debug.Assert(deltaNonScaled >= 0);
 
-            var delta = deltaNonScaled * Time.GlobalTimeScale;
+            var delta = deltaNonScaled;
 
             UpdateDeltaNonScaled = deltaNonScaled;
             UpdateDeltaNonScaledF = (float)deltaNonScaled;
@@ -258,6 +258,7 @@ public partial class GameHost : Time, IDisposable
             return;
 
         int fixedUpdateCount = 0;
+
         while (DoFixedUpdate)
         {
             // never allow FixedUpdate blocks the game logic too heavily
@@ -281,7 +282,7 @@ public partial class GameHost : Time, IDisposable
 
             _root.FixedUpdateSubtree();
 
-            double engineElapsed = EngineTimer.GetElapsedSeconds();
+            double engineElapsed = EngineTimer.ElapsedSeconds;
 
             // Must do this before the FixedElapsedSecondsNonScaled is updated
             RealFixedUpdateDelta = engineElapsed - RealLastFixedUpdateTime;
@@ -294,6 +295,8 @@ public partial class GameHost : Time, IDisposable
 
             ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
             ElapsedSeconds = FixedElapsedSeconds;
+
+            UpdateThread.OnFixedUpdate();
         }
 
         Debug.Assert(QueuedFixedUpdateCount == 0);
@@ -354,7 +357,7 @@ public partial class GameHost : Time, IDisposable
                 Console.CancelKeyPress += (_, e) =>
                 {
                     if (lastCancelPress is not null &&
-                        EngineTimer.Elapsed.TotalSeconds - lastCancelPress < 1)
+                        AppTimer.ElapsedSeconds - lastCancelPress < 1)
                     {
                         Logger.Warn("Exiting...");
                     }
@@ -363,7 +366,7 @@ public partial class GameHost : Time, IDisposable
                         RequestClose();
 
                         e.Cancel = true;
-                        lastCancelPress = EngineTimer.Elapsed.TotalSeconds;
+                        lastCancelPress = AppTimer.ElapsedSeconds;
                         Logger.Warn("Press Ctrl+C again to force exit.");
                     }
 

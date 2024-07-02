@@ -21,28 +21,22 @@ public class UpdateThread : GameThread
         ThreadSync.IsUpdateThread = true;
     }
 
-    private long lastFrameFixedUpdateCount = 0;
+    internal void OnFixedUpdate()
+    {
+        _fixedDeltaPool.CurrentAndNext = Time.RealFixedUpdateDelta;
+    }
+
     protected override void postRunFrame()
     {
         base.postRunFrame();
 
         var currentTime = Executor.SourceTime;
 
-        int fixedUpdateCount = (int)(Time.FixedUpdateCount - lastFrameFixedUpdateCount);
-        var didFixedUpdate = fixedUpdateCount != 0;
-
         var error = Time.ExcessFixedFrameTime - (currentTime - Time.RealLastFixedUpdateTime);
         if (Time.LastFixedUpdateTimeWithErrors + error + Time.FixedUpdateDeltaNonScaled < currentTime)
         {
             Time.AccumulatedErrorForFixedUpdate += error;
             Time.AccumulatedErrorForFixedUpdate = Math.Max(Time.AccumulatedErrorForFixedUpdate, -Time.FixedUpdateDeltaNonScaled);
-        }
-
-        if (didFixedUpdate)
-        {
-            periodFixedUpdateCount += fixedUpdateCount;
-
-            _fixedDeltaPool.CurrentAndNext = Time.RealFixedUpdateDelta;
         }
 
         var elapsedSinceLastCalcFramerate = ElapsedSeconds - lastCalcFixedDeltaTime;
@@ -54,15 +48,11 @@ public class UpdateThread : GameThread
             Time.FixedUpdateJitter = stddev;
 
             lastCalcFixedDeltaTime = ElapsedSeconds;
-            periodFixedUpdateCount = 0;
         }
-
-        lastFrameFixedUpdateCount = Time.FixedUpdateCount;
     }
 
     private RingPool<double> _fixedDeltaPool = new(128);
     private double lastCalcFixedDeltaTime = 0;
-    private int periodFixedUpdateCount = 0;
 
     protected override void OnInitialize()
     {
@@ -84,9 +74,6 @@ public class UpdateThread : GameThread
         Time.FixedUpdateJitter = 0;
 
         Time.QueuedFixedUpdateCount = 0;
-
-        Time.GlobalTimeScale = 1.0;
-        Time.ApplyTimeScale();
 
         Time.EngineTimer = Executor.TimeSource;
 

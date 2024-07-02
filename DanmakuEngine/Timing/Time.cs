@@ -4,8 +4,8 @@ namespace DanmakuEngine.Timing;
 
 public class Time
 {
-    public static Stopwatch AppTimer { get; } = Stopwatch.StartNew();
-    public static Stopwatch EngineTimer { get; internal set; } = null!;
+    public static StopwatchClock AppTimer { get; } = StopwatchClock.StartNew();
+    public static StopwatchClock EngineTimer { get; internal set; } = null!;
 
     public static readonly StandardClock Clock = new();
 
@@ -45,10 +45,10 @@ public class Time
     public static double UpdateDeltaNonScaled { get; internal set; }
     public static double UpdateDeltaNonScaledF { get; internal set; }
 
-    public static double FixedUpdateHz => FixedUpdateHzNonScaled * GlobalTimeScale;
+    public static double FixedUpdateHz => FixedUpdateHzNonScaled;
     public static double FixedUpdateHzNonScaled { get; protected set; } = 60.0;
 
-    public static double FixedUpdateDelta => (1.0 * GlobalTimeScale) / FixedUpdateHz;
+    public static double FixedUpdateDelta => 1.0 / FixedUpdateHz;
 
     public static float FixedUpdateDeltaF => (float)FixedUpdateDelta;
 
@@ -57,25 +57,6 @@ public class Time
     public static float FixedUpdateDeltaNonScaledF => (float)FixedUpdateDeltaNonScaled;
 
     public static double RealFixedUpdateFramerate { get; internal set; } = 60.0;
-
-    public static double GlobalTimeScale { get; internal set; } = 1.0;
-
-    internal static void ApplyTimeScale()
-    {
-        if (GlobalTimeScale == _requestedTimeScale)
-            return;
-
-        GlobalTimeScale = _requestedTimeScale;
-    }
-
-    private static double _requestedTimeScale = 1.0;
-    public static void SetGlobalTimeScale(double scale)
-    {
-        ArgumentOutOfRangeException
-            .ThrowIfNegativeOrZero(scale, nameof(scale));
-
-        _requestedTimeScale = scale;
-    }
 
     public static int QueuedFixedUpdateCount { get; internal set; }
     public static bool DoFixedUpdate => QueuedFixedUpdateCount > 0;

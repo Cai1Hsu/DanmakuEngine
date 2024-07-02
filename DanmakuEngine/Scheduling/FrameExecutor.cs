@@ -31,13 +31,16 @@ public class FrameExecutor(Action onFrame)
 
     protected readonly StopwatchClock clock = new();
 
-    public Stopwatch TimeSource => clock;
+    public StopwatchClock TimeSource => clock;
 
     public virtual void RunFrame()
     {
         ++FrameCount;
 
-        clock.Update();
+        if (clock.IsPaused)
+            clock.Start();
+        else
+            clock.Update();
 
         // do work
         runFrame.Invoke();

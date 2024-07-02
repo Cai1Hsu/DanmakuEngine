@@ -119,7 +119,7 @@ public class TestTime
             Assert.That(clock.ElapsedSeconds, Is.GreaterThan(lastClockElapsedSeconds).Within(1E-6));
             Assert.That(Time.FixedElapsedSeconds, Is.GreaterThanOrEqualTo(lastFixedElapsedSeconds).Within(1E-6));
             Assert.That(Time.ElapsedSeconds, Is.GreaterThanOrEqualTo(lastElapsedSeconds).Within(1E-6));
-            Assert.That(Time.EngineTimer.Elapsed.TotalSeconds, Is.GreaterThanOrEqualTo(lastEngineElapsedSeconds).Within(1E-6));
+            Assert.That(Time.EngineTimer.ElapsedSeconds, Is.GreaterThanOrEqualTo(lastEngineElapsedSeconds).Within(1E-6));
 
             Assert.That(clock.DeltaTime, Is.Not.Negative);
             Assert.That(Time.UpdateDelta, Is.Not.Negative);
@@ -127,7 +127,7 @@ public class TestTime
             lastClockElapsedSeconds = clock.ElapsedSeconds;
             lastFixedElapsedSeconds = Time.FixedElapsedSeconds;
             lastElapsedSeconds = Time.ElapsedSeconds;
-            lastEngineElapsedSeconds = Time.EngineTimer.Elapsed.TotalSeconds;
+            lastEngineElapsedSeconds = Time.EngineTimer.ElapsedSeconds;
         };
 
         host.OnLoad += _ => clock.Start();
