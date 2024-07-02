@@ -16,7 +16,7 @@ public class StopwatchClock : IClock, ICanStep, IHasPlayback, ICanPause
     public double ElapsedMilliseconds => ElapsedSeconds * 1000;
 
     public double ElapsedSeconds
-        => IsPaused ? _accomulatedSeconds : _accomulatedSeconds + _timePeriod.Elapsed(sourceElapsedSeconds) * _playback;
+        => IsPaused ? _accomulatedSeconds : _accomulatedSeconds + (_timePeriod.Elapsed(sourceElapsedSeconds) * _playback);
 
     public double realElapsedTime => IsPaused ? _accomulatedSeconds : _accomulatedSeconds + _timePeriod.Elapsed(sourceElapsedSeconds);
 
