@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using DanmakuEngine.Allocations;
 using DanmakuEngine.Engine.Platform.Environments;
 using DanmakuEngine.Engine.Platform.Environments.Xdg;
 using DanmakuEngine.Engine.Platform.Linux.X11;
@@ -112,13 +112,13 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
                         var mode = new SDL_DisplayMode
                         {
                             Format = format,
-                            Driverdata = (SDL_DisplayModeData*)Marshal.AllocHGlobal(sizeof(SDL_DisplayModeData)),
+                            Driverdata = (SDL_DisplayModeData*)NativeMemory.Alloc((nuint)sizeof(SDL_DisplayModeData)),
                         };
 
                         if (!setXRandRModeInfo(display, screen, output_info->crtc,
                             output_info->modes[j], ref mode))
                         {
-                            Marshal.FreeHGlobal((IntPtr)mode.Driverdata);
+                            NativeMemory.Free(mode.Driverdata);
                             continue;
                         }
 
