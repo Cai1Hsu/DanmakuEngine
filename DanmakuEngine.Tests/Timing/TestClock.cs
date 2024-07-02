@@ -116,49 +116,43 @@ public class TestClock
     {
         Clock clock = new();
 
+        int count_frame = 0;
+        double current_time = 0;
+
         var game = new TestGame();
 
-        using var host = new TestGameHost(500);
+        using var host = new TestGameHost(5000);
 
-        ManualResetEventSlim tpLock = new(true);
-        host.OnUpdate += _ =>
+        host.OnUpdate += h =>
         {
-            // Wait for thread pool work to finish
-            tpLock.Wait();
+            count_frame += 1;
+
+            if (count_frame < 60)
+            {
+                if (current_time == 0)
+                    current_time = clock.ElapsedSeconds;
+                else
+                    Assert.That(clock.ElapsedSeconds, Is.LessThan(current_time));
+            }
+            else if (count_frame < 120)
+            {
+                clock.Resume();
+            }
+            else if (count_frame < 180)
+            {
+                Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time));
+            }
+            else
+            {
+                h.RequestClose();
+            }
         };
 
-        host.OnLoad += h =>
+        host.OnLoad += _ =>
         {
             clock.Start();
 
-            Task.Run(async () =>
-            {
-                await Task.Delay(10);
-
-                clock.Pause();
-
-                var current_time = clock.ElapsedSeconds;
-
-                await Task.Delay(50);
-
-                tpLock.Reset();
-                {
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
-                    clock.Resume();
-                    Assert.That(clock.ElapsedSeconds, Is.EqualTo(current_time).Within(1E-6));
-                }
-                tpLock.Set();
-
-                await Task.Delay(10);
-
-                tpLock.Reset();
-                {
-                    Assert.That(clock.ElapsedSeconds, Is.GreaterThan(current_time).Within(1E-6));
-                }
-                tpLock.Set();
-
-                h.RequestClose();
-            });
+            clock.Pause();
         };
 
         host.Run(game, defaultProvider);
@@ -317,7 +311,7 @@ public class TestClock
 
         host.OnUpdate += h =>
         {
-            if (Time.ElapsedSeconds > 0.2)
+            if (clock.ElapsedSeconds > 0.2)
             {
                 var current_time = clock.ElapsedSeconds;
 

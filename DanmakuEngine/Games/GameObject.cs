@@ -129,9 +129,6 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
 
     public virtual void FixedUpdateSubtree()
     {
-        Debug.Assert(!isDisposed);
-        Debug.Assert(LoadState == LoadState.Complete);
-
         if (isDisposed)
             return;
 

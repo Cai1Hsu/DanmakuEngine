@@ -10,9 +10,6 @@ namespace DanmakuEngine.Engine;
 
 public partial class GameHost
 {
-    protected long lastUpdateTime = 0;
-    protected long lastRenderTime = 0;
-
     protected ThreadRunner threadRunner = null!;
 
     public virtual void RegisterThreads()

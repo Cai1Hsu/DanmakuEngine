@@ -1,6 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Text;
 using DanmakuEngine.DearImgui;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Dependency;
@@ -216,16 +214,20 @@ public partial class MainScreen : Screen
             ImGui.Text($"    Update: {_updateThread.AverageFramerate:F2}({1000 / _updateThread.AverageFramerate:F2}±{_updateThread.Jitter:F2}ms)");
             ImGui.Text($"    Render: {_renderThread.AverageFramerate:F2}({1000 / _renderThread.AverageFramerate:F2}±{_renderThread.Jitter:F2}ms)");
 
+            ImGui.Text($"    Fixed: {Time.RealFixedUpdateFramerate:F2}({1000 / Time.RealFixedUpdateFramerate:F2}ms±{Time.FixedUpdateJitter:F2}ms)");
+
             ImGui.Separator();
 
             ImGui.Text(@"Time:");
             ImGui.Text($"    FixedUpdateCount: {Time.FixedUpdateCount}");
-            ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds * 1000:F2}ms");
-            ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds * 1000:F2}ms");
+            ImGui.Text($"    FixedElapsedSeconds: {Time.FixedElapsedSeconds:F2}s");
+            ImGui.Text($"    ElapsedSeconds: {Time.ElapsedSeconds:F2}s");
             ImGui.Text($"    UpdateDelta: {Time.UpdateDelta * 1000:F2}ms");
+            ImGui.Text($"    LastFixedUpdateSecondsWithErrors: {Time.LastFixedUpdateTimeWithErrors * 1000:F2}ms");
+            ImGui.Text($"    ExcessFixedFrameTime: {Time.ExcessFixedFrameTime * 1000:F2}ms");
 
-            ImGui.Text($"    App time: {Time.AppTimer.GetElapsedMilliseconds():F2}ms");
-            ImGui.Text($"    Engine time: {Time.EngineTimer.GetElapsedMilliseconds():F2}ms");
+            ImGui.Text($"    App time: {Time.AppTimer.ElapsedSeconds:F2}s");
+            ImGui.Text($"    Engine time: {Time.EngineTimer.ElapsedSeconds:F2}s");
 
             ImGui.Separator();
 
@@ -234,6 +236,14 @@ public partial class MainScreen : Screen
 
             if (ImGui.Button("Exit Game"))
                 _host.RequestClose();
+
+            if (ImGui.Button("Block Update"))
+                _blockUpdate = !_blockUpdate;
+
+            if (_blockUpdate)
+                ImGui.Text("Update blocked");
+
+            ImGui.Separator();
 
             ImGui.Text(string_with_cjk);
         };
@@ -318,5 +328,10 @@ Marisa Kirisame
     {
         // foreach (var transformation in transformations)
         //     transformation.Update(clock.DeltaTime * 1000);
+
+        if (_blockUpdate)
+            Thread.Sleep(50);
     }
+
+    private bool _blockUpdate = false;
 }

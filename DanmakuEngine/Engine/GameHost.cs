@@ -197,44 +197,119 @@ public partial class GameHost : Time, IDisposable
         Logger.Debug("Everything is ready, let's go!");
     }
 
-    private double lastFixedUpdateElapsedSeconds = 0;
+    private long lastFrameFixedUpdateCount = 0;
+    private double lastFrameTime = 0;
+    private void PreUpdate()
+    {
+        bool didFixedUpdate = lastFrameFixedUpdateCount != FixedUpdateCount;
+
+        double currentTime = EngineTimer.ElapsedSeconds;
+
+        QueuedFixedUpdateCount = (int)((currentTime - LastFixedUpdateTimeWithErrors) / FixedUpdateDeltaNonScaled);
+        if (DoFixedUpdate)
+        {
+            // Sometimes the Update ended after the next FixedUpdate should start
+            // When we execute the next FixedUpdate, the ElapsedSeconds will be pull back to the last FixedUpdate
+            // We want to fake a time for next frame to keep the time consistent
+            var deltaNonScaled = (FixedUpdateDeltaNonScaled * (FixedUpdateCount + QueuedFixedUpdateCount)) - ElapsedSecondsNonScaled;
+            var delta = (FixedUpdateDelta * (FixedUpdateCount + QueuedFixedUpdateCount)) - ElapsedSeconds;
+
+            Debug.Assert(deltaNonScaled >= 0);
+            Debug.Assert(delta >= 0);
+
+            UpdateDeltaNonScaled = deltaNonScaled;
+            UpdateDeltaNonScaledF = (float)deltaNonScaled;
+
+            UpdateDelta = delta;
+            UpdateDeltaF = (float)delta;
+        }
+        else
+        {
+            var timeSinceLastFixedUpdate = currentTime - RealLastFixedUpdateTime;
+
+            var deltaNonScaled = didFixedUpdate
+                ? timeSinceLastFixedUpdate
+                : currentTime - lastFrameTime;
+
+            Debug.Assert(timeSinceLastFixedUpdate >= 0);
+            Debug.Assert(deltaNonScaled >= 0);
+
+            var delta = deltaNonScaled;
+
+            UpdateDeltaNonScaled = deltaNonScaled;
+            UpdateDeltaNonScaledF = (float)deltaNonScaled;
+
+            UpdateDelta = delta;
+            UpdateDeltaF = (float)delta;
+
+            ElapsedSecondsNonScaled += deltaNonScaled;
+            ElapsedSeconds += delta;
+        }
+
+        lastFrameTime = currentTime;
+        lastFrameFixedUpdateCount = FixedUpdateCount;
+    }
+
     protected void Update()
     {
+        PreUpdate();
+
         if (_root == null)
             return;
 
-        Imgui.Update();
+        int fixedUpdateCount = 0;
 
-        int updateCount = 0;
-        while (MeasuredFixedUpdateElapsedSeconds + FixedUpdateDeltaNonScaled
-            < EngineTimer.GetElapsedSeconds())
+        while (DoFixedUpdate)
         {
             // never allow FixedUpdate blocks the game logic too heavily
-            if (updateCount > 5)
+            if (fixedUpdateCount > 5)
             {
                 // if we are too far behind, just skip the update
                 // And add the floored skipped frames to the count
                 // This ensures the Time.ElapsedSeconds is always correct
-                var skipped = (int)((EngineTimer.GetElapsedSeconds() - MeasuredFixedUpdateElapsedSeconds) / FixedUpdateDeltaNonScaled);
-
+                var skipped = QueuedFixedUpdateCount;
                 FixedUpdateCount += skipped;
+                QueuedFixedUpdateCount = 0;
 
-                MeasuredFixedUpdateElapsedSeconds += FixedUpdateDeltaNonScaled * skipped;
+                ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
+                ElapsedSeconds = FixedElapsedSeconds;
 
+#if DEBUG
+                Logger.Warn($"Skipped {skipped} FixedUpdate frames");
+#endif
                 break;
             }
-            updateCount++;
 
             _root.FixedUpdateSubtree();
 
+            double engineElapsed = EngineTimer.ElapsedSeconds;
+
             // Must do this before the FixedElapsedSecondsNonScaled is updated
-            MeasuredFixedUpdateElapsedSeconds = FixedElapsedSecondsNonScaled + (EngineTimer.GetElapsedSeconds() - lastFixedUpdateElapsedSeconds);
-            lastFixedUpdateElapsedSeconds = EngineTimer.GetElapsedSeconds();
+            RealFixedUpdateDelta = engineElapsed - RealLastFixedUpdateTime;
+            ExcessFixedFrameTime = FixedUpdateDeltaNonScaled - RealFixedUpdateDelta;
+            RealLastFixedUpdateTime = engineElapsed;
 
             FixedUpdateCount++;
+            fixedUpdateCount++;
+            QueuedFixedUpdateCount--;
+
+            ElapsedSecondsNonScaled = FixedElapsedSecondsNonScaled;
+            ElapsedSeconds = FixedElapsedSeconds;
+
+            UpdateThread.OnFixedUpdate();
         }
 
+        Debug.Assert(QueuedFixedUpdateCount == 0);
+
+        if (fixedUpdateCount > 1)
+            Logger.Warn($"FixedUpdate took {fixedUpdateCount} frames to catch up");
+
+        Debug.Assert(ElapsedSecondsNonScaled >= FixedElapsedSecondsNonScaled);
+        Debug.Assert(ElapsedSecondsNonScaled <= FixedElapsedSecondsNonScaled + FixedUpdateDeltaNonScaled);
+
         _root.UpdateSubTree();
+
+        Imgui.Update();
     }
 
     // private DrawableContainer DrawRoot = null!;
@@ -282,7 +357,7 @@ public partial class GameHost : Time, IDisposable
                 Console.CancelKeyPress += (_, e) =>
                 {
                     if (lastCancelPress is not null &&
-                        EngineTimer.Elapsed.TotalSeconds - lastCancelPress < 1)
+                        AppTimer.ElapsedSeconds - lastCancelPress < 1)
                     {
                         Logger.Warn("Exiting...");
                     }
@@ -291,7 +366,7 @@ public partial class GameHost : Time, IDisposable
                         RequestClose();
 
                         e.Cancel = true;
-                        lastCancelPress = EngineTimer.Elapsed.TotalSeconds;
+                        lastCancelPress = AppTimer.ElapsedSeconds;
                         Logger.Warn("Press Ctrl+C again to force exit.");
                     }
 

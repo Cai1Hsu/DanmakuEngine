@@ -2,7 +2,7 @@ namespace DanmakuEngine.Timing;
 
 public interface IHasPlayback
 {
-    public double Playback => 1;
+    public double Playback { get; }
 
     public void SetPlayback(double playback, bool bypassCheck);
 

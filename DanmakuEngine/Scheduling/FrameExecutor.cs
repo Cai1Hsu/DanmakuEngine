@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using DanmakuEngine.Allocations;
 using DanmakuEngine.Timing;
 
@@ -30,11 +31,16 @@ public class FrameExecutor(Action onFrame)
 
     protected readonly StopwatchClock clock = new();
 
+    public StopwatchClock TimeSource => clock;
+
     public virtual void RunFrame()
     {
         ++FrameCount;
 
-        clock.Update();
+        if (clock.IsPaused)
+            clock.Start();
+        else
+            clock.Update();
 
         // do work
         runFrame.Invoke();

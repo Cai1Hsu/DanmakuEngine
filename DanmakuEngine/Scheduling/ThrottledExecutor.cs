@@ -51,6 +51,8 @@ public class ThrottledExecutor : FrameExecutor
         }
     }
 
+    protected virtual double excessFrameTime => (1000.0 / Hz) - (DeltaTime * 1000);
+
     private double accumulatedSleepError;
 
     private void throttle()
@@ -58,8 +60,6 @@ public class ThrottledExecutor : FrameExecutor
         double excessFrameTime = (1000.0 / Hz) - (DeltaTime * 1000);
 
         SleptMilliseconds = sleepAndUpdateCurrent(Math.Max(0, excessFrameTime + accumulatedSleepError));
-
-        // Logger.Log($"Slept {SleptMilliseconds:F4}ms, ExcessFrameTime {excessFrameTime:F4}ms, AccumulatedSleepError {accumulatedSleepError:F4}ms, DeltaTime: {DeltaTime:F4}ms");
 
         accumulatedSleepError += excessFrameTime - SleptMilliseconds;
 
