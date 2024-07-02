@@ -4,10 +4,10 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 {
     #region IClock
     /// <summary>
-    /// Represents the current time of the clock in seconds. 
+    /// Represents the current time of the clock in seconds.
     /// This time can be affected by <see cref="Playback"/> and <seealso cref="SetPlayback"/>
     /// </summary>
-    public double ElapsedSeconds => _accomulatedTime + (IsPaused ? 0 : currentPeriodElapsedTime);
+    public double ElapsedSeconds => _accomulatedSeconds + (IsPaused ? 0 : currentPeriodElapsedTime);
 
     private double realElapsedTime => Time.ElapsedSeconds - _startTime;
 
@@ -29,7 +29,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
     private double _startTime;
 
-    private double _accomulatedTime = 0;
+    private double _accomulatedSeconds = 0;
 
     public bool IsPaused
     {
@@ -45,7 +45,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// <summary>
     /// You may want to use this because the delta time is affected by the playback.
     /// This is helpful when you want to make a slow motion effect.
-    /// 
+    ///
     /// In seconds.
     /// </summary>
     public double DeltaTime
@@ -73,7 +73,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     {
         _startTime = Time.ElapsedSeconds;
 
-        _accomulatedTime = 0;
+        _accomulatedSeconds = 0;
 
         _state = ClockState.Paused;
     }
@@ -85,7 +85,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// </summary>
     public void Pause()
     {
-        _accomulatedTime = this.ElapsedSeconds;
+        _accomulatedSeconds = this.ElapsedSeconds;
 
         _state = ClockState.Paused;
     }
@@ -142,7 +142,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
 
         // accomulate time before _playback was changed.
         // it changes CurrentTime calculation
-        _accomulatedTime = this.ElapsedSeconds;
+        _accomulatedSeconds = this.ElapsedSeconds;
 
         _playback = playback;
 
@@ -161,28 +161,28 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
     /// </summary>
     /// <param name="seconds"> The time to step in in seconds. </param>
     public void StepIn(double seconds)
-        => _accomulatedTime += seconds;
+        => _accomulatedSeconds += seconds;
 
     /// <summary>
     /// Step out the clock by a specific time.
     /// This will throw an exception if the result is negative.
     /// </summary>
-    /// <param name="seconds"> The time to step out in seconds. </param> 
-    /// <exception cref="ArgumentException"> If the result is negative. </exception> 
+    /// <param name="seconds"> The time to step out in seconds. </param>
+    /// <exception cref="ArgumentException"> If the result is negative. </exception>
     public void StepOut(double seconds)
     {
-        if (_accomulatedTime < seconds)
+        if (_accomulatedSeconds < seconds)
         {
             // let's try accomulate time
             // and see if it's enough to step out
-            _accomulatedTime = this.ElapsedSeconds;
+            _accomulatedSeconds = this.ElapsedSeconds;
             _startTime = Time.ElapsedSeconds;
 
-            if (_accomulatedTime < seconds)
-                throw new ArgumentException($"Cannot step out more than the accomulated time, accomulated time: {_accomulatedTime}, step out time: {seconds}.");
+            if (_accomulatedSeconds < seconds)
+                throw new ArgumentException($"Cannot step out more than the accomulated time, accomulated time: {_accomulatedSeconds}, step out time: {seconds}.");
         }
 
-        _accomulatedTime -= seconds;
+        _accomulatedSeconds -= seconds;
     }
 
     #endregion
@@ -220,7 +220,7 @@ public class Clock : IClock, ICanStep, IHasPlayback, ICanTheWorld
         _startTime = Time.ElapsedSeconds;
 
         // accomulate the extra time
-        _accomulatedTime += ((Time.ElapsedSeconds - _theworldStartTime) - _theworldTime) * Playback;
+        _accomulatedSeconds += ((Time.ElapsedSeconds - _theworldStartTime) - _theworldTime) * Playback;
     }
 
     private bool isTheWorldFinished()
