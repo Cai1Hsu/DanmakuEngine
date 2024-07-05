@@ -6,7 +6,7 @@ namespace DanmakuEngine.Allocations;
 
 public static unsafe class NativeMemory
 {
-    private static bool _supportUcrt = false;
+    private static readonly bool _supportUcrt;
 
     static NativeMemory()
     {
