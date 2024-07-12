@@ -180,22 +180,22 @@ public unsafe class Sdl2Window : IWindow
                 // we should only handle the event once
                 // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case (uint)EventType.Keydown:
-                    {
-                        if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
-                            break;
-                        if (KeyDown?.Invoke(e->Key) is not true)
-                            KeyEvent?.Invoke(e->Key);
-                    }
-                    break;
+                {
+                    if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
+                        break;
+                    if (KeyDown?.Invoke(e->Key) is not true)
+                        KeyEvent?.Invoke(e->Key);
+                }
+                break;
 
                 case (uint)EventType.Keyup:
-                    {
-                        if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
-                            break;
-                        if (KeyUp?.Invoke(e->Key) is not true)
-                            KeyEvent?.Invoke(e->Key);
-                    }
-                    break;
+                {
+                    if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
+                        break;
+                    if (KeyUp?.Invoke(e->Key) is not true)
+                        KeyEvent?.Invoke(e->Key);
+                }
+                break;
 
                 case (uint)EventType.Textinput:
                     if (!imguiMagic || !Imgui.EatTextInputEvents(e->Text))
