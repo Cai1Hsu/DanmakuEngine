@@ -53,8 +53,6 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
         if (Initialized)
             return;
 
-        var _ = _sdl.GLLoadLibrary(0);
-
         Logger.Debug("Initializing Silk.NET OpenGL Renderer");
 
         var glApiFetch = new Func<GL>[]
@@ -82,14 +80,12 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
             {
                 return (_gl = glFetch()) != null;
             }
-#pragma warning disable CS0168
             catch (Exception e)
             {
 #if DEBUG
                 Logger.Debug($"Failed to fetch GL Api: {e.Message}");
 #endif // DEBUG
             }
-#pragma warning restore CS0168
 
             return false;
         });

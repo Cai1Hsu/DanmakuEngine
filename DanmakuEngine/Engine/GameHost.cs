@@ -744,7 +744,7 @@ public unsafe partial class GameHost
             Logger.Warn($"No avaliable display mode found for target size {expected.W}x{expected.H}. Using closest mode.");
 
             // TODO: currently only support primary display
-            _sdl.GetClosestDisplayMode(0, expected, &closest);
+            _sdl.GetClosestDisplayMode(0, in expected, &closest);
         }
 
         _sdl.SetWindowDisplayMode(window.Window, &closest);

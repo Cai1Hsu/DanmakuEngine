@@ -44,7 +44,8 @@ internal class ImguiFontTexture : IDisposable
         SetWrap(TextureCoordinate.S, TextureWrapMode.Repeat);
         SetWrap(TextureCoordinate.T, TextureWrapMode.Repeat);
 
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLevel, MipmapLevels - 1);
+        var level = MipmapLevels - 1;
+        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLevel, &level);
     }
 
     public void Bind()
@@ -54,12 +55,18 @@ internal class ImguiFontTexture : IDisposable
 
     public void SetMinFilter(TextureMinFilter filter)
     {
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinFilter, (int)filter);
+        unsafe
+        {
+            _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinFilter, (int*)&filter);
+        }
     }
 
     public void SetMagFilter(TextureMagFilter filter)
     {
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMagFilter, (int)filter);
+        unsafe
+        {
+            _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMagFilter, (int*)&filter);
+        }
     }
 
     public void SetAnisotropy(float level)
@@ -71,14 +78,17 @@ internal class ImguiFontTexture : IDisposable
 
     public void SetLod(int @base, int min, int max)
     {
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureLodBias, @base);
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinLod, min);
-        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLod, max);
+        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureLodBias, in @base);
+        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMinLod, in min);
+        _gl.TexParameterI(GLEnum.Texture2D, TextureParameterName.TextureMaxLod, in max);
     }
 
     public void SetWrap(TextureCoordinate coord, TextureWrapMode mode)
     {
-        _gl.TexParameterI(GLEnum.Texture2D, (TextureParameterName)coord, (int)mode);
+        unsafe
+        {
+            _gl.TexParameterI(GLEnum.Texture2D, (TextureParameterName)coord, (int*)&mode);
+        }
     }
 
     public void Dispose()
