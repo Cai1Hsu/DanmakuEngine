@@ -139,7 +139,7 @@ public unsafe class Sdl2Window : IWindow
             onFrame.Invoke();
         } while (exists && condition.Invoke());
 
-        OnClose?.Invoke();
+        OnExit?.Invoke();
     }
 
     public void RequestClose()
@@ -159,6 +159,8 @@ public unsafe class Sdl2Window : IWindow
     {
         Event* e = stackalloc Event[1];
 
+        bool imguiMagic = checkImGuiMagic();
+
         while (_sdl.PollEvent(e) != 0)
         {
             switch (e->Type)
@@ -169,31 +171,34 @@ public unsafe class Sdl2Window : IWindow
 
                 case (uint)EventType.AppTerminating:
                 case (uint)EventType.Quit:
-                    RequestClose();
+                    if (OnClose is null)
+                        RequestClose();
+                    else if (!OnClose.Invoke())
+                        RequestClose();
                     break;
 
                 // we should only handle the event once
                 // and KeyDown(KeyUp) should has higher priority than KeyEvent as it is Engine level
                 case (uint)EventType.Keydown:
-                {
-                    if (checkImGuiMagic() && Imgui.EatKeyboardEvents(e->Key))
-                        break;
-                    if (KeyDown?.Invoke(e->Key) is not true)
-                        KeyEvent?.Invoke(e->Key);
-                }
-                break;
+                    {
+                        if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
+                            break;
+                        if (KeyDown?.Invoke(e->Key) is not true)
+                            KeyEvent?.Invoke(e->Key);
+                    }
+                    break;
 
                 case (uint)EventType.Keyup:
-                {
-                    if (checkImGuiMagic() && Imgui.EatKeyboardEvents(e->Key))
-                        break;
-                    if (KeyUp?.Invoke(e->Key) is not true)
-                        KeyEvent?.Invoke(e->Key);
-                }
-                break;
+                    {
+                        if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
+                            break;
+                        if (KeyUp?.Invoke(e->Key) is not true)
+                            KeyEvent?.Invoke(e->Key);
+                    }
+                    break;
 
                 case (uint)EventType.Textinput:
-                    if (!checkImGuiMagic() || !Imgui.EatTextInputEvents(e->Text))
+                    if (!imguiMagic || !Imgui.EatTextInputEvents(e->Text))
                         TextInput?.Invoke(e->Text);
                     break;
 
@@ -213,12 +218,12 @@ public unsafe class Sdl2Window : IWindow
                     break;
 
                 case (uint)EventType.Mousebuttondown:
-                    if (!checkImGuiMagic() || !Imgui.EatMouseButtonEvents(e->Button))
+                    if (!imguiMagic || !Imgui.EatMouseButtonEvents(e->Button))
                         MouseButtonDown?.Invoke(e->Button);
                     break;
 
                 case (uint)EventType.Mousebuttonup:
-                    if (!checkImGuiMagic() || !Imgui.EatMouseButtonEvents(e->Button))
+                    if (!imguiMagic || !Imgui.EatMouseButtonEvents(e->Button))
                         MouseButtonUp?.Invoke(e->Button);
                     break;
 
@@ -227,7 +232,7 @@ public unsafe class Sdl2Window : IWindow
                     break;
 
                 case (uint)EventType.Mousewheel:
-                    if (!checkImGuiMagic() || !Imgui.EatMouseWheelEvents(e->Wheel))
+                    if (!imguiMagic || !Imgui.EatMouseWheelEvents(e->Wheel))
                         MouseScroll?.Invoke(e->Wheel);
                     break;
 
@@ -350,7 +355,15 @@ public unsafe class Sdl2Window : IWindow
 
     // public event Action<double>? OnDraw = null!;
 
-    public event Action? OnClose = null!;
+    /// <summary>
+    /// This event is called when the window is about to be closed
+    /// </summary>
+    public event Action? OnExit = null!;
+
+    /// <summary>
+    /// Is called when a close event is received. return true to block the close event
+    /// </summary>
+    public Func<bool>? OnClose { get; set; } = null!;
 
     #region Input Events
 
