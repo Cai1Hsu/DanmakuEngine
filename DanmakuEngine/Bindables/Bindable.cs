@@ -382,6 +382,17 @@ public class Bindable<T>
         return newBindable;
     }
 
+    /// <summary>
+    /// Create a bound clone of this bindable.
+    /// </summary>
+    /// <returns>the cloned bindable</returns>
+    public Bindable<T> GetBoundCopy()
+    {
+        var newBindable = CreateInstance();
+        newBindable.BindTo(this);
+        return newBindable;
+    }
+
     /// <inheritdoc cref="CreateInstance"/>
     protected virtual Bindable<T> CreateInstance() => new Bindable<T>();
 
