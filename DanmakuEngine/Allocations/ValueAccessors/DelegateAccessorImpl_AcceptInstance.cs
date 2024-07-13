@@ -1,8 +1,6 @@
-using DanmakuEngine.Allocations.ValueAccessors;
+namespace DanmakuEngine.Allocations.ValueAccessors;
 
-namespace DanmakuEngine.Allocations;
-
-public class DelegateAccessorImpl_AcceptInstance<TValue, TInstance> : IAccessor<TValue>
+internal class DelegateAccessorImpl_AcceptInstance<TValue, TInstance> : IAccessor<TValue>
 {
     private Func<TInstance, TValue> _getter;
     private Action<TInstance, TValue> _setter;
