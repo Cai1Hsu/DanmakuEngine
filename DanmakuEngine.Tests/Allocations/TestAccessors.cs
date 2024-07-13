@@ -49,10 +49,23 @@ public class TestAccessors
     }
 
     [Test]
-    public void TestRefAccessor_AccessFieldsThroughUnsafeAccessor()
+    public void TestRefAccessor_UnsafeAccessorStoreInstance()
     {
         var testClass = new TestClass(0, 0);
-        var accessor = new RefAccessor<int>(() => ref ReadTestClassField(testClass));
+        var accessor = RefAccessor<int>.Create(testClass, ReadTestClassField);
+
+        Assert.That(accessor.Value, Is.EqualTo(0));
+
+        accessor.Value = 42;
+
+        Assert.That(testClass._value, Is.EqualTo(42));
+    }
+
+    [Test]
+    public void TestRefAccessor_UnsafeAccessorStoreInstanceWithInClosure()
+    {
+        var testClass = new TestClass(0, 0);
+        var accessor = RefAccessor<int>.Create(() => ref ReadTestClassField(testClass));
 
         Assert.That(accessor.Value, Is.EqualTo(0));
 
@@ -65,7 +78,7 @@ public class TestAccessors
     private static extern ref int ReadTestClassField(TestClass testClass);
 
     [Test]
-    public void TestUnsafeAccessor_AccessPropertiesWithInstanceStored()
+    public void TestUnsafeAccessor_WithInstanceStored()
     {
         var testClass = new TestClass(0, 0);
         var accessor = DelegateAccessor<int>.Create(testClass, ReadTestClassProperty, WriteTestClassProperty);
@@ -78,7 +91,7 @@ public class TestAccessors
     }
 
     [Test]
-    public void TestUnsafeAccessor_NotStoreInstance()
+    public void TestUnsafeAccessor_StoreInstanceInClosure()
     {
         var testClass = new TestClass(0, 0);
         var accessor = DelegateAccessor<int>.Create(() => ReadTestClassProperty(testClass), v => WriteTestClassProperty(testClass, v));
