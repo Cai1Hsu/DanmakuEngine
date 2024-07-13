@@ -173,7 +173,9 @@ public partial class GameHost : Time, IDisposable
         {
             Children =
             {
-                (ScreenStack = new(Root))
+                // Inputs should be updated first
+                (InputManager = new InputManager()),
+                (ScreenStack = new(Root)),
             }
         };
 
@@ -184,12 +186,14 @@ public partial class GameHost : Time, IDisposable
 
         if (window is not null)
         {
-            InputManager = new InputManager();
-
             Dependencies.Cache(InputManager);
 
-            InputManager.RegisterHandlers(this);
+            // Only window exists can we register events for it
+            // But handlers still run, as long as we feed events manually
+            InputManager.Register(this);
         }
+
+        Dependencies.Cache(InputManager);
 
         Game.prelude();
         ScreenStack.Push(Game.EntryScreen);

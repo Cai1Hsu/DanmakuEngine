@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
-using DanmakuEngine.Input.Handlers;
-using DanmakuEngine.Input.Keybards;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;
@@ -14,8 +12,6 @@ public partial class Screen : CompositeDrawable
     public override ScreenStack Parent => _parent;
 
     protected ScreenStack ScreenStack => Parent;
-
-    public KeyboardHandler keyboardHandler = null!;
 
     /// <summary>
     /// The clock for the screen
@@ -73,8 +69,6 @@ public partial class Screen : CompositeDrawable
         var _ = Clock;
 
         base.load();
-
-        keyboardHandler?.RegisterKeys();
     }
 
     public virtual void OnScreenLeaving()
