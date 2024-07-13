@@ -7,7 +7,7 @@ internal class DelegateAccessorImpl_AcceptInstance<TValue, TInstance> : IAccesso
 
     private TInstance _instance;
 
-    public DelegateAccessorImpl_AcceptInstance(TInstance instance, Func<TInstance, TValue> getter, Action<TInstance, TValue>  setter)
+    public DelegateAccessorImpl_AcceptInstance(TInstance instance, Func<TInstance, TValue> getter, Action<TInstance, TValue> setter)
     {
         ArgumentNullException.ThrowIfNull(getter, nameof(getter));
         ArgumentNullException.ThrowIfNull(setter, nameof(setter));
