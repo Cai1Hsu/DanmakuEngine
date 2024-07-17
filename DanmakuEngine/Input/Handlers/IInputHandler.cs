@@ -6,7 +6,7 @@ using DanmakuEngine.Input.Events;
 
 namespace DanmakuEngine.Input.Handlers;
 
-public interface IInputHandler : IInjectable
+public interface IInputHandler
 {
     public Bindable<bool> Enabled { get; }
 

@@ -41,8 +41,6 @@ public partial class InputManager : GameObject
         {
             Logger.Debug($"Registering {h.GetType()}");
 
-            h.AutoInject();
-
             h.Register(host);
         }
 
