@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using DanmakuEngine.Allocations;
-using DanmakuEngine.Input;
 using DanmakuEngine.Dependency;
+using DanmakuEngine.Input;
 using DanmakuEngine.Input.EventReceivers;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
