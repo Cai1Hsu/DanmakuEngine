@@ -1,5 +1,8 @@
 using System.Diagnostics;
 using DanmakuEngine.Allocations;
+using DanmakuEngine.Input;
+using DanmakuEngine.Dependency;
+using DanmakuEngine.Input.EventReceivers;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Scheduling;
 using DanmakuEngine.Timing;
@@ -25,6 +28,15 @@ public class GameObject(LoadState loadState = LoadState.NotLoaded) : IDisposable
             return;
 
         LoadState = LoadState.Ready;
+
+        if (this is IInjectable injectable)
+            injectable.AutoInject();
+
+        if (this is IReceiveEvent eventReceiver)
+        {
+            eventReceiver.InputManager = InputManager.GetInputManager();
+            eventReceiver.InputManager.RegisterReceiver(eventReceiver);
+        }
 
         Load();
 

@@ -58,10 +58,6 @@ public partial class Screen : CompositeDrawable
 
     protected override void load()
     {
-        // we make the Screen base class injectable
-        if (this is IInjectable injectable)
-            injectable.AutoInject();
-
         // we dont have to assert as early as in the constructor
         Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
 

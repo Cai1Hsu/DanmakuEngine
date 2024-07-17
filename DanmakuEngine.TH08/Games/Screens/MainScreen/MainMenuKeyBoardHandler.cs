@@ -1,16 +1,15 @@
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
-using DanmakuEngine.Input.Keybards;
+using DanmakuEngine.Input;
+using DanmakuEngine.Input.EventReceivers;
+using DanmakuEngine.Input.Events.Mouse;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
 
-public partial class MainMenuKeyBoardHandler : KeyboardHandler
+public partial class MainMenuKeyBoardHandler : GameObject, IReceiveKeyboardEvent
 {
-    [Inject]
-    private ScreenStack _screens = null!;
-
     [Inject]
     private GameHost _host = null!;
 
@@ -18,17 +17,14 @@ public partial class MainMenuKeyBoardHandler : KeyboardHandler
 
     private bool cheating = false;
 
-    public override void RegisterKeys()
+    public bool Active => true;
+
+    public uint Priority => 100;
+
+    public InputManager InputManager { get; set; } = null!;
+
+    protected override void Start()
     {
-        // DEMO: Pressing escape closes the game
-        Register(KeyCode.KEscape).OnDown += (_, _) =>
-        {
-            while (!_screens.Empty())
-                _screens.Pop();
-
-            _host.RequestClose();
-        };
-
         secretCodeHandler.OnSecretCodeEntered += delegate
         {
             Logger.Error("😠 You are cheating!");
@@ -36,15 +32,17 @@ public partial class MainMenuKeyBoardHandler : KeyboardHandler
         };
     }
 
-    public override bool HandleEvent(KeyboardEvent e)
+    public void OnKeyDown(KeyDownEvent e, ref bool handled)
     {
-        var handled = base.HandleEvent(e);
+        if (!cheating)
+            handled |= secretCodeHandler.HandleKey(e.Button);
+        if (e.Button is Keys.Escape)
+            _host.RequestClose();
 
-        handled |= !cheating &&
-                   secretCodeHandler is not null &&
-                   IsKeyDown(e) &&
-                   secretCodeHandler.HandleKey((KeyCode)e.Keysym.Sym);
+        Logger.Debug($"MainMenuKeyBoardHandler: Handled key: {e.Button}, {cheating}");
+    }
 
-        return handled;
+    public void OnKeyUp(KeyUpEvent e, ref bool handled)
+    {
     }
 }
