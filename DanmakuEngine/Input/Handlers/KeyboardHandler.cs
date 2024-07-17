@@ -32,20 +32,22 @@ public partial class KeyboardHandler : InputHandlerBase
     {
         var keycode = sym.Sym;
 
-        if (keycode >= (int)SDL_KeyCode.K0 && keycode <= (int)SDL_KeyCode.K9)
-            return Keys.Number0 + (keycode - (int)SDL_KeyCode.K0);
-
         if (keycode >= (int)SDL_KeyCode.KA && keycode <= (int)SDL_KeyCode.KZ)
             return Keys.A + (keycode - (int)SDL_KeyCode.KA);
 
-        if (keycode >= (int)SDL_KeyCode.KF1 && keycode <= (int)SDL_KeyCode.KF24)
-            return Keys.F1 + (keycode - (int)SDL_KeyCode.KF1);
+        if (keycode >= (int)SDL_KeyCode.K0 && keycode <= (int)SDL_KeyCode.K9)
+            return Keys.Number0 + (keycode - (int)SDL_KeyCode.K0);
 
-        if (keycode >= (int)SDL_KeyCode.KKP0 && keycode <= (int)SDL_KeyCode.KKP9)
-            return Keys.Keypad0 + (keycode - (int)SDL_KeyCode.KKP0);
+        if (keycode >= (int)SDL_KeyCode.KKP1 && keycode <= (int)SDL_KeyCode.KKP9)
+            return Keys.Keypad1 + (keycode - (int)SDL_KeyCode.KKP1);
+
+        if (keycode >= (int)SDL_KeyCode.KF1 && keycode <= (int)SDL_KeyCode.KF12)
+            return Keys.F1 + (keycode - (int)SDL_KeyCode.KF1);
 
         return keycode switch
         {
+            (int)SDL_KeyCode.KKP0 => Keys.Keypad0,
+            (int)SDL_KeyCode.KKPPeriod => Keys.KeypadDecimal,
             (int)SDL_KeyCode.KTab => Keys.Tab,
             (int)SDL_KeyCode.KLeft => Keys.Left,
             (int)SDL_KeyCode.KRight => Keys.Right,
