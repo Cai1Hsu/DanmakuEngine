@@ -326,11 +326,9 @@ public class RBTree<T> : IEnumerable<RBTreeNode<T>>
 
     public void CopyTo(T[] array, int arrayIndex)
     {
-        if (array is null)
-            throw new ArgumentNullException(nameof(array));
+        ArgumentNullException.ThrowIfNull(array);
 
-        if (arrayIndex >= array.Length)
-            throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(arrayIndex, array.Length);
 
         foreach (var item in this)
         {
