@@ -16,8 +16,8 @@ public class GameViewport
 
     public Vector2D<float> ToWorldSpace(Vector2D<float> vector)
         => new Vector2D<float>(
-            (vector.X - Size.X / 2) * 640.0f / Size.X,
-            (Size.Y / 2 - vector.Y) * 480.0f / Size.Y
+            (vector.X - (Size.X / 2)) * 640.0f / Size.X,
+            ((Size.Y / 2) - vector.Y) * 480.0f / Size.Y
         );
 
     public void UpdateSize(Vector2D<float> size)
