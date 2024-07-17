@@ -16,7 +16,7 @@ public class MouseUpEvent : IMouseEvent
     // TODO: store the position of the mouse when the event was fired
     // public Vector2D<float> Position { get; set; }
 
-    public bool Apply(InputState inputState, IHandleInputState handler)
+    public bool Apply(InputState inputState)
     {
         inputState.Mouse.LastEvent = this;
         return inputState.Mouse.SetPressed(Button, false);

@@ -17,7 +17,7 @@ public class KeyDownEvent : IKeyEvent
 
     public bool IsRepeatInput { get; set; }
 
-    public bool Apply(InputState inputState, IHandleInputState handler)
+    public bool Apply(InputState inputState)
     {
         inputState.Keyboard.LastEvent = this;
         return inputState.Keyboard.SetPressed(Button, true);

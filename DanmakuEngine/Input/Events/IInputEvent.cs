@@ -9,5 +9,5 @@ public interface IInputEvent
     /// </summary>
     public uint Timestamp { get; }
 
-    public bool Apply(InputState inputState, IHandleInputState handler);
+    public bool Apply(InputState inputState);
 }

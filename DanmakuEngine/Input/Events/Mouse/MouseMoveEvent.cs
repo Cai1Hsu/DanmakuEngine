@@ -21,7 +21,7 @@ public class MouseMoveEvent : IMouseEvent
     /// </summary>
     public Vector2D<float> Delta { get; set; }
 
-    public bool Apply(InputState inputState, IHandleInputState handler)
+    public bool Apply(InputState inputState)
     {
         if (Delta == Vector2D<float>.Zero)
             return false;
