@@ -57,32 +57,7 @@ public partial class InputManager : GameObject
     }
 
     [Inject]
-    private Sdl2Window _window = null!;
-
-    private Vector2D<float>? _pendingWindowSize = null;
-    private Vector2D<float> _windowSize = Vector2D<float>.Zero;
-    protected override void Start()
-    {
-        _window.WindowSizeChanged += (x, y) => _pendingWindowSize = new Vector2D<float>(x, y);
-
-        var windowSize = _window.Size;
-
-        _windowSize = new Vector2D<float>(windowSize.X, windowSize.Y);
-    }
-
-    protected override void LateUpdate()
-    {
-        if (_pendingWindowSize.HasValue)
-        {
-            _windowSize = _pendingWindowSize.Value;
-        }
-    }
-
-    private Vector2D<float> toWorldSpace(Vector2D<float> vector)
-        => new Vector2D<float>(
-            (vector.X - _windowSize.X / 2) * 640.0f / _windowSize.X,
-            (_windowSize.Y / 2 - vector.Y) * 480.0f / _windowSize.Y
-        );
+    private GameViewport _viewport = null!;
 
     protected override void Update()
     {
@@ -115,7 +90,7 @@ public partial class InputManager : GameObject
 
                 case MouseMoveEvent mouseMoveEvent:
                     var mousePosition = State.Mouse.Position;
-                    var worldPosition = toWorldSpace(mousePosition);
+                    var worldPosition = _viewport.ToWorldSpace(mousePosition);
                     traverseReceivers(receiver =>
                     {
                         if (receiver is IReceiveMouseInput mouseInputReceiver)

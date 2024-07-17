@@ -89,6 +89,8 @@ public partial class GameHost : Time, IDisposable
 
     public EngineState State { get; protected set; } = EngineState.Created;
 
+    public GameViewport Viewport { get; private set; } = null!;
+
     public string DefaultWindowTitle
     {
         get
@@ -184,13 +186,23 @@ public partial class GameHost : Time, IDisposable
 
         RegisterEvents();
 
+        Viewport = new GameViewport();
+
         if (window is not null)
         {
             // Only window exists can we register events for it
             // But handlers still run, as long as we feed events manually
             InputManager.Register(this);
+
+            Viewport.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
+
+            window.WindowSizeChanged += (w, h) =>
+            {
+                Viewport.UpdateSize(new Vector2D<float>(w, h));
+            };
         }
 
+        Dependencies.Cache(Viewport);
         Dependencies.Cache(InputManager);
 
         Game.prelude();
