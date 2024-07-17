@@ -186,8 +186,6 @@ public partial class GameHost : Time, IDisposable
 
         if (window is not null)
         {
-            Dependencies.Cache(InputManager);
-
             // Only window exists can we register events for it
             // But handlers still run, as long as we feed events manually
             InputManager.Register(this);
