@@ -1,5 +1,4 @@
 using DanmakuEngine.Graphics.Colors;
-using DanmakuEngine.Logging;
 using DanmakuEngine.Utils;
 
 namespace DanmakuEngine.Transformation;
@@ -17,24 +16,38 @@ public class ColorLerpHandle : ILerpHandle<RGBAColor>
         _start = HkSLColor.FromRGBA(start);
         _end = HkSLColor.FromRGBA(end);
 
-        start = _start.ToRGBAColor(start.A);
-        end = _end.ToRGBAColor(end.A);
-
         _startAlpha = start.A;
         _endAlpha = end.A;
     }
 
     public RGBAColor Lerp(float t)
     {
+        float ah = _start.Hk, bh = _end.Hk;
+        float delta = bh - ah;
+
+        if (ah > bh)
+        {
+            delta = -delta;
+            t = 1 - t;
+
+            (ah, bh) = (bh, ah);
+        }
+
+        float hk;
+        if (delta > 0.5f)
+            hk = MathUtils.Lerp(ah + 1, bh, t) % 1;
+        else
+            hk = ah + delta * t;
+
         var hsl = new HkSLColor
         {
-            Hk = _start.Hk + (_end.Hk - _start.Hk) * t,
-            S = _start.S + (_end.S - _start.S) * t,
-            L = _start.L + (_end.L - _start.L) * t
+            Hk = hk,
+            S = MathUtils.Lerp(_start.S, _end.S, t),
+            L = MathUtils.Lerp(_start.L, _end.L, t),
         };
 
         var a = MathUtils.Lerp(_startAlpha, _endAlpha, t);
 
-        return hsl.ToRGBAColor(a / 255f);
+        return hsl.toRGBAColorInternal(a / 255f);
     }
 }
