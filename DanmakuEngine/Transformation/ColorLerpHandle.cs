@@ -11,6 +11,8 @@ public class ColorLerpHandle : ILerpHandle<RGBAColor>
     private float _startAlpha;
     private float _endAlpha;
 
+    private bool _flipPath = false;
+
     public ColorLerpHandle(RGBAColor start, RGBAColor end)
     {
         _start = HkSLColor.FromRGBA(start);
@@ -18,6 +20,12 @@ public class ColorLerpHandle : ILerpHandle<RGBAColor>
 
         _startAlpha = start.A;
         _endAlpha = end.A;
+
+        if (_start.Hk > _end.Hk)
+        {
+            _flipPath = true;
+            (_start.Hk, _end.Hk) = (_end.Hk, _start.Hk);
+        }
     }
 
     public RGBAColor Lerp(float t)
@@ -25,19 +33,16 @@ public class ColorLerpHandle : ILerpHandle<RGBAColor>
         float ah = _start.Hk, bh = _end.Hk;
         float delta = bh - ah;
 
-        if (ah > bh)
-        {
-            delta = -delta;
-            t = 1 - t;
+        float th = t;
 
-            (ah, bh) = (bh, ah);
-        }
+        if (_flipPath)
+            th = -th;
 
         float hk;
         if (delta > 0.5f)
-            hk = MathUtils.Lerp(ah + 1, bh, t) % 1;
+            hk = MathUtils.Lerp(ah + 1, bh, th) % 1;
         else
-            hk = ah + delta * t;
+            hk = ah + delta * th;
 
         var hsl = new HkSLColor
         {
