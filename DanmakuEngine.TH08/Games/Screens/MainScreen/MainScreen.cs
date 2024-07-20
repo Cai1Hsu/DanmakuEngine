@@ -250,6 +250,8 @@ public partial class MainScreen : Screen
         _debugWindow.Register();
         _demoWindow.Register();
 
+        new LerpTestWindow().Register();
+
 #if DEBUG
         _allocViewer.OnUpdate += delegate
         {
