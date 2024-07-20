@@ -11,10 +11,10 @@ public class RGBALerpHandle : ILerpHandle<RGBAColor>
     {
         return new RGBAColor
         {
-            R = _start.R + (_end.R - _start.R) * t,
-            G = _start.G + (_end.G - _start.G) * t,
-            B = _start.B + (_end.B - _start.B) * t,
-            A = _start.A + (_end.A - _start.A) * t
+            R = _start.R + ((_end.R - _start.R) * t),
+            G = _start.G + ((_end.G - _start.G) * t),
+            B = _start.B + ((_end.B - _start.B) * t),
+            A = _start.A + ((_end.A - _start.A) * t)
         };
     }
 

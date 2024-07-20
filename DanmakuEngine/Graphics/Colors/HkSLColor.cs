@@ -64,15 +64,15 @@ public struct HkSLColor
         float s = (l == 1 || l == 0) switch
         {
             true => 0,
-            _ => delta / (1 - MathF.Abs(2 * l - 1)),
+            _ => delta / (1 - MathF.Abs((2 * l) - 1)),
         };
 
         float h = delta switch
         {
             0 => 0,
-            _ when max == rgb.X => (rgb.Y - rgb.Z) / delta % 6 / 6,
-            _ when max == rgb.Y => ((rgb.Z - rgb.X) / delta + 2) / 6,
-            _ => ((rgb.X - rgb.Y) / delta + 4) / 6,
+            _ when max == rgb.X => (((rgb.Y - rgb.Z) / delta) % 6) / 6,
+            _ when max == rgb.Y => (((rgb.Z - rgb.X) / delta) + 2) / 6,
+            _ => (((rgb.X - rgb.Y) / delta) + 4) / 6,
         };
 
         if (h < 0)
@@ -93,9 +93,9 @@ public struct HkSLColor
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     internal RGBAColor toRGBAColorInternal(float alpha = 1.00f)
     {
-        float c = (1 - MathF.Abs(2 * L - 1)) * S;
-        float x = c * (1 - MathF.Abs(Hk * 6 % 2 - 1));
-        float m = L - c / 2;
+        float c = (1 - MathF.Abs((2 * L) - 1)) * S;
+        float x = c * (1 - MathF.Abs(((Hk * 6) % 2) - 1));
+        float m = L - (c / 2);
 
         float r, g, b;
 

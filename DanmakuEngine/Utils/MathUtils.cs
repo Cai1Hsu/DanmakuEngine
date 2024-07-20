@@ -43,17 +43,17 @@ public static class MathUtils
     {
         if (typeof(T) == typeof(float))
         {
-            return (T)(object)((float)(object)a! + ((float)(object)b! - (float)(object)a) * t);
+            return (T)(object)((float)(object)a! + (((float)(object)b! - (float)(object)a) * t));
         }
 
         if (typeof(T) == typeof(double))
         {
-            return (T)(object)((double)(object)a! + ((double)(object)b! - (double)(object)a) * t);
+            return (T)(object)((double)(object)a! + (((double)(object)b! - (double)(object)a) * t));
         }
 
         if (typeof(T) == typeof(Half))
         {
-            return (T)(object)((Half)(object)a! + ((Half)(object)b! - (Half)(object)a) * (Half)t);
+            return (T)(object)((Half)(object)a! + (((Half)(object)b! - (Half)(object)a) * (Half)t));
         }
 
         throw new NotSupportedException();
