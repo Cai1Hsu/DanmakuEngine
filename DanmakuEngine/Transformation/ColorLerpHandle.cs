@@ -1,58 +1,82 @@
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using DanmakuEngine.Graphics.Colors;
 using DanmakuEngine.Utils;
 
 namespace DanmakuEngine.Transformation;
 
+/// <summary>
+/// A handle for lerping between two colors. Using HSL color space and Quaternion spherical linear interpolation.
+/// </summary>
 public class ColorLerpHandle : ILerpHandle<RGBAColor>
 {
-    private HkSLColor _start;
-    private HkSLColor _end;
+    private Quaternion _start;
+    private Quaternion _end;
 
     private float _startAlpha;
     private float _endAlpha;
 
-    private bool _flipPath = false;
-
     public ColorLerpHandle(RGBAColor start, RGBAColor end)
     {
-        _start = HkSLColor.FromRGBA(start);
-        _end = HkSLColor.FromRGBA(end);
+        _start = hslToQuaternion(HkSLColor.FromRGBA(start));
+        _end = hslToQuaternion(HkSLColor.FromRGBA(end));
 
         _startAlpha = start.A;
         _endAlpha = end.A;
-
-        if (_start.Hk > _end.Hk)
-        {
-            _flipPath = true;
-            (_start.Hk, _end.Hk) = (_end.Hk, _start.Hk);
-        }
     }
 
     public RGBAColor Lerp(float t)
     {
-        float ah = _start.Hk, bh = _end.Hk;
-        float delta = bh - ah;
+        var lerped = Quaternion.Slerp(_start, _end, t);
 
-        float th = t;
+        var hsl = quaternionToHSL(lerped);
 
-        if (_flipPath)
-            th = -th;
+        float a = MathUtils.Lerp(_startAlpha, _endAlpha, t);
 
-        float hk;
-        if (delta > 0.5f)
-            hk = MathUtils.Lerp(ah + 1, bh, th) % 1;
-        else
-            hk = ah + delta * th;
+        return hsl.ToRGBAColor(a / 255f);
+    }
 
-        var hsl = new HkSLColor
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    private static Quaternion hslToQuaternion(HkSLColor hksl)
+    {
+        float radius = hksl.S;
+
+        float halfHueRad = hksl.Hk * MathF.Tau / 2;
+        float halfLightnessRad = hksl.L * MathF.PI / 2;
+
+        float CosHalfHue = MathF.Cos(halfHueRad);
+        float SinHalfHue = MathF.Sin(halfHueRad);
+
+        float CosHalfLightness = MathF.Cos(halfLightnessRad);
+        float SinHalfLightness = MathF.Sin(halfLightnessRad);
+
+        return new Quaternion
         {
-            Hk = hk,
-            S = MathUtils.Lerp(_start.S, _end.S, t),
-            L = MathUtils.Lerp(_start.L, _end.L, t),
+            W = CosHalfHue * CosHalfLightness,
+            X = SinHalfHue * CosHalfLightness,
+            Y = CosHalfHue * SinHalfLightness,
+            Z = SinHalfHue * SinHalfLightness * radius,
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    private static HkSLColor quaternionToHSL(Quaternion quaternion)
+    {
+        float radius = quaternion.Length();
+
+        float lightnessRad = MathF.Atan2(quaternion.Y, quaternion.W) * 2;
+        float hueRad = MathF.Atan2(quaternion.X, quaternion.W) * 2;
+
+        var color = new HkSLColor
+        {
+            Hk = hueRad / MathF.Tau,
+            S = radius,
+            L = lightnessRad / MathF.PI,
         };
 
-        var a = MathUtils.Lerp(_startAlpha, _endAlpha, t);
+        if (color.Hk < 0)
+            color.Hk += 1;
 
-        return hsl.toRGBAColorInternal(a / 255f);
+        return color;
     }
 }
