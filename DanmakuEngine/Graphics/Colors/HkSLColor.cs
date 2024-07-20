@@ -61,11 +61,10 @@ public struct HkSLColor
 
         float l = (min + max) / 2;
 
-        float s = (delta == 0 || l == 0) switch
+        float s = (l == 1 || l == 0) switch
         {
             true => 0,
-            false when l < 0.5 => delta / (max + min),
-            _ => delta / (2 - max - min)
+            _ => delta / (1 - MathF.Abs(2 * l - 1)),
         };
 
         float h = delta switch
@@ -76,6 +75,9 @@ public struct HkSLColor
             _ => ((rgb.X - rgb.Y) / delta + 4) / 6,
         };
 
+        if (h < 0)
+            h += 1;
+
         return new HkSLColor
         {
             Hk = h,
@@ -83,8 +85,13 @@ public struct HkSLColor
             L = l
         };
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     public RGBAColor ToRGBAColor(float alpha = 1.00f)
+        => toRGBAColorInternal(alpha);
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    internal RGBAColor toRGBAColorInternal(float alpha = 1.00f)
     {
         float c = (1 - MathF.Abs(2 * L - 1)) * S;
         float x = c * (1 - MathF.Abs(Hk * 6 % 2 - 1));
