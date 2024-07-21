@@ -1,9 +1,10 @@
+using System.Runtime.CompilerServices;
 using DanmakuEngine.Graphics.Colors;
 using DanmakuEngine.Utils;
 
 namespace DanmakuEngine.Transformation;
 
-public class HslLerpHandle : ILerpHandle<RGBAColor>
+public class HslLerpHandle : ILerpHandle<SRGBColor>
 {
     private HkSLColor _start;
     private HkSLColor _end;
@@ -11,7 +12,7 @@ public class HslLerpHandle : ILerpHandle<RGBAColor>
     private float _startAlpha;
     private float _endAlpha;
 
-    public HslLerpHandle(RGBAColor start, RGBAColor end)
+    public HslLerpHandle(SRGBColor start, SRGBColor end)
         : this(HkSLColor.FromRGBA(start), HkSLColor.FromRGBA(end), start.A, end.A)
     {
     }
@@ -25,6 +26,7 @@ public class HslLerpHandle : ILerpHandle<RGBAColor>
         _endAlpha = endAlpha;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private HkSLColor hslLerp(float t)
     {
         float ah = _start.Hk, bh = _end.Hk;
@@ -56,7 +58,7 @@ public class HslLerpHandle : ILerpHandle<RGBAColor>
         };
     }
 
-    public RGBAColor Lerp(float t)
+    public SRGBColor Lerp(float t)
     {
         float a = MathUtils.Lerp(_startAlpha, _endAlpha, t);
 
