@@ -8,7 +8,7 @@ namespace DanmakuEngine.Transformation;
 /// <summary>
 /// A handle for lerping between two colors. Using HSL color space.
 /// </summary>
-public class ColorLerpHandle : ILerpHandle<RgbaColor>
+public class ColorLerpHandle : ILerpHandle<SRGBColor>
 {
     private HkSLColor _start;
     private HkSLColor _end;
@@ -16,7 +16,7 @@ public class ColorLerpHandle : ILerpHandle<RgbaColor>
     private float _startAlpha;
     private float _endAlpha;
 
-    public ColorLerpHandle(RgbaColor start, RgbaColor end)
+    public ColorLerpHandle(SRGBColor start, SRGBColor end)
         : this(HkSLColor.FromRGBA(start), HkSLColor.FromRGBA(end), start.A, end.A)
     {
     }
@@ -31,7 +31,7 @@ public class ColorLerpHandle : ILerpHandle<RgbaColor>
     }
 
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public RgbaColor Lerp(float t)
+    public SRGBColor Lerp(float t)
     {
         HkSLColor hsl;
 
