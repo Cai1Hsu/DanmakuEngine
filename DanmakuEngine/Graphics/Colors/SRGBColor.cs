@@ -1,70 +1,73 @@
-// Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
-
+using System.Numerics;
+using System.Runtime.InteropServices;
 using DanmakuEngine.Extensions;
-using OpenTK.Mathematics;
+using Silk.NET.Maths;
 
 namespace DanmakuEngine.Graphics.Colors;
 
+[StructLayout(LayoutKind.Sequential)]
 public struct SRGBColor : IEquatable<SRGBColor>
 {
-    /// <summary>
-    /// A <see cref="Color4"/> representation of this Color in the sRGB space.
-    /// </summary>
-    public Color4 SRGB;
+    public float R;
+    public float G;
+    public float B;
+    public float A;
 
-    /// <summary>
-    /// A <see cref="Color4"/> representation of this Color in the linear space.
-    /// </summary>
-    public readonly Color4 Linear => SRGB.ToLinear();
+    public readonly Vector4 Linear => ToLinear();
 
-    public static Color4 ToColor4(SRGBColor sRGBColor)
-        => sRGBColor.SRGB;
+    public static unsafe Vector4 ToVector4(SRGBColor sRGBColor)
+        => *(Vector4*)&sRGBColor;
 
-    public readonly Color4 ToColor4()
-        => ToColor4(this);
+    public static unsafe Vector4D<float> ToVector4D(SRGBColor sRGBColor)
+        => *(Vector4D<float>*)&sRGBColor;
 
-    public static SRGBColor FromColor4(Color4 value)
-        => new() { SRGB = value };
+    public readonly Vector4 ToColor4()
+        => ToVector4(this);
 
-    public SRGBColor(Color4 srgb)
+    public static unsafe SRGBColor FromVector4(Vector4 value)
+        => *(SRGBColor*)&value;
+
+    public SRGBColor(Vector4 srgb)
     {
-        SRGB = srgb;
+        R = srgb.X;
+        G = srgb.Y;
+        B = srgb.Z;
+        A = srgb.W;
     }
 
     public SRGBColor(float r, float g, float b, float a)
     {
-        SRGB = new Color4(r, g, b, a);
+        R = r;
+        G = g;
+        B = b;
+        A = a;
     }
 
-    public readonly float Alpha => SRGB.A;
+    public readonly float Alpha => A;
 
     public static SRGBColor operator *(SRGBColor first, SRGBColor second)
     {
         var firstLinear = first.Linear;
         var secondLinear = second.Linear;
 
-        return new SRGBColor
-        {
-            SRGB = new Color4(
-                firstLinear.R * secondLinear.R,
-                firstLinear.G * secondLinear.G,
-                firstLinear.B * secondLinear.B,
-                firstLinear.A * secondLinear.A).ToSRGB(),
-        };
+        return ColorExtensions.FromLinearVector4(new Vector4(
+            firstLinear.X * secondLinear.X,
+            firstLinear.Y * secondLinear.Y,
+            firstLinear.Z * secondLinear.Z,
+            firstLinear.W * secondLinear.W
+        ));
     }
 
     public static SRGBColor operator *(SRGBColor first, float second)
     {
         var firstLinear = first.Linear;
 
-        return new SRGBColor
-        {
-            SRGB = new Color4(
-                firstLinear.R * second,
-                firstLinear.G * second,
-                firstLinear.B * second,
-                firstLinear.A * second).ToSRGB(),
-        };
+        return ColorExtensions.FromLinearVector4(new Vector4(
+            firstLinear.X * second,
+            firstLinear.Y * second,
+            firstLinear.Z * second,
+            firstLinear.W * second
+        ));
     }
 
     public static SRGBColor operator /(SRGBColor first, float second)
@@ -75,29 +78,42 @@ public struct SRGBColor : IEquatable<SRGBColor>
         var firstLinear = first.Linear;
         var secondLinear = second.Linear;
 
-        return new SRGBColor
-        {
-            SRGB = new Color4(
-                firstLinear.R + secondLinear.R,
-                firstLinear.G + secondLinear.G,
-                firstLinear.B + secondLinear.B,
-                firstLinear.A + secondLinear.A).ToSRGB(),
-        };
+        return ColorExtensions.FromLinearVector4(new Vector4(
+            firstLinear.X + secondLinear.X,
+            firstLinear.Y + secondLinear.Y,
+            firstLinear.Z + secondLinear.Z,
+            firstLinear.W + secondLinear.W
+        ));
     }
 
-    public readonly Vector4 ToVector()
-        => new(SRGB.R, SRGB.G, SRGB.B, SRGB.A);
+    public static unsafe SRGBColor FromVector(Vector4 v)
+        => *(SRGBColor*)&v;
 
-    public static SRGBColor FromVector(Vector4 v)
-        => new() { SRGB = new Color4(v.X, v.Y, v.Z, v.W) };
+    public static SRGBColor FromARGB(byte a, byte r, byte g, byte b)
+        => new SRGBColor(r, g, b, a);
+
+    public static unsafe SRGBColor FromFloatRGB(Vector4 aRGBColor)
+        => FromVector(aRGBColor * 255f);
+
+    public static unsafe Vector4 ToFloatRGB(SRGBColor sRGBColor)
+        => ToVector4(sRGBColor) / 255f;
+
+    public readonly Vector4 ToFloatRGB()
+        => ToFloatRGB(this);
+
+    public static Vector4 ToLinear(SRGBColor sRGBColor)
+        => ColorExtensions.ToLinearVector4(sRGBColor);
+
+    public readonly Vector4 ToLinear()
+        => ToLinear(this);
 
     /// <summary>
     /// Multiplies the alpha value of this Color by the given alpha factor.
     /// </summary>
     /// <param name="alpha">The alpha factor to multiply with.</param>
     public void MultiplyAlpha(float alpha)
-        => SRGB.A *= alpha;
+        => A *= alpha;
 
     public readonly bool Equals(SRGBColor other)
-        => SRGB.Equals(other.SRGB);
+        => R == other.R && G == other.G && B == other.B && A == other.A;
 }

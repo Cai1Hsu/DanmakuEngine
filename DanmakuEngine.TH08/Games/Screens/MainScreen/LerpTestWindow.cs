@@ -12,9 +12,9 @@ public class LerpTestWindow : ImguiWindowBase
     {
     }
 
-    private RGBAColor? _result = null;
+    private SRGBColor? _result = null;
 
-    private ColorLerpHandle? _lerpHandle = null;
+    private SRGBLerpHandle? _lerpHandle = null;
 
     private Vector4 _startColor = new(1, 0, 0, 1);
 
@@ -32,7 +32,7 @@ public class LerpTestWindow : ImguiWindowBase
 
         if (_lerpHandle is null || baseChanged)
         {
-            _lerpHandle = new ColorLerpHandle(toRGBAColor(_startColor), toRGBAColor(_endColor));
+            _lerpHandle = new SRGBLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
         }
 
         bool lerpChanged = ImGui.SliderFloat("factor", ref _lerpValue, 0, 1);
@@ -42,29 +42,12 @@ public class LerpTestWindow : ImguiWindowBase
             _result = _lerpHandle.Lerp(_lerpValue);
         }
 
-        var result = new Vector4
-        {
-            X = _result.Value.R / 255f,
-            Y = _result.Value.G / 255f,
-            Z = _result.Value.B / 255f,
-            W = _result.Value.A / 255f,
-        };
+        var result = _result.Value.ToFloatRGB();
 
         ImGui.ColorButton("Result", result, ImGuiColorEditFlags.None, new Vector2
         {
             X = 100,
             Y = 100,
         });
-    }
-
-    private static RGBAColor toRGBAColor(Vector4 color)
-    {
-        return new RGBAColor
-        {
-            R = color.X * 255,
-            G = color.Y * 255,
-            B = color.Z * 255,
-            A = color.W * 255,
-        };
     }
 }

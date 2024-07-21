@@ -50,7 +50,7 @@ public struct HkSLColor
     public static HkSLColor FromRGB(Vector3D<float> rgb)
         => fromRGBInternal(rgb);
 
-    public static HkSLColor FromRGBA(RGBAColor rgba)
+    public static HkSLColor FromRGBA(RgbaColor rgba)
         => fromRGBInternal(new Vector3D<float>(rgba.R / 255f, rgba.G / 255f, rgba.B / 255f));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -87,11 +87,11 @@ public struct HkSLColor
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public RGBAColor ToRGBAColor(float alpha = 1.00f)
+    public RgbaColor ToRGBAColor(float alpha = 1.00f)
         => toRGBAColorInternal(alpha);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    internal RGBAColor toRGBAColorInternal(float alpha = 1.00f)
+    internal RgbaColor toRGBAColorInternal(float alpha = 1.00f)
     {
         float c = (1 - MathF.Abs((2 * L) - 1)) * S;
         float x = c * (1 - MathF.Abs(((Hk * 6) % 2) - 1));
@@ -112,7 +112,7 @@ public struct HkSLColor
         else
             (r, g, b) = (c, 0, x);
 
-        return new RGBAColor
+        return new RgbaColor
         {
             R = (r + m) * 255,
             G = (g + m) * 255,

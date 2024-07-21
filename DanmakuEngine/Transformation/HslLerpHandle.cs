@@ -1,14 +1,9 @@
-using System.Numerics;
-using System.Runtime.CompilerServices;
 using DanmakuEngine.Graphics.Colors;
 using DanmakuEngine.Utils;
 
 namespace DanmakuEngine.Transformation;
 
-/// <summary>
-/// A handle for lerping between two colors. Using HSL color space.
-/// </summary>
-public class ColorLerpHandle : ILerpHandle<RgbaColor>
+public class HslLerpHandle : ILerpHandle<RGBAColor>
 {
     private HkSLColor _start;
     private HkSLColor _end;
@@ -16,12 +11,12 @@ public class ColorLerpHandle : ILerpHandle<RgbaColor>
     private float _startAlpha;
     private float _endAlpha;
 
-    public ColorLerpHandle(RgbaColor start, RgbaColor end)
+    public HslLerpHandle(RGBAColor start, RGBAColor end)
         : this(HkSLColor.FromRGBA(start), HkSLColor.FromRGBA(end), start.A, end.A)
     {
     }
 
-    public ColorLerpHandle(HkSLColor start, HkSLColor end, float startAlpha = 1.0f, float endAlpha = 1.0f)
+    public HslLerpHandle(HkSLColor start, HkSLColor end, float startAlpha, float endAlpha)
     {
         _start = start;
         _end = end;
@@ -30,15 +25,12 @@ public class ColorLerpHandle : ILerpHandle<RgbaColor>
         _endAlpha = endAlpha;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveOptimization)]
-    public RgbaColor Lerp(float t)
+    private HkSLColor hslLerp(float t)
     {
-        HkSLColor hsl;
-
         float ah = _start.Hk, bh = _end.Hk;
         float delta = bh - ah;
 
-        float ht;
+        float hk, ht;
         if (ah > bh)
         {
             (ah, bh) = (bh, ah);
@@ -52,15 +44,22 @@ public class ColorLerpHandle : ILerpHandle<RgbaColor>
         }
 
         if (delta > 0.5f)
-            hsl.Hk = MathUtils.Lerp(ah + 1, bh, ht) % 1;
+            hk = MathUtils.Lerp(ah + 1, bh, ht) % 1;
         else
-            hsl.Hk = ah + delta * ht;
+            hk = ah + delta * ht;
 
-        hsl.S = MathUtils.Lerp(_start.S, _end.S, t);
-        hsl.L = MathUtils.Lerp(_start.L, _end.L, t);
+        return new HkSLColor
+        {
+            Hk = hk,
+            S = MathUtils.Lerp(_start.S, _end.S, t),
+            L = MathUtils.Lerp(_start.L, _end.L, t),
+        };
+    }
 
+    public RGBAColor Lerp(float t)
+    {
         float a = MathUtils.Lerp(_startAlpha, _endAlpha, t);
 
-        return hsl.ToRGBAColor(a / 255f);
+        return hslLerp(t).ToRGBAColor(a / 255f);
     }
 }
