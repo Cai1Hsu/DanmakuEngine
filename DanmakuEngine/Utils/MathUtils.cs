@@ -39,23 +39,37 @@ public static class MathUtils
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    public static T Lerp<T>(T a, T b, float t)
+    public static float Lerp(float a, float b, float t)
     {
-        if (typeof(T) == typeof(float))
-        {
-            return (T)(object)((float)(object)a! + (((float)(object)b! - (float)(object)a) * t));
-        }
+        return a + ((b - a) * t);
+    }
 
-        if (typeof(T) == typeof(double))
-        {
-            return (T)(object)((double)(object)a! + (((double)(object)b! - (double)(object)a) * t));
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static double Lerp(double a, double b, float t)
+    {
+        return a + ((b - a) * t);
+    }
 
-        if (typeof(T) == typeof(Half))
-        {
-            return (T)(object)((Half)(object)a! + (((Half)(object)b! - (Half)(object)a) * (Half)t));
-        }
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Half Lerp(Half a, Half b, float t)
+    {
+        return a + ((b - a) * (Half)t);
+    }
 
-        throw new NotSupportedException();
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static float Lerp(float a, float b, double t)
+    {
+        return a + ((b - a) * (float)t);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static double Lerp(double a, double b, double t)
+    {
+        return a + ((b - a) * (float)t);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]    public static Half Lerp(Half a, Half b, double t)
+    {
+        return a + ((b - a) * (Half)(float)t);
     }
 }
