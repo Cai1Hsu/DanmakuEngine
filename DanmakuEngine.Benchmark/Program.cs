@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Running;
 
 namespace DanmakuEngine.Benchmarks;
@@ -9,6 +10,9 @@ public static class Program
     {
         BenchmarkSwitcher
             .FromAssembly(typeof(Program).Assembly)
-            .Run(args, DefaultConfig.Instance.WithOption(ConfigOptions.DisableOptimizationsValidator, true));
+            .Run(args, DefaultConfig.Instance
+                .WithOption(ConfigOptions.DisableOptimizationsValidator, true)
+                .AddDiagnoser(MemoryDiagnoser.Default)
+            );
     }
 }
