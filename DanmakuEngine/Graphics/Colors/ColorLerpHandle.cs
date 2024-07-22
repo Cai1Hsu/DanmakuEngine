@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using DanmakuEngine.Graphics.Colors;
 using DanmakuEngine.Utils;
 
-namespace DanmakuEngine.Transformation;
+namespace DanmakuEngine.Graphics.Color;
 
 /// <summary>
 /// A handle for lerping between two colors. Using HSL color space.

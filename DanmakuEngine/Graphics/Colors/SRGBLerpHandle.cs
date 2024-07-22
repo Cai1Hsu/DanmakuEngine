@@ -2,7 +2,7 @@ using System.Numerics;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Graphics.Colors;
 
-namespace DanmakuEngine.Transformation;
+namespace DanmakuEngine.Graphics.Color;
 
 public class SRGBLerpHandle : ILerpHandle<SRGBColor>
 {
