@@ -56,7 +56,7 @@ public struct LabColor
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static float xyz2Lab(float t)
-        => t > t3 ? MathF.Pow(t, 1.0f / 3.0f) : t / t2 + t0;
+        => t > t3 ? MathF.Pow(t, 1.0f / 3.0f) : (t / t2) + t0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static float lab2Xyz(float t)
@@ -66,17 +66,17 @@ public struct LabColor
     private static SRGBColor toSRGBInternal(LabColor lab)
     {
         float y = (lab.L + 16f) / 116f,
-            x = float.IsNaN(lab.A) ? y : y + lab.A / 500f,
-            z = float.IsNaN(lab.B) ? y : y - lab.B / 200f;
+            x = float.IsNaN(lab.A) ? y : y + (lab.A / 500f),
+            z = float.IsNaN(lab.B) ? y : y - (lab.B / 200f);
 
         float newX = lab2Xyz(x) * xn;
         float newY = lab2Xyz(y) * yn;
         float newZ = lab2Xyz(z) * zn;
 
         return new SRGBColor(
-            (float)(ColorExtensions.ToSRGB(+3.1338561f * newX - 1.6168667f * newY - 0.4906146f * newZ) * 255f),
-            (float)(ColorExtensions.ToSRGB(-0.9787684f * newX + 1.9161415f * newY + 0.0334540f * newZ) * 255f),
-            (float)(ColorExtensions.ToSRGB(+0.0719453f * newX - 0.2289914f * newY + 1.4052427f * newZ) * 255f),
+            (float)(ColorExtensions.ToSRGB((+3.1338561f * newX) - (1.6168667f * newY) - (0.4906146f * newZ)) * 255f),
+            (float)(ColorExtensions.ToSRGB((-0.9787684f * newX) + (1.9161415f * newY) + (0.0334540f * newZ)) * 255f),
+            (float)(ColorExtensions.ToSRGB((+0.0719453f * newX) - (0.2289914f * newY) + (1.4052427f * newZ)) * 255f),
             lab.Opacity * 255f
         );
     }
@@ -89,7 +89,7 @@ public struct LabColor
     {
         var linear = sRGBColor.ToLinear();
 
-        float x, z, y = xyz2Lab((0.2225045f * linear.X + 0.7168786f * linear.Y + 0.0606169f * linear.Z) / yn);
+        float x, z, y = xyz2Lab(((0.2225045f * linear.X) + (0.7168786f * linear.Y) + (0.0606169f * linear.Z)) / yn);
 
         if (linear.X == linear.Y && linear.Y == linear.Z)
         {
@@ -97,12 +97,12 @@ public struct LabColor
         }
         else
         {
-            x = xyz2Lab((0.4360747f * linear.X + 0.3850649f * linear.Y + 0.1430804f * linear.Z) / xn);
-            z = xyz2Lab((0.0139322f * linear.X + 0.0971045f * linear.Y + 0.7141733f * linear.Z) / zn);
+            x = xyz2Lab(((0.4360747f * linear.X) + (0.3850649f * linear.Y) + (0.1430804f * linear.Z)) / xn);
+            z = xyz2Lab(((0.0139322f * linear.X) + (0.0971045f * linear.Y) + (0.7141733f * linear.Z)) / zn);
         }
 
         return new LabColor(
-            (float)(116f * y - 16f),
+            (float)((116f * y) - 16f),
             (float)(500f * (x - y)),
             (float)(200f * (y - z)),
             sRGBColor.A / 255f
