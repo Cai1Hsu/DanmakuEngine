@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using DanmakuEngine.Bindables;
 using DanmakuEngine.Extensions;
 using DanmakuEngine.Logging;
 using Silk.NET.Maths;
@@ -90,6 +91,32 @@ public unsafe class Sdl2Window : IWindow
             return size;
         }
         set => _sdl.SetWindowSize(_window, value.X, value.Y);
+    }
+
+    private Bindable<bool>? _isMouseInWindow = null;
+
+    public Bindable<bool> IsMouseInWindow
+    {
+        get
+        {
+            if (_isMouseInWindow is null)
+            {
+                var windowSize = Size;
+                var windowPosition = Position;
+                var mousePosition = Vector2D<int>.Zero;
+
+                _sdl.GetMouseState(ref mousePosition.X, ref mousePosition.Y);
+
+                var isInWindow = mousePosition.X >= windowPosition.X &&
+                                mousePosition.Y >= windowPosition.Y &&
+                                mousePosition.X <= windowPosition.X + windowSize.X &&
+                                mousePosition.Y <= windowPosition.Y + windowSize.Y;
+
+                _isMouseInWindow = new Bindable<bool>(isInWindow);
+            }
+
+            return _isMouseInWindow;
+        }
     }
 
     public Sdl2Window(string title,
@@ -183,8 +210,7 @@ public unsafe class Sdl2Window : IWindow
                 {
                     if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
                         break;
-                    if (KeyDown?.Invoke(e->Key) is not true)
-                        KeyEvent?.Invoke(e->Key);
+                    KeyDown?.Invoke(e->Key);
                 }
                 break;
 
@@ -192,8 +218,7 @@ public unsafe class Sdl2Window : IWindow
                 {
                     if (imguiMagic && Imgui.EatKeyboardEvents(e->Key))
                         break;
-                    if (KeyUp?.Invoke(e->Key) is not true)
-                        KeyEvent?.Invoke(e->Key);
+                    KeyUp?.Invoke(e->Key);
                 }
                 break;
 
@@ -234,6 +259,20 @@ public unsafe class Sdl2Window : IWindow
                 case (uint)EventType.Mousewheel:
                     if (!imguiMagic || !Imgui.EatMouseWheelEvents(e->Wheel))
                         MouseScroll?.Invoke(e->Wheel);
+                    break;
+
+                case SDL_EVENT_WINDOW_MOUSE_ENTER:
+                    if (_isMouseInWindow is not null)
+                        _isMouseInWindow.Value = true;
+
+                    MouseEnteredWindow?.Invoke();
+                    break;
+
+                case SDL_EVENT_WINDOW_MOUSE_LEAVE:
+                    if (_isMouseInWindow is not null)
+                        _isMouseInWindow.Value = false;
+
+                    MouseLeftWindow?.Invoke();
                     break;
 
                 case (uint)EventType.Windowevent:
@@ -367,17 +406,15 @@ public unsafe class Sdl2Window : IWindow
 
     #region Input Events
 
-    public event Action<KeyboardEvent> KeyEvent = null!;
+    /// <summary>
+    /// Return true to prevent the event from being passed to the next handler
+    /// </summary>
+    public event Action<KeyboardEvent> KeyDown = null!;
 
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> KeyDown = null!;
-
-    /// <summary>
-    /// Return true to prevent the event from being passed to the next handler
-    /// </summary>
-    public event Func<KeyboardEvent, bool> KeyUp = null!;
+    public event Action<KeyboardEvent> KeyUp = null!;
 
     public event Action<MouseButtonEvent> MouseButtonDown = null!;
 
@@ -386,6 +423,10 @@ public unsafe class Sdl2Window : IWindow
     public event Action<MouseMotionEvent> MouseMove = null!;
 
     public event Action<MouseWheelEvent> MouseScroll = null!;
+
+    public event Action MouseEnteredWindow = null!;
+
+    public event Action MouseLeftWindow = null!;
 
     public event Action<TextInputEvent> TextInput = null!;
 
@@ -444,4 +485,9 @@ public unsafe class Sdl2Window : IWindow
     public event Action AppDidenterbackground = null!;
 
     public event Action AppDidenterforeground = null!;
+
+#pragma warning disable IDE1006 // Naming Styles
+    private const uint SDL_EVENT_WINDOW_MOUSE_ENTER = 523;
+    private const uint SDL_EVENT_WINDOW_MOUSE_LEAVE = 524;
+#pragma warning restore IDE1006
 }

@@ -1,8 +1,6 @@
 using System.Diagnostics;
 using DanmakuEngine.Dependency;
 using DanmakuEngine.Graphics;
-using DanmakuEngine.Input.Handlers;
-using DanmakuEngine.Input.Keybards;
 using DanmakuEngine.Timing;
 
 namespace DanmakuEngine.Games.Screens;
@@ -14,8 +12,6 @@ public partial class Screen : CompositeDrawable
     public override ScreenStack Parent => _parent;
 
     protected ScreenStack ScreenStack => Parent;
-
-    public KeyboardHandler keyboardHandler = null!;
 
     /// <summary>
     /// The clock for the screen
@@ -62,10 +58,6 @@ public partial class Screen : CompositeDrawable
 
     protected override void load()
     {
-        // we make the Screen base class injectable
-        if (this is IInjectable injectable)
-            injectable.AutoInject();
-
         // we dont have to assert as early as in the constructor
         Debug.Assert(_parent != null, $"ScreenStack for {GetType()} is null");
 
@@ -73,8 +65,6 @@ public partial class Screen : CompositeDrawable
         var _ = Clock;
 
         base.load();
-
-        keyboardHandler?.RegisterKeys();
     }
 
     public virtual void OnScreenLeaving()

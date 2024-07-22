@@ -89,6 +89,8 @@ public partial class GameHost : Time, IDisposable
 
     public EngineState State { get; protected set; } = EngineState.Created;
 
+    public GameViewport Viewport { get; private set; } = null!;
+
     public string DefaultWindowTitle
     {
         get
@@ -173,7 +175,9 @@ public partial class GameHost : Time, IDisposable
         {
             Children =
             {
-                (ScreenStack = new(Root))
+                // Inputs should be updated first
+                (InputManager = new InputManager()),
+                (ScreenStack = new(Root)),
             }
         };
 
@@ -182,14 +186,24 @@ public partial class GameHost : Time, IDisposable
 
         RegisterEvents();
 
+        Viewport = new GameViewport();
+
         if (window is not null)
         {
-            InputManager = new InputManager();
+            // Only window exists can we register events for it
+            // But handlers still run, as long as we feed events manually
+            InputManager.Register(this);
 
-            Dependencies.Cache(InputManager);
+            Viewport.Size = new Vector2D<float>(window.Size.X, window.Size.Y);
 
-            InputManager.RegisterHandlers(this);
+            window.WindowSizeChanged += (w, h) =>
+            {
+                Viewport.UpdateSize(new Vector2D<float>(w, h));
+            };
         }
+
+        Dependencies.Cache(Viewport);
+        Dependencies.Cache(InputManager);
 
         Game.prelude();
         ScreenStack.Push(Game.EntryScreen);

@@ -26,10 +26,10 @@ public partial class MainScreen : Screen
     // This method is called when the screen(or average object) is loading
     protected override void Load()
     {
-        keyboardHandler = new MainMenuKeyBoardHandler()
+        Add(new MainMenuKeyBoardHandler()
         {
             secretCodeHandler = new(),
-        };
+        });
 
         // transformations.AddRange(new TransformSequence[]
         // {

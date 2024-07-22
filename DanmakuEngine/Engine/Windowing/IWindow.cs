@@ -76,17 +76,15 @@ public interface IWindow : IDisposable
 
     #region Input Events
 
-    public event Action<KeyboardEvent> KeyEvent;
+    /// <summary>
+    /// Return true to prevent the event from being passed to the next handler
+    /// </summary>
+    public event Action<KeyboardEvent> KeyDown;
 
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> KeyDown;
-
-    /// <summary>
-    /// Return true to prevent the event from being passed to the next handler
-    /// </summary>
-    public event Func<KeyboardEvent, bool> KeyUp;
+    public event Action<KeyboardEvent> KeyUp;
 
     public event Action<MouseButtonEvent> MouseButtonDown;
 

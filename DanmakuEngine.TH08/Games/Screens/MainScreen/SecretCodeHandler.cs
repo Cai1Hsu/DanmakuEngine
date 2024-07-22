@@ -1,4 +1,5 @@
 using DanmakuEngine.Extensions.Keys;
+using DanmakuEngine.Input;
 using DanmakuEngine.Logging;
 using DanmakuEngine.Timing;
 using Silk.NET.SDL;
@@ -7,20 +8,20 @@ namespace DanmakuEngine.Games.Screens.MainMenu;
 
 public class SecretCodeHandler
 {
-    private readonly KeyCode[] secretCode = new KeyCode[]
+    private readonly Keys[] secretCode = new Keys[]
     {
-        KeyCode.KUp,
-        KeyCode.KUp,
-        KeyCode.KDown,
-        KeyCode.KDown,
-        KeyCode.KLeft,
-        KeyCode.KRight,
-        KeyCode.KLeft,
-        KeyCode.KRight,
-        KeyCode.KB,
-        KeyCode.KA,
-        KeyCode.KB,
-        KeyCode.KA
+        Keys.Up,
+        Keys.Up,
+        Keys.Down,
+        Keys.Down,
+        Keys.Left,
+        Keys.Right,
+        Keys.Left,
+        Keys.Right,
+        Keys.B,
+        Keys.A,
+        Keys.B,
+        Keys.A
     };
 
     private int secretCodeIndex = 0;
@@ -29,7 +30,7 @@ public class SecretCodeHandler
 
     public Action OnSecretCodeEntered { get; set; } = null!;
 
-    public bool HandleKey(KeyCode key)
+    public bool HandleKey(Keys key)
     {
         if (Time.ElapsedSeconds - lastKeyDown > 1000)
             secretCodeIndex = 0;
@@ -41,7 +42,7 @@ public class SecretCodeHandler
 #if DEBUG
             // definitely we don't want to leak the secret code in release build
 
-            Logger.Debug($"SecretCode: Handled key: {key.GetName()}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
+            Logger.Debug($"SecretCode: Handled key: {key}, Index: {secretCodeIndex}, LastKeyDown: {lastKeyDown:F2}");
 
 #endif // DEBUG
 

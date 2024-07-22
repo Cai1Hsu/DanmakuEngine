@@ -62,16 +62,10 @@ public partial class GameHost
     public virtual void RequestClose()
         => window?.RequestClose();
 
-    public event Action<KeyboardEvent> KeyEvent
-    {
-        add => window.KeyEvent += value;
-        remove => window.KeyEvent -= value;
-    }
-
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> Keydown
+    public event Action<KeyboardEvent> KeyDown
     {
         add => window.KeyDown += value;
         remove => window.KeyDown -= value;
@@ -80,13 +74,13 @@ public partial class GameHost
     /// <summary>
     /// Return true to prevent the event from being passed to the next handler
     /// </summary>
-    public event Func<KeyboardEvent, bool> KeyUp
+    public event Action<KeyboardEvent> KeyUp
     {
         add => window.KeyUp += value;
         remove => window.KeyUp -= value;
     }
 
-    public event Action<MouseButtonEvent> Mousebuttondown
+    public event Action<MouseButtonEvent> MouseButtonDown
     {
         add => window.MouseButtonDown += value;
         remove => window.MouseButtonDown -= value;
@@ -108,5 +102,17 @@ public partial class GameHost
     {
         add => window.MouseScroll += value;
         remove => window.MouseScroll -= value;
+    }
+
+    public event Action MouseEnteredWindow
+    {
+        add => window.MouseEnteredWindow += value;
+        remove => window.MouseEnteredWindow -= value;
+    }
+
+    public event Action MouseLeftWindow
+    {
+        add => window.MouseLeftWindow += value;
+        remove => window.MouseLeftWindow -= value;
     }
 }
