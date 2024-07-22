@@ -1,7 +1,6 @@
 using System.Numerics;
 using DanmakuEngine.DearImgui.Windowing;
 using DanmakuEngine.Graphics.Colors;
-using DanmakuEngine.Transformation;
 using ImGuiNET;
 
 namespace DanmakuEngine.Games.Screens.MainMenu;
@@ -12,9 +11,17 @@ public class LerpTestWindow : ImguiWindowBase
     {
     }
 
-    private SRGBColor? _result = null;
+    private SRGBColor? _result1 = null;
+    private SRGBColor? _result2 = null;
+    private SRGBColor? _result3 = null;
+    private SRGBColor? _result4 = null;
+    private SRGBColor? _result5 = null;
 
-    private SRGBLerpHandle? _lerpHandle = null;
+    private SRGBLerpHandle? _srgbHandle = null;
+    private ColorLerpHandle? _hslHandle = null;
+    private LchLerpHandle? _lchHandle = null;
+    private LabLerpHandle? _labHandle = null;
+    private OklabLerpHandle? _oklabHandle = null;
 
     private Vector4 _startColor = new(1, 0, 0, 1);
 
@@ -30,21 +37,57 @@ public class LerpTestWindow : ImguiWindowBase
 
         baseChanged |= ImGui.ColorPicker4("End Color", ref _endColor);
 
-        if (_lerpHandle is null || baseChanged)
+        if (_srgbHandle is null || _hslHandle is null || _lchHandle is null || _labHandle is null || _oklabHandle is null || baseChanged)
         {
-            _lerpHandle = new SRGBLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _srgbHandle = new SRGBLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _hslHandle = new ColorLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _lchHandle = new LchLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _labHandle = new LabLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _oklabHandle = new OklabLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
         }
 
         bool lerpChanged = ImGui.SliderFloat("factor", ref _lerpValue, 0, 1);
 
-        if (lerpChanged || !_result.HasValue || baseChanged)
+        if (lerpChanged || baseChanged || _result1 is null || _result2 is null || _result3 is null || _result4 is null || _result5 is null)
         {
-            _result = _lerpHandle.Lerp(_lerpValue);
+            _result1 = _srgbHandle.Lerp(_lerpValue);
+            _result2 = _hslHandle.Lerp(_lerpValue);
+            _result3 = _lchHandle.Lerp(_lerpValue);
+            _result4 = _labHandle.Lerp(_lerpValue);
+            _result5 = _oklabHandle.Lerp(_lerpValue);
         }
 
-        var result = _result.Value.ToFloatRGB();
+        var result1 = _result1.Value.ToFloatRGB();
+        var result2 = _result2.Value.ToFloatRGB();
+        var result3 = _result3.Value.ToFloatRGB();
+        var result4 = _result4.Value.ToFloatRGB();
+        var result5 = _result5.Value.ToFloatRGB();
 
-        ImGui.ColorButton("Result", result, ImGuiColorEditFlags.None, new Vector2
+        ImGui.ColorButton("linear sRGB lerp", result1, ImGuiColorEditFlags.None, new Vector2
+        {
+            X = 100,
+            Y = 100,
+        });
+
+        ImGui.ColorButton("Hsl lerp", result2, ImGuiColorEditFlags.None, new Vector2
+        {
+            X = 100,
+            Y = 100,
+        });
+
+        ImGui.ColorButton("Lch lerp", result3, ImGuiColorEditFlags.None, new Vector2
+        {
+            X = 100,
+            Y = 100,
+        });
+
+        ImGui.ColorButton("Lab lerp", result4, ImGuiColorEditFlags.None, new Vector2
+        {
+            X = 100,
+            Y = 100,
+        });
+
+        ImGui.ColorButton("Oklab lerp", result5, ImGuiColorEditFlags.None, new Vector2
         {
             X = 100,
             Y = 100,
