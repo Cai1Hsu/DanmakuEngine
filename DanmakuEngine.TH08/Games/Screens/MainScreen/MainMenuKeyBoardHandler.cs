@@ -2,7 +2,7 @@ using DanmakuEngine.Dependency;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Input;
 using DanmakuEngine.Input.EventReceivers;
-using DanmakuEngine.Input.Events.Mouse;
+using DanmakuEngine.Input.Events.Keyboard;
 using DanmakuEngine.Logging;
 using Silk.NET.SDL;
 
