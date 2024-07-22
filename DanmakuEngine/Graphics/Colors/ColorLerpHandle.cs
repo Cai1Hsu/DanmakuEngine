@@ -1,27 +1,28 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using DanmakuEngine.Graphics.Colors;
+using DanmakuEngine.Transformation;
 using DanmakuEngine.Utils;
 
-namespace DanmakuEngine.Graphics.Color;
+namespace DanmakuEngine.Graphics.Colors;
 
 /// <summary>
 /// A handle for lerping between two colors. Using HSL color space.
 /// </summary>
 public class ColorLerpHandle : ILerpHandle<SRGBColor>
 {
-    private HkSLColor _start;
-    private HkSLColor _end;
+    private HslColor _start;
+    private HslColor _end;
 
     private float _startAlpha;
     private float _endAlpha;
 
     public ColorLerpHandle(SRGBColor start, SRGBColor end)
-        : this(HkSLColor.FromRGBA(start), HkSLColor.FromRGBA(end), start.A, end.A)
+        : this(HslColor.FromRGBA(start), HslColor.FromRGBA(end), start.A, end.A)
     {
     }
 
-    public ColorLerpHandle(HkSLColor start, HkSLColor end, float startAlpha = 1.0f, float endAlpha = 1.0f)
+    public ColorLerpHandle(HslColor start, HslColor end, float startAlpha = 1.0f, float endAlpha = 1.0f)
     {
         _start = start;
         _end = end;
@@ -33,7 +34,7 @@ public class ColorLerpHandle : ILerpHandle<SRGBColor>
     [MethodImpl(MethodImplOptions.AggressiveOptimization)]
     public SRGBColor Lerp(float t)
     {
-        HkSLColor hsl;
+        HslColor hsl;
 
         float ah = _start.Hk, bh = _end.Hk;
         float delta = bh - ah;
