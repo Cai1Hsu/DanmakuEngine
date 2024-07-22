@@ -82,9 +82,7 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
             }
             catch (Exception e)
             {
-#if DEBUG
                 Logger.Debug($"Failed to fetch GL Api: {e.Message}");
-#endif // DEBUG
             }
 
             return false;
