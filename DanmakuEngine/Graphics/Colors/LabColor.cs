@@ -47,16 +47,16 @@ public struct LabColor
         => LchColor.FromLab(this);
 
     private const double xn = 0.96422;
-    private const double yn = 1f;
+    private const double yn = 1.0;
     private const double zn = 0.82521;
-    private const double t0 = 4 / 29;
-    private const double t1 = 6 / 29;
-    private const double t2 = 3 * t1 * t1;
+    private const double t0 = 4.0 / 29.0;
+    private const double t1 = 6.0 / 29.0;
+    private const double t2 = 3.0 * t1 * t1;
     private const double t3 = t1 * t1 * t1;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static double xyz2Lab(double t)
-        => t > t3 ? Math.Pow(t, 1 / 3) : t / t2 + t0;
+        => t > t3 ? Math.Pow(t, 1.0 / 3.0) : t / t2 + t0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
     private static double lab2Xyz(double t)
@@ -74,9 +74,9 @@ public struct LabColor
         double newZ = lab2Xyz(z) * zn;
 
         return new SRGBColor(
-            (float)ColorExtensions.ToSRGB(3.1338561 * newX - 1.6168667 * newY - 0.4906146 * newZ),
-            (float)ColorExtensions.ToSRGB(-0.9787684 * newX + 1.9161415 * newY + 0.0334540 * newZ),
-            (float)ColorExtensions.ToSRGB(0.0719453 * newX - 0.2289914 * newY + 1.4052427 * newZ),
+            (float)(ColorExtensions.ToSRGB(3.1338561 * newX - 1.6168667 * newY - 0.4906146 * newZ) * 255f),
+            (float)(ColorExtensions.ToSRGB(-0.9787684 * newX + 1.9161415 * newY + 0.0334540 * newZ) * 255f),
+            (float)(ColorExtensions.ToSRGB(0.0719453 * newX - 0.2289914 * newY + 1.4052427 * newZ) * 255f),
             lab.Opacity * 255f
         );
     }
