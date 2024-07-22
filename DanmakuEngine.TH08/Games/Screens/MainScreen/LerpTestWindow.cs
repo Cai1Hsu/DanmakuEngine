@@ -18,7 +18,7 @@ public class LerpTestWindow : ImguiWindowBase
     private SRGBColor? _result5 = null;
 
     private SRGBLerpHandle? _srgbHandle = null;
-    private ColorLerpHandle? _hslHandle = null;
+    private HslLerpHandle? _hslHandle = null;
     private LchLerpHandle? _lchHandle = null;
     private LabLerpHandle? _labHandle = null;
     private OklabLerpHandle? _oklabHandle = null;
@@ -40,7 +40,7 @@ public class LerpTestWindow : ImguiWindowBase
         if (_srgbHandle is null || _hslHandle is null || _lchHandle is null || _labHandle is null || _oklabHandle is null || baseChanged)
         {
             _srgbHandle = new SRGBLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
-            _hslHandle = new ColorLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
+            _hslHandle = new HslLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
             _lchHandle = new LchLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
             _labHandle = new LabLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));
             _oklabHandle = new OklabLerpHandle(SRGBColor.FromFloatRGB(_startColor), SRGBColor.FromFloatRGB(_endColor));

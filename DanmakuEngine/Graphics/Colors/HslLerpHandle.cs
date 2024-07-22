@@ -9,7 +9,7 @@ namespace DanmakuEngine.Graphics.Colors;
 /// <summary>
 /// A handle for lerping between two colors. Using HSL color space.
 /// </summary>
-public class ColorLerpHandle : ILerpHandle<SRGBColor>
+public class HslLerpHandle : ILerpHandle<SRGBColor>
 {
     private HslColor _start;
     private HslColor _end;
@@ -17,12 +17,12 @@ public class ColorLerpHandle : ILerpHandle<SRGBColor>
     private float _startAlpha;
     private float _endAlpha;
 
-    public ColorLerpHandle(SRGBColor start, SRGBColor end)
+    public HslLerpHandle(SRGBColor start, SRGBColor end)
         : this(HslColor.FromRGBA(start), HslColor.FromRGBA(end), start.A, end.A)
     {
     }
 
-    public ColorLerpHandle(HslColor start, HslColor end, float startAlpha = 1.0f, float endAlpha = 1.0f)
+    public HslLerpHandle(HslColor start, HslColor end, float startAlpha = 1.0f, float endAlpha = 1.0f)
     {
         _start = start;
         _end = end;
