@@ -37,7 +37,6 @@ public class MouseManager
 
     public MouseHandler Initialize(MouseHandler mouseHandler)
     {
-        // FIXME: Should get bound copy
         RawInput = mouseHandler.RawInput.GetBoundCopy();
         ShowCursor = mouseHandler.ShowCursor.GetBoundCopy();
         LockCursor = mouseHandler.LockCursor.GetBoundCopy();
