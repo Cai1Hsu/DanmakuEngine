@@ -6,7 +6,7 @@ using Silk.NET.Maths;
 namespace DanmakuEngine.Graphics.Colors;
 
 [StructLayout(LayoutKind.Sequential)]
-public struct HkSLColor
+public struct HslColor
 {
     /// <summary>
     /// Hue in degrees, from 0 to 360;
@@ -28,7 +28,7 @@ public struct HkSLColor
     /// </summary>
     public float L;
 
-    public static HkSLColor FromHSL(Vector3D<float> hsl)
+    public static HslColor FromHSL(Vector3D<float> hsl)
         => new()
         {
             Hk = hsl.X / 360,
@@ -36,7 +36,7 @@ public struct HkSLColor
             L = hsl.Z
         };
 
-    public static HkSLColor FromHSL(float h, float s, float l)
+    public static HslColor FromHSL(float h, float s, float l)
         => new()
         {
             Hk = h / 360,
@@ -44,17 +44,17 @@ public struct HkSLColor
             L = l
         };
 
-    public static HkSLColor FromRGB(Vector3D<int> rgb)
+    public static HslColor FromRGB(Vector3D<int> rgb)
         => fromRGBInternal(new Vector3D<float>(rgb.X / 255f, rgb.Y / 255f, rgb.Z / 255f));
 
-    public static HkSLColor FromRGB(Vector3D<float> rgb)
+    public static HslColor FromRGB(Vector3D<float> rgb)
         => fromRGBInternal(rgb);
 
-    public static HkSLColor FromRGBA(SRGBColor rgba)
+    public static HslColor FromRGBA(SRGBColor rgba)
         => fromRGBInternal(new Vector3D<float>(rgba.R / 255f, rgba.G / 255f, rgba.B / 255f));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-    private static HkSLColor fromRGBInternal(Vector3D<float> rgb)
+    private static HslColor fromRGBInternal(Vector3D<float> rgb)
     {
         var (min, max) = MathUtils.MinMax(rgb.X, rgb.Y, rgb.Z);
         float delta = max - min;
