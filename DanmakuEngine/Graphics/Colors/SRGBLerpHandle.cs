@@ -1,8 +1,8 @@
 using System.Numerics;
 using DanmakuEngine.Extensions;
-using DanmakuEngine.Graphics.Colors;
+using DanmakuEngine.Transformation;
 
-namespace DanmakuEngine.Graphics.Color;
+namespace DanmakuEngine.Graphics.Colors;
 
 public class SRGBLerpHandle : ILerpHandle<SRGBColor>
 {

@@ -43,6 +43,9 @@ public struct SRGBColor : IEquatable<SRGBColor>
         A = a;
     }
 
+    public static SRGBColor FromLinear(Vector4 linear)
+        => ColorExtensions.FromLinearVector4(linear);
+
     public readonly float Alpha => A;
 
     public static SRGBColor operator *(SRGBColor first, SRGBColor second)
@@ -106,6 +109,13 @@ public struct SRGBColor : IEquatable<SRGBColor>
 
     public readonly Vector4 ToLinear()
         => ToLinear(this);
+
+    public readonly Vector3 ToLinearRGB()
+        => new Vector3(
+            ColorExtensions.ToLinear(R / 255f),
+            ColorExtensions.ToLinear(G / 255f),
+            ColorExtensions.ToLinear(B / 255f)
+        );
 
     /// <summary>
     /// Multiplies the alpha value of this Color by the given alpha factor.
