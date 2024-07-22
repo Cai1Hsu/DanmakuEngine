@@ -68,7 +68,8 @@ public static class MathUtils
         return a + ((b - a) * (float)t);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]    public static Half Lerp(Half a, Half b, double t)
+    [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+    public static Half Lerp(Half a, Half b, double t)
     {
         return a + ((b - a) * (Half)(float)t);
     }

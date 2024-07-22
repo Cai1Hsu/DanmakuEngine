@@ -1,9 +1,9 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>.
 
-using System.Numerics;
 using System.Globalization;
-using DanmakuEngine.Graphics.Colors;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using DanmakuEngine.Graphics.Colors;
 
 namespace DanmakuEngine.Extensions;
 
