@@ -78,7 +78,7 @@ public struct HslColor
         if (h < 0)
             h += 1;
 
-        return new HkSLColor
+        return new HslColor
         {
             Hk = h,
             S = s,
