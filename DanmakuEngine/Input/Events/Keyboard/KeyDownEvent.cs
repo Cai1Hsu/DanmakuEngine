@@ -1,7 +1,6 @@
 using DanmakuEngine.Input.States;
-using Silk.NET.Input;
 
-namespace DanmakuEngine.Input.Events.Mouse;
+namespace DanmakuEngine.Input.Events.Keyboard;
 
 public class KeyDownEvent : IKeyEvent
 {

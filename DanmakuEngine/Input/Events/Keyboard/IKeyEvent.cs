@@ -1,4 +1,4 @@
-namespace DanmakuEngine.Input.Events;
+namespace DanmakuEngine.Input.Events.Keyboard;
 
 public interface IKeyEvent : IInputEvent
 {

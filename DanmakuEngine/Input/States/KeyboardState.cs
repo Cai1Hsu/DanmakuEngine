@@ -1,16 +1,5 @@
-using System.Collections.Frozen;
-using System.Collections.Immutable;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
-using DanmakuEngine.Bindables;
-using DanmakuEngine.Dependency;
-using DanmakuEngine.Input.Events;
-using DanmakuEngine.Input.Handlers;
 using DanmakuEngine.Input.States;
-using Silk.NET.Input;
-using Silk.NET.SDL;
-using Veldrid.Sdl2;
+using DanmakuEngine.Input.Events.Keyboard;
 
 namespace DanmakuEngine.Input.Keybards;
 

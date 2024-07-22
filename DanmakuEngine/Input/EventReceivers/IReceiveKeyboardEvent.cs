@@ -1,4 +1,4 @@
-using DanmakuEngine.Input.Events.Mouse;
+using DanmakuEngine.Input.Events.Keyboard;
 
 namespace DanmakuEngine.Input.EventReceivers;
 

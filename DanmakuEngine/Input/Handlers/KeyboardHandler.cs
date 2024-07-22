@@ -1,6 +1,5 @@
 using DanmakuEngine.Engine;
-using DanmakuEngine.Input.Events;
-using DanmakuEngine.Input.Events.Mouse;
+using DanmakuEngine.Input.Events.Keyboard;
 using Silk.NET.SDL;
 using SDL_KeyCode = Silk.NET.SDL.KeyCode;
 
