@@ -143,12 +143,10 @@ public sealed unsafe class GLSilkRenderer : Renderer, IGLContextSource
 
     public override void BeginFrame()
     {
-
     }
 
     public override void EndFrame()
     {
-
     }
 
     protected override void WaitForVSyncInternal()

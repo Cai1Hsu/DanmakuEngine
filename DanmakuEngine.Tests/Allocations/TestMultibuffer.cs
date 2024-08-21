@@ -10,7 +10,6 @@ public class TestMultiBuffer
     [SetUp]
     public void SetUp()
     {
-
     }
 
     [Test]

@@ -36,46 +36,46 @@ public class AcceleratedMovementF(float initialSpeed, float acceleration)
     : AcceleratedMovementBase<float>(initialSpeed, acceleration)
 {
     public override float Speed
-        => initialSpeed + Acceleration * (float)ElapsedTime;
+        => initialSpeed + (Acceleration * (float)ElapsedTime);
 
     protected override float AccumulatedValue()
         => Value.Value +
-           initialSpeed * (float)Clock.DeltaTime +
-           Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2;
+           (initialSpeed * (float)Clock.DeltaTime) +
+           (Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2);
 }
 
 public class AcceleratedMovementD(double initialSpeed, double acceleration)
     : AcceleratedMovementBase<double>(initialSpeed, acceleration)
 {
     public override double Speed
-        => initialSpeed + Acceleration * ElapsedTime;
+        => initialSpeed + (Acceleration * ElapsedTime);
 
     protected override double AccumulatedValue()
         => Value.Value +
-           initialSpeed * Clock.DeltaTime +
-           Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2;
+           (initialSpeed * Clock.DeltaTime) +
+           (Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2);
 }
 
 public class AcceleratedMovementV2F(Vector2D<float> initialSpeed, Vector2D<float> acceleration)
     : AcceleratedMovementBase<Vector2D<float>>(initialSpeed, acceleration)
 {
     public override Vector2D<float> Speed
-        => initialSpeed + Acceleration * (float)ElapsedTime;
+        => initialSpeed + (Acceleration * (float)ElapsedTime);
 
     protected override Vector2D<float> AccumulatedValue()
         => Value.Value +
-           initialSpeed * (float)Clock.DeltaTime +
-           Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2;
+           (initialSpeed * (float)Clock.DeltaTime) +
+           (Acceleration * (float)Clock.DeltaTime * (float)Clock.DeltaTime / 2);
 }
 
 public class AcceleratedMovementV2D(Vector2D<double> initialSpeed, Vector2D<double> acceleration)
     : AcceleratedMovementBase<Vector2D<double>>(initialSpeed, acceleration)
 {
     public override Vector2D<double> Speed
-        => initialSpeed + Acceleration * ElapsedTime;
+        => initialSpeed + (Acceleration * ElapsedTime);
 
     protected override Vector2D<double> AccumulatedValue()
         => Value.Value +
-           initialSpeed * Clock.DeltaTime +
-           Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2;
+           (initialSpeed * Clock.DeltaTime) +
+           (Acceleration * Clock.DeltaTime * Clock.DeltaTime / 2);
 }

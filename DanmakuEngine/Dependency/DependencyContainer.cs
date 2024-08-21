@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using DanmakuEngine.Engine;
 
 namespace DanmakuEngine.Dependency;
@@ -126,7 +126,6 @@ public class DependencyContainer
 
                 Instance._cache.Remove(typeof(T));
             }
-
         }
     }
 

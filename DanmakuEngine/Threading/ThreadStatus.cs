@@ -26,5 +26,5 @@ public enum ThreadStatus : byte
     /// <summary>
     /// The thread has been stopped, but has not been disposed yet.
     /// </summary>
-    Zombie = 1 << (sizeof(ThreadStatus) * 8 - 1),
+    Zombie = 1 << ((sizeof(ThreadStatus) * 8) - 1),
 }

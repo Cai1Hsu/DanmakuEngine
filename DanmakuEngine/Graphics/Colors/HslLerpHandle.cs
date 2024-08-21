@@ -55,7 +55,7 @@ public class HslLerpHandle : ILerpHandle<SRGBColor>
         if (delta > 0.5f)
             hsl.Hk = MathUtils.Lerp(ah + 1, bh, ht) % 1;
         else
-            hsl.Hk = ah + delta * ht;
+            hsl.Hk = ah + (delta * ht);
 
         hsl.S = MathUtils.Lerp(_start.S, _end.S, t);
         hsl.L = MathUtils.Lerp(_start.L, _end.L, t);

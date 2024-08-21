@@ -40,7 +40,6 @@ using DanmakuEngine.Arguments;
             var code = HandleClass(classSymbol, membersToInit);
 
             context.AddSource($"{classSymbol.GetClassNameWithNamespace()}_{name_extension}.g.cs", SourceText.From(code, Encoding.UTF8));
-
         }
     }
 

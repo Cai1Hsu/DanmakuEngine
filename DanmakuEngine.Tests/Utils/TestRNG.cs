@@ -68,7 +68,6 @@ public class TestRNG
             same += rng1.Next() == rng2.Next() ? 1 : 0;
 
         Assert.That(same, Is.LessThan(5));
-
     }
 
     private void testConsitentBehaviour(RNG rng1, RNG rng2)

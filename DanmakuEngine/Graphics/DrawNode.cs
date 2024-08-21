@@ -4,6 +4,5 @@ public class DrawNode : IDisposable
 {
     public void Dispose()
     {
-
     }
 }

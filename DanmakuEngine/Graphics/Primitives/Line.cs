@@ -71,7 +71,7 @@ public readonly struct Line
     /// <param name="t">A parameter representing the position along the line to compute. 0 yields the start point and 1 yields the end point.</param>
     /// <returns>The position along the line.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D<float> At(float t) => new Vector2D<float>(StartPoint.X + (EndPoint.X - StartPoint.X) * t, StartPoint.Y + (EndPoint.Y - StartPoint.Y) * t);
+    public Vector2D<float> At(float t) => new Vector2D<float>(StartPoint.X + ((EndPoint.X - StartPoint.X) * t), StartPoint.Y + ((EndPoint.Y - StartPoint.Y) * t));
 
     /// <summary>
     /// Intersects this line with another.
@@ -115,7 +115,7 @@ public readonly struct Line
         float otherYDist = otherEnd.Y - otherStart.Y;
         float otherXDist = otherEnd.X - otherStart.X;
 
-        float denom = (EndPoint.X - StartPoint.X) * otherYDist - (EndPoint.Y - StartPoint.Y) * otherXDist;
+        float denom = ((EndPoint.X - StartPoint.X) * otherYDist) - ((EndPoint.Y - StartPoint.Y) * otherXDist);
 
         if (Precision.AlmostEquals(denom, 0))
         {
@@ -123,7 +123,7 @@ public readonly struct Line
             return false;
         }
 
-        distance = ((otherStart.X - StartPoint.X) * otherYDist - (otherStart.Y - StartPoint.Y) * otherXDist) / denom;
+        distance = (((otherStart.X - StartPoint.X) * otherYDist) - ((otherStart.Y - StartPoint.Y) * otherXDist)) / denom;
         return true;
     }
 
@@ -162,7 +162,7 @@ public readonly struct Line
 
         // p is closest to point pB, between p1 and p2
         float b = c1 / c2;
-        Vector2D<float> pB = StartPoint + b * v;
+        Vector2D<float> pB = StartPoint + (b * v);
 
         return pB;
     }

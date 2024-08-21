@@ -30,7 +30,7 @@ public struct ImguiVector<T>
     public nint Data;
 
     public unsafe ref T this[int index]
-        => ref Unsafe.AsRef<T>((byte*)(void*)Data + index * Unsafe.SizeOf<T>());
+        => ref Unsafe.AsRef<T>((byte*)(void*)Data + (index * Unsafe.SizeOf<T>()));
 
     public static unsafe explicit operator ImVector(ImguiVector<T> v)
         => *(ImVector*)&v;

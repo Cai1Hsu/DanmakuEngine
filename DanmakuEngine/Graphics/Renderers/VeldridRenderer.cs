@@ -318,5 +318,4 @@ public class VeldridRenderer : Renderer
 
         _device.Dispose();
     }
-
 }

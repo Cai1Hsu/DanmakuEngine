@@ -39,5 +39,4 @@ public class BufferObject<TDataType> : IDisposable
         //Remember to delete our buffer.
         _gl.DeleteBuffer(_handle);
     }
-
 }

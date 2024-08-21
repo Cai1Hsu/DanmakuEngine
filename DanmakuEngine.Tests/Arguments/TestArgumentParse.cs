@@ -10,7 +10,6 @@ public class TestArgumentParse
     [SetUp]
     public void SetUp()
     {
-
     }
 
     [Test]
@@ -122,7 +121,6 @@ public class TestArgumentParse
 
 public class UnsupportedType
 {
-
 }
 
 public partial class TestArgumentTemplate : Paramaters

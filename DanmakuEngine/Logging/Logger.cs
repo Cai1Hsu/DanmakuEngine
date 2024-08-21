@@ -252,7 +252,7 @@ public readonly struct Log
 
 public enum LogLevel : byte
 {
-    Silent = 1 << (sizeof(byte) * 8 - 1),
+    Silent = 1 << ((sizeof(byte) * 8) - 1),
     Error = 1 << 4,
     Warning = 1 << 3,
     Verbose = 1 << 2,
