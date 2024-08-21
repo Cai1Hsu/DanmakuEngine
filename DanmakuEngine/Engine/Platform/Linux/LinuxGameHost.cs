@@ -162,13 +162,13 @@ public unsafe partial class LinuxGameHost : DesktopGameHost
 
             if ((rotation & (XRANDR_ROTATION_LEFT | XRANDR_ROTATION_RIGHT)) != 0)
             {
-                mode.W = (int)((info->height * scale_w + 0xffff) >> 16);
-                mode.H = (int)((info->width * scale_h + 0xffff) >> 16);
+                mode.W = (int)(((info->height * scale_w) + 0xffff) >> 16);
+                mode.H = (int)(((info->width * scale_h) + 0xffff) >> 16);
             }
             else
             {
-                mode.W = (int)((info->width * scale_w + 0xffff) >> 16);
-                mode.H = (int)((info->height * scale_h + 0xffff) >> 16);
+                mode.W = (int)(((info->width * scale_w) + 0xffff) >> 16);
+                mode.H = (int)(((info->height * scale_h) + 0xffff) >> 16);
             }
 
             mode.RefreshRate = (int)Math.Round(calculateXRandRRefreshRate(info));

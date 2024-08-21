@@ -38,9 +38,9 @@ public readonly struct Triangle : IEquatable<Triangle>
         var dot11 = Vector2DExtensions.Dot(v1, v1);
         var dot12 = Vector2DExtensions.Dot(v1, v2);
 
-        var invDenom = 1 / (dot00 * dot11 - dot01 * dot01);
-        var u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-        var v = (dot00 * dot12 - dot01 * dot02) * invDenom;
+        var invDenom = 1 / ((dot00 * dot11) - (dot01 * dot01));
+        var u = ((dot11 * dot02) - (dot01 * dot12)) * invDenom;
+        var v = ((dot00 * dot12) - (dot01 * dot02)) * invDenom;
 
         return (u >= 0) && (v >= 0) && (u + v < 1);
     }

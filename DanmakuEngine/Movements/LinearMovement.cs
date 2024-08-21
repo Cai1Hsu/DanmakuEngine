@@ -50,7 +50,7 @@ public class LinearMovementF(float speed)
     protected override float AccumulatedValue()
         => startValue +
            // we still want to try to avoid accumulating to prevent floating point errors
-           Speed * (float)currentPeriodElapsedTime;
+           (Speed * (float)currentPeriodElapsedTime);
 }
 
 public class LinearMovementD(double speed)
@@ -59,7 +59,7 @@ public class LinearMovementD(double speed)
     protected override double AccumulatedValue()
         => startValue +
            // we still want to try to avoid accumulating to prevent floating point errors
-           Speed * currentPeriodElapsedTime;
+           (Speed * currentPeriodElapsedTime);
 }
 
 public class LinearMovementV2F(Vector2D<float> speed)
@@ -68,7 +68,7 @@ public class LinearMovementV2F(Vector2D<float> speed)
     protected override Vector2D<float> AccumulatedValue()
         => startValue +
            // we still want to try to avoid accumulating to prevent floating point errors
-           Speed * (float)currentPeriodElapsedTime;
+           (Speed * (float)currentPeriodElapsedTime);
 }
 
 public class LinearMovementV2D(Vector2D<double> speed)
@@ -77,5 +77,5 @@ public class LinearMovementV2D(Vector2D<double> speed)
     protected override Vector2D<double> AccumulatedValue()
         => startValue +
            // we still want to try to avoid accumulating to prevent floating point errors
-           Speed * currentPeriodElapsedTime;
+           (Speed * currentPeriodElapsedTime);
 }

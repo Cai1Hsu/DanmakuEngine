@@ -211,7 +211,7 @@ public class TestClock
             else if (count_frame == 60)
             {
                 // half of the second part and the first part
-                var correct_clock_time = (Time.ElapsedSeconds - current_time) * 2 + current_time;
+                var correct_clock_time = ((Time.ElapsedSeconds - current_time) * 2) + current_time;
 
                 Assert.That(clock.ElapsedSeconds, Is.EqualTo(correct_clock_time).Within(0.001));
 

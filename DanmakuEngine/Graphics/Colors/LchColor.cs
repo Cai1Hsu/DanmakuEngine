@@ -42,7 +42,7 @@ public struct LchColor
             return new LchColor
             {
                 H = float.NaN,
-                C = 0 < lab.L && lab.L < 100 ? 0 : float.NaN,
+                C = lab.L > 0 && lab.L < 100 ? 0 : float.NaN,
                 L = lab.L,
                 Opacity = lab.Opacity,
             };
@@ -51,7 +51,7 @@ public struct LchColor
         return new LchColor
         {
             H = h < 0 ? h + 360 : h,
-            C = MathF.Sqrt(lab.A * lab.A + lab.B * lab.B),
+            C = MathF.Sqrt((lab.A * lab.A) + (lab.B * lab.B)),
             L = lab.L,
             Opacity = lab.Opacity,
         };

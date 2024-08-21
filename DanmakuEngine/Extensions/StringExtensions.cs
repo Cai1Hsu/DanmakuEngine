@@ -27,7 +27,7 @@ public static class StringExtensions
     public static int GetDisplayLength(this string str)
     {
         int asciiCount = str.Count(c => c < 128);
-        return str.Length * 2 - asciiCount;
+        return (str.Length * 2) - asciiCount;
 
         // int length = str.Length;
 

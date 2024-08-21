@@ -50,10 +50,10 @@ internal static unsafe partial class SDL_Hack
         {
             // find the k
             int k = 1;
-            while (nmodes > p_display->max_display_modes + 32 * k)
+            while (nmodes > p_display->max_display_modes + (32 * k))
                 k++;
 
-            var new_count = p_display->max_display_modes + 32 * k;
+            var new_count = p_display->max_display_modes + (32 * k);
 
             // realloc the modes
             modes = (SDL_DisplayMode*)Marshal.ReAllocHGlobal((IntPtr)modes,

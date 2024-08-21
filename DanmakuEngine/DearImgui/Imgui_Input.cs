@@ -16,7 +16,6 @@ namespace DanmakuEngine.DearImgui;
 
 public static partial class Imgui
 {
-
 #pragma warning disable
     private const uint SDL_MOUSEWHEEL_NORMAL = 0;
     private const uint SDL_MOUSEWHEEL_FLIPPED = 1;

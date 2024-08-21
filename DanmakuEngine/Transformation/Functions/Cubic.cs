@@ -24,6 +24,6 @@ public class CubicOut : ITransformFunction
     {
         double f = time - 1;
 
-        return f * f * f + 1;
+        return (f * f * f) + 1;
     }
 }

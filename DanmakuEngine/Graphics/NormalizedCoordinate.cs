@@ -26,6 +26,6 @@ public readonly struct Coordinate : IEquatable<Coordinate>
         => (windowWidth, windowHeight) = (width, height);
 
     public (float x, float y) ToNormalizedCoordinate()
-        => (this.X / windowWidth - 0.5f,
-            this.Y / windowHeight - 0.5f);
+        => ((this.X / windowWidth) - 0.5f,
+            (this.Y / windowHeight) - 0.5f);
 }

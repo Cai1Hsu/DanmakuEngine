@@ -108,7 +108,7 @@ public struct RectangleF : IEquatable<RectangleF>
     }
 
     public readonly Vector2D<float> Center
-        => new(X + Width / 2, Y + Height / 2);
+        => new(X + (Width / 2), Y + (Height / 2));
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 

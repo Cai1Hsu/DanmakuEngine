@@ -9,7 +9,6 @@ public class TestBindables
     [SetUp]
     public void Setup()
     {
-
     }
 
     [Test]

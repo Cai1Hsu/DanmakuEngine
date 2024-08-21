@@ -699,7 +699,6 @@ public unsafe partial class GameHost
 
     private IList<DisplayMode> getDisplayModes()
     {
-
         var displays = _sdl.GetNumVideoDisplays();
 
         if (displays == 0)

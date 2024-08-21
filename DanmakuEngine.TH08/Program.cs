@@ -1,4 +1,4 @@
-﻿using DanmakuEngine.Arguments;
+using DanmakuEngine.Arguments;
 using DanmakuEngine.Engine;
 using DanmakuEngine.Engine.Platform;
 using DanmakuEngine.Logging;
@@ -8,7 +8,6 @@ using GraphicsBinding = DanmakuEngine.Graphics.Renderers.RendererType;
 
 internal class Program
 {
-
     [STAThread]
     internal static void Main(string[] args)
     {

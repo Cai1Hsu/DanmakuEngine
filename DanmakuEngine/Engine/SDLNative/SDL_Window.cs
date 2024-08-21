@@ -45,4 +45,4 @@ internal unsafe struct SDL_Window
     public SdlBool is_dropping; /* drag/drop in progress, expecting SDL_SendDropComplete(). */
 
     public SDL_Rect mouse_rect;
-};
+}

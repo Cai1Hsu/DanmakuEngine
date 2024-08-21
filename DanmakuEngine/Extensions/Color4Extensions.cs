@@ -39,7 +39,7 @@ public static class ColorExtensions
         if (color == 1)
             return 1;
 
-        return color < 0.0031308 ? 12.92 * color : 1.055 * Math.Pow(color, 1.0 / GAMMA) - 0.055;
+        return color < 0.0031308 ? 12.92 * color : (1.055 * Math.Pow(color, 1.0 / GAMMA)) - 0.055;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -48,7 +48,7 @@ public static class ColorExtensions
         if (color == 1)
             return 1;
 
-        return color < 0.0031308f ? 12.92f * color : 1.055f * MathF.Pow(color, 1.0f / (float)GAMMA) - 0.055f;
+        return color < 0.0031308f ? 12.92f * color : (1.055f * MathF.Pow(color, 1.0f / (float)GAMMA)) - 0.055f;
     }
 
     public static Vector4 ToLinearVector4(this SRGBColor Color) =>
